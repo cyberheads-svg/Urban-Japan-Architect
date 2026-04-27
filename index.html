@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja" style="background:#0c0b0e">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urban Japan Architect</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap');
+  :root{
+    --bg:#0c0b0e;--panel:#131118;--border:#22202a;--border2:#332f40;
+    --text:#d4cee0;--muted:#6a6278;--dim:#2a2535;
+    --spring:#f9a8d4;--summer:#86efac;--autumn:#fcd34d;--winter:#93c5fd;
+    --accent:#c084fc;--mono:'DM Mono',monospace;--serif:'DM Serif Display',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:#0c0b0e}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px 60px}
+  header{text-align:center;margin-bottom:32px}
+  .eyebrow{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  h1{font-family:var(--serif);font-style:italic;font-size:clamp(28px,5vw,46px);color:#fff;font-weight:400;line-height:1.1;margin-bottom:4px}
+  h1 span{color:var(--spring)}
+  .subtitle{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.15em}
+  .counter{font-size:10px;color:var(--dim);margin-top:8px;letter-spacing:.2em}
+  .selector-group{width:100%;max-width:680px;margin-bottom:12px}
+  .selector-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .selector{display:flex;gap:8px;width:100%}
+  .selector-btn{flex:1;padding:11px 0;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+  .selector-btn:hover{border-color:var(--border2);color:var(--text)}
+  .selector-btn.active-spring{border-color:var(--spring);color:var(--spring);background:#1a0f14}
+  .selector-btn.active-summer{border-color:var(--summer);color:var(--summer);background:#0f1a12}
+  .selector-btn.active-autumn{border-color:var(--autumn);color:var(--autumn);background:#1a1710}
+  .selector-btn.active-winter{border-color:var(--winter);color:var(--winter);background:#0f1218}
+  .frame-btn.active{border-color:var(--accent);color:var(--accent);background:#16101a}
+  .card{width:100%;max-width:680px;background:var(--panel);border:1px solid var(--border);padding:32px;margin-bottom:20px}
+  .empty-state{text-align:center;padding:40px 0;color:var(--dim);font-size:12px;letter-spacing:.05em;line-height:1.7}
+  .fields{display:flex;flex-direction:column;gap:0}
+  .field-row{display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid var(--border)}
+  .field-row:last-child{border-bottom:none}
+  .field-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+  .field-value{font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.4}
+  .rare-badge{font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;padding:1px 6px;border:1px solid currentColor;opacity:.6;margin-left:8px;vertical-align:middle;font-style:normal}
+  .divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+  .prompt-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .prompt-textarea{width:100%;background:#0a080c;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11px;line-height:1.9;padding:12px;resize:vertical;min-height:120px;margin-bottom:14px;word-break:break-word}
+  .prompt-textarea:focus{outline:none;border-color:var(--accent)}
+  .copy-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:8px 20px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;font-family:var(--mono);transition:all .2s}
+  .copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .copy-btn.copied{border-color:var(--summer);color:var(--summer)}
+  .generate-btn{width:100%;max-width:680px;background:var(--accent);color:#000;font-weight:700;border:none;padding:20px;font-size:12px;letter-spacing:.4em;text-transform:uppercase;cursor:pointer;font-family:var(--mono);transition:all .2s;margin-bottom:12px}
+  .generate-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+  .generate-btn:active{transform:translateY(0)}
+  .save-btn{width:100%;max-width:680px;background:transparent;border:1px solid var(--border);color:var(--muted);padding:12px;font-size:10px;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;font-family:var(--mono);transition:all .2s;margin-bottom:40px}
+  .save-btn:hover{border-color:var(--border2);color:var(--text)}
+  .saved-section{width:100%;max-width:680px}
+  .saved-title{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .saved-item{background:var(--panel);border:1px solid var(--border);padding:12px 16px;margin-bottom:8px;font-size:11px;color:var(--muted);line-height:1.7;cursor:pointer;transition:border-color .15s}
+  .saved-item:hover{border-color:var(--border2);color:var(--text)}
+  footer{margin-top:20px;font-size:9px;color:var(--dim);letter-spacing:.2em;text-align:center}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .animate-in{animation:fadeIn .3s ease forwards}
+  .reroll-btn{background:transparent;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px 6px;line-height:1;transition:color .15s;flex-shrink:0}
+  .reroll-btn:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">AI Prompt Suite</div>
+  <h1>Urban Japan <span>Architect</span></h1>
+  <div class="subtitle">Cityscape · Techwear · Modern Tokyo</div>
+  <div class="counter" id="counter">— generated</div>
+</header>
+
+<div class="selector-group">
+  <div class="selector-label">Season</div>
+  <div class="selector">
+    <button class="selector-btn active-spring" data-season="spring" onclick="setSeason('spring')">🌸 Spring</button>
+    <button class="selector-btn" data-season="summer" onclick="setSeason('summer')">☀️ Summer</button>
+    <button class="selector-btn" data-season="autumn" onclick="setSeason('autumn')">🍂 Autumn</button>
+    <button class="selector-btn" data-season="winter" onclick="setSeason('winter')">❄️ Winter</button>
+  </div>
+</div>
+
+<div class="selector-group">
+  <div class="selector-label">Framing</div>
+  <div class="selector">
+    <button class="selector-btn frame-btn active" onclick="setFraming('full')" id="frame-full">Full Body</button>
+    <button class="selector-btn frame-btn" onclick="setFraming('upper')" id="frame-upper">Upper Body</button>
+    <button class="selector-btn frame-btn" onclick="setFraming('bust')" id="frame-bust">Bust Up</button>
+    <button class="selector-btn frame-btn" onclick="setFraming('close')" id="frame-close">Face Close-up</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="empty-state" id="emptyState">
+    <div style="font-size:32px;margin-bottom:12px;opacity:.4">✦</div>
+    都会的な匿名性を生み出すためのアーバン特化型ジェネレーター<br>ランドマークを避け、リアルな現代日本の空気感を出力します
+  </div>
+  <div id="displayFields" class="fields animate-in" style="display:none"></div>
+  <div id="promptBox" style="display:none">
+    <hr class="divider">
+    <div class="prompt-label">画像AIにコピー</div>
+    <textarea class="prompt-textarea" id="finalPrompt" onInput="currentPrompt=this.value"></textarea>
+    <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy Prompt</button>
+  </div>
+</div>
+
+<button class="generate-btn" onclick="generateAll()">GENERATE ARCHITECT</button>
+<button class="save-btn" onclick="savePrompt()" id="saveBtn" style="display:none">SAVE THIS PROMPT</button>
+
+<div class="saved-section" id="savedSection" style="display:none">
+  <div class="saved-title">Saved Prompts</div>
+  <div id="savedList"></div>
+</div>
+
+<footer>MODERN CITYSCAPE · ANONYMOUS TOKYO · TECHWEAR & MINIMALISM</footer>
+
+<script>
+let currentSeason = "spring";
+let currentFraming = "full";
+let generated = 0;
+let currentPrompt = "";
+
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const pickN = (arr, n) => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, Math.min(n, a.length));
+};
+
+// ==================== OUTFIT DATA (Urban & Modern) ====================
+const STYLES = [
+  "Tokyo minimal chic","city boy aesthetic","Ura-Harajuku techwear","Daikanyama layered silhouette",
+  "Aoyama sophisticated monochrome","Shimokitazawa thrift mix","Koenji vintage street",
+  "Japanese streetwear","techwear ninja","office casual Tokyo","monochrome minimalist",
+  "Gorpcore Japanese style","Y2K Shibuya revival","modern utilitarian","architectural avant-garde",
+  "quiet luxury Japanese brand","Nakameguro relaxed casual","mode street fashion",
+  "dark techwear","clean girl Tokyo edition","suburban youth culture","deconstructed tailoring"
+];
+
+const TOPS = [
+  "oversized graphic tee","heavyweight loopwheel hoodie","technical multi-pocket vest",
+  "crisp oversized button-down shirt","mock neck ribbed knit","structured asymmetrical crop top",
+  "boxy fit short-sleeve shirt","nylon anorak half-zip","sheer layer over basic tee",
+  "seamless athletic top","deconstructed asymmetrical blouse","vintage band tee faded",
+  "drop-shoulder sweatshirt","technical fleece pullover","minimalist high-neck top",
+  "utilitarian harness vest over tee","translucent organza shirt","layered mesh top"
+];
+
+const BOTTOMS = [
+  "wide-leg tailored trousers","parachute pants with drawstrings","raw Okayama selvage denim",
+  "pleated midi skirt asymmetrical","technical cargo pants","baggy washed denim",
+  "nylon track pants","wide-leg linen pants","deconstructed wrap skirt",
+  "A-line structured maxi skirt","biker shorts under oversized top","flared ribbed knit pants",
+  "straight-leg corduroy trousers","utilitarian shorts with pockets","skater fit chinos",
+  "layered skirt over trousers","high-waisted wide slacks","slit-hem tailored pants"
+];
+
+const OUTERWEAR = {
+  spring: ["oversized trench coat","lightweight nylon shell jacket","denim trucker jacket","unstructured minimalist blazer","coach jacket","sheer blouson"],
+  summer: ["short-sleeve open-collar shirt worn open","sheer mesh outer layer","lightweight technical vest","translucent rain jacket"],
+  autumn: ["MA-1 bomber jacket","corduroy overshirt","deconstructed oversized blazer","padded technical vest","leather biker jacket","military surplus liner jacket"],
+  winter: ["long sleek wool overcoat","voluminous puffer jacket","GORE-TEX technical parka","shearling collar aviator jacket","heavy wool duffle coat","layered down vests"]
+};
+
+const FABRICS = [
+  "Japanese technical nylon","heavyweight loopwheel cotton","crisp paper-touch poplin",
+  "Okayama selvage denim","matte recycled polyester","ripstop nylon","sheer organza",
+  "high-density gabardine","washed canvas","GORE-TEX","ribbed knit jersey",
+  "technical fleece","crinkled taffeta","matte faux leather","boiled wool",
+  "reflective tech fabric","water-repellent coating fabric","breathable mesh"
+];
+
+const COLORS = {
+  spring: ["dusty pink and concrete grey","sage green and off-white","pale blue and black","navy and crisp white","monochrome with neon pink accent","beige tonal layering"],
+  summer: ["stark white and pitch black","vivid neon green and charcoal","washed denim blue and white","charcoal grey monochrome","safety orange accent against black"],
+  autumn: ["olive drab and black","burnt orange and navy","mustard yellow and concrete grey","brown tonal layering","deep burgundy and black","khaki and stark white"],
+  winter: ["all black techwear","slate grey and silver","midnight blue monochrome","pure white and ice blue","black with reflective silver accents","charcoal and dark olive"]
+};
+
+const ACCESSORIES = [
+  "crossbody technical sling bag","wireless earbuds","silver chain necklace","minimalist silver rings",
+  "bucket hat","black face mask","tinted sunglasses","clear frame glasses","tote bag from an indie bookstore",
+  "carabiner with keys on belt loop","chunky headphones worn around neck","nylon backpack with straps",
+  "cap with subtle logo","silver ear cuffs","leather key clochette","smartwatch with technical band"
+];
+
+const SHOES = [
+  "chunky platform sneakers","GORE-TEX hiking sneakers","sleek leather derbies","tabi boots",
+  "technical running shoes","slip-on suede mules","chunky lug-sole loafers","canvas classic sneakers",
+  "utilitarian combat boots","minimalist white sneakers","strappy sandals with socks (spring/summer only)",
+  "designer tech sneakers","leather side-gore boots"
+];
+
+// ==================== SCENE DATA (Urban / Anonymous Japan) ====================
+const LOCATIONS = [
+  "narrow backstreet in Tokyo, complex utility poles and tangled power lines overhead",
+  "generic urban convenience store exterior, bright white LED light, parking lot at night",
+  "elevated highway overpass, concrete pillars, evening shadows in a city canyon",
+  "modern glass-facade building lobby, reflections of street traffic in the glass",
+  "suburban pedestrian footbridge over a multi-lane road, blue hour",
+  "stairwell of a 1990s concrete apartment complex, weathered grey walls",
+  "automatic vending machine corner in a quiet alley, glowing in the dark",
+  "multistory bicycle parking lot near a city station, thousands of silver spokes",
+  "narrow asphalt road with yellow 'Stop' characters painted on the ground",
+  "generic minimalist cafe interior, concrete walls and warm wood, Nakameguro vibe",
+  "underground walkway with white tiles and flickering fluorescent lights",
+  "rooftop of a commercial building, HVAC units and chain-link fence, twilight",
+  "coin laundry interior at midnight, fluorescent glow on washing machines",
+  "empty crossing in an anonymous business district, weekend afternoon",
+  "train station platform edge, yellow tactile paving, passing express train blur",
+  "subterranean shopping mall corridor, closed shutters after hours",
+  "urban construction site fence, white panels and red cones",
+  "narrow space between two modern office buildings, sliver of sky",
+  "coin parking lot wedged between buildings, asphalt and yellow wheel stoppers",
+  "interior of a clean, empty subway car, green velour seats and metal handholds",
+  "guardrail along a suburban riverbank, concrete blocks and distant city lights",
+  "back entrance of a restaurant building, exhaust fans and stacked crates",
+  "modern public library exterior, glass and concrete geometry",
+  "generic urban park with concrete benches and a single clock tower"
+];
+
+const SEASONS_SCENE = {
+  spring: ["urban spring, faint cherry blossom petals scattered on damp asphalt","mild spring evening in the city, clear air","overcast spring day, soft diffused light on concrete"],
+  summer: ["midsummer city heat, heat shimmer on the asphalt road","humid summer night, neon bleeding into the damp air","blazing summer sun reflecting off glass facades"],
+  autumn: ["autumn in the metropolis, yellow ginkgo leaves on the pavement","crisp autumn air, sharp shadows cast by buildings","cool autumn twilight, city lights warming up"],
+  winter: ["winter in the city, crisp air and clear sharp building outlines","cold winter night, breath visible under streetlamps","stark winter overcast, flat grey urban landscape"]
+};
+
+const WEATHER = {
+  spring: ["post-rain clarity, wet asphalt reflecting sky","soft overcast, flat lighting","clear sunny day, sharp building shadows"],
+  summer: ["heavy humidity, hazy background","sudden urban downpour, rain bouncing off concrete","blinding midday sunlight"],
+  autumn: ["crisp and dry, high visibility","golden hour sunlight piercing through buildings","light autumn drizzle, umbrellas in the background"],
+  winter: ["clear and freezing, high contrast","light snow melting immediately on the street","thick grey overcast, shadowless city"]
+};
+
+const TIMES = [
+  "blue hour just after sunset, city lights turning on",
+  "midnight, deserted streets, solitary vending machine glow",
+  "early morning commute hour, long shadows",
+  "midday, harsh overhead sun, deep geometric shadows",
+  "late afternoon golden hour, amber light reflecting off windows",
+  "3 AM, eerie stillness under orange sodium streetlights",
+  "twilight, the boundary between natural and artificial light"
+];
+
+const MOODS = [
+  "urban anonymity and quiet solitude",
+  "the stillness of a sleeping modern city",
+  "neon-lit melancholy and isolation",
+  "crisp, objective, and deeply observed everyday life",
+  "cool, detached, and highly stylized",
+  "the quiet poetry of modern Japanese infrastructure",
+  "transient moments in a fast-paced metropolis",
+  "calm within the concrete jungle"
+];
+
+const CAMERA = [
+  "35mm focal length, environmental portrait",
+  "85mm lens, shallow depth of field, background blurred into bokeh",
+  "wide angle 24mm, emphasizing leading lines of architecture",
+  "low angle looking slightly up, architectural dominance",
+  "security camera aesthetic, slightly elevated and detached",
+  "handheld documentary style, raw and intimate",
+  "perfectly leveled architectural photography framing",
+  "telephoto compression, flattening the subject against the background"
+];
+
+const STYLE_SCENE = [
+  "Takashi Homma style suburban minimalism",
+  "modern Japanese indie film aesthetic",
+  "shot on Arri Alexa, urban Tokyo color grade",
+  "cinematic street photography, cool blue shadows and warm highlights",
+  "Rinko Kawauchi soft light photography, ephemeral urban details",
+  "high-fashion editorial look, stark contrast",
+  "Kodak Portra 400 film simulation, slight grain and muted tones",
+  "cyberpunk-adjacent but grounded in reality, neon reflections"
+];
+
+const PERCEPTION = [
+  "fluorescent light flicker captured mid-frame",
+  "slight motion blur on passing background objects",
+  "lens flare from a distant streetlamp",
+  "geometric distortion near the edges of the frame",
+  "grainy texture amplifying the concrete surfaces",
+  "color temperature shifting from warm foreground to cool background"
+];
+
+const CORE_FIXED = "anonymous urban beauty, the quiet poetry of modern Japanese infrastructure, highly detailed cityscape";
+const CORE_VARIATION = [
+  "a fleeting moment in the metropolis",
+  "finding stillness in the urban noise",
+  "the aesthetic of the everyday contemporary"
+];
+
+// ==================== FIGURE DATA ====================
+const BODY_POSES = [
+  "standing casually with weight shifted to one leg","walking confidently towards the camera","leaning against a concrete wall or railing",
+  "standing still amidst a slightly blurred background","hands buried deep in pockets, slight slouch",
+  "looking away, distracted by something out of frame","crouching slightly, adjusting shoes or bag",
+  "mid-stride crossing the street","standing straight, looking directly at the lens"
+];
+
+const HAND_GESTURES = [
+  "holding a smartphone loosely","adjusting a headphone or earbud","hand resting on a bag strap",
+  "fingers touching the collar of the jacket","one hand in pocket, the other free",
+  "holding a canned coffee or drink","adjusting glasses or sunglasses","arms loosely crossed"
+];
+
+const FACIAL_EXPRESSIONS = [
+  "cool, detached, and neutral","slight, mysterious smirk","deep in thought, gaze slightly lowered",
+  "confident direct stare","relaxed and observant","melancholic, looking into the distance",
+  "subtle annoyance or impatience (cool vibe)","soft, unguarded moment of rest"
+];
+
+const LIGHTING = [
+  "harsh artificial LED lighting from above","soft bounce light off a concrete surface",
+  "dramatic neon rim light on the subject's profile","flat overcast natural light, low contrast",
+  "golden hour backlighting, subject in slight silhouette","harsh camera flash aesthetic (paparazzi style)",
+  "mixed lighting: warm streetlamp and cool ambient sky","volumetric light cutting through narrow buildings"
+];
+
+// ==================== LOGIC ====================
+function setSeason(s) {
+  currentSeason = s;
+  document.querySelectorAll(".selector-btn[data-season]").forEach(b => {
+    b.className = "selector-btn";
+    if (b.dataset.season === s) b.classList.add("active-" + s);
+  });
+}
+
+function setFraming(f) {
+  currentFraming = f;
+  document.querySelectorAll(".frame-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("frame-" + f).classList.add("active");
+}
+
+let lastVals = {};
+
+function reroll(key) {
+  const sources = {
+    style: STYLES, top: TOPS, bottom: BOTTOMS, fabric: FABRICS,
+    shoe: SHOES, loc: LOCATIONS, time: TIMES, mood: MOODS,
+    camera: CAMERA, styleScene: STYLE_SCENE, pose: BODY_POSES,
+    gesture: HAND_GESTURES, expression: FACIAL_EXPRESSIONS, light: LIGHTING,
+  };
+  if (sources[key]) {
+    lastVals[key] = pick(sources[key]);
+  } else if (key === 'color') {
+    lastVals.color = pick(COLORS[currentSeason]);
+  } else if (key === 'weather') {
+    lastVals.weather = pick(WEATHER[currentSeason]);
+  } else if (key === 'season_scene') {
+    lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]);
+  } else if (key === 'acc') {
+    lastVals.acc = pickN(ACCESSORIES, Math.random() < 0.5 ? 1 : 2).join(", ");
+  } else if (key === 'outer') {
+    lastVals.outer = Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null;
+  } else if (key === 'perception') {
+    lastVals.perception = Math.random() < 0.35 ? pick(PERCEPTION) : null;
+  }
+  rebuildPromptAndDisplay();
+}
+
+function rebuildPromptAndDisplay() {
+  const v = lastVals;
+  const framingText = { full: "full body shot", upper: "upper body shot from waist up", bust: "bust shot", close: "extreme close-up on face" }[currentFraming];
+  const parts = [
+    "young Japanese person (modern street style)", framingText, v.pose, v.gesture, v.expression, v.light,
+    `wearing ${v.style} outfit`, v.top, v.bottom,
+    ...(v.outer ? [v.outer] : []),
+    `${v.fabric} fabric details`, `color palette: ${v.color}`, `accessories: ${v.acc}`, v.shoe,
+    `location: ${v.loc}`, v.season_scene, v.time, v.weather,
+    `mood: ${v.mood}`, v.camera, v.styleScene,
+    ...(v.perception ? [v.perception] : []),
+    CORE_FIXED, ...(v.variation ? [v.variation] : []),
+    "hyper-realistic, high detail urban photography"
+  ];
+  currentPrompt = parts.join(", ");
+  document.getElementById("finalPrompt").value = currentPrompt;
+  renderFields();
+}
+
+function renderFields() {
+  const v = lastVals;
+  document.getElementById("displayFields").innerHTML = [
+    { label: "Style", value: v.style, color: "#f9a8d4", key: "style" },
+    { label: "Top", value: v.top, color: "#c084fc", key: "top" },
+    { label: "Bottom", value: v.bottom, color: "#c084fc", key: "bottom" },
+    { label: "Outer", value: v.outer || "— none —", color: v.outer ? "#93c5fd" : "#2a2535", key: "outer" },
+    { label: "Fabric", value: v.fabric, color: "#fcd34d", key: "fabric" },
+    { label: "Color", value: v.color, color: "#fcd34d", key: "color" },
+    { label: "Accessories", value: v.acc, color: "#86efac", key: "acc" },
+    { label: "Shoes", value: v.shoe, color: "#67e8f9", key: "shoe" },
+    { label: "Scene", value: v.loc, color: "#fda4af", key: "loc" },
+    { label: "Season", value: v.season_scene, color: "#fcd34d", key: "season_scene" },
+    { label: "Time", value: v.time, color: "#fcd34d", key: "time" },
+    { label: "Weather", value: v.weather, color: "#a5f3fc", key: "weather" },
+    { label: "Mood", value: v.mood, color: "#d9f99d", key: "mood" },
+    { label: "Camera", value: v.camera, color: "#fed7aa", key: "camera" },
+    { label: "Figure", value: v.pose, color: "#c084fc", key: "pose" },
+    { label: "Gesture", value: v.gesture, color: "#f9a8d4", key: "gesture" },
+    { label: "Expression", value: v.expression, color: "#86efac", key: "expression" },
+    { label: "Lighting", value: v.light, color: "#fcd34d", key: "light" },
+    ...(v.perception ? [{ label: "Perception", value: v.perception, color: "#c084fc", key: "perception", rare: true }] : []),
+  ].map(f => `
+    <div class="field-row">
+      <div class="field-label">${f.label}</div>
+      <div class="field-value" style="color:${f.color}">
+        ${f.value}${f.rare ? '<span class="rare-badge" style="color:#c084fc">rare</span>' : ''}
+      </div>
+      <button class="reroll-btn" onclick="reroll('${f.key}')" title="Re-roll">🔄</button>
+    </div>
+  `).join("");
+}
+
+function generateAll() {
+  generated++;
+  document.getElementById("counter").textContent = `${generated} generated`;
+  document.getElementById("emptyState").style.display = "none";
+  document.getElementById("displayFields").style.display = "flex";
+  document.getElementById("promptBox").style.display = "block";
+
+  const style = pick(STYLES);
+  const top = pick(TOPS);
+  const bottom = pick(BOTTOMS);
+  const outer = Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null;
+  const fabric = pick(FABRICS);
+  const color = pick(COLORS[currentSeason]);
+  const acc = pickN(ACCESSORIES, Math.random() < 0.5 ? 1 : 2).join(", ");
+  const shoe = pick(SHOES);
+
+  const loc = pick(LOCATIONS);
+  const time = pick(TIMES);
+  const weather = pick(WEATHER[currentSeason]);
+  const season_scene = pick(SEASONS_SCENE[currentSeason]);
+  const mood = pick(MOODS);
+  const camera = pick(CAMERA);
+  const styleScene = pick(STYLE_SCENE);
+  const perception = Math.random() < 0.35 ? pick(PERCEPTION) : null;
+  const variation = Math.random() < 0.5 ? pick(CORE_VARIATION) : null;
+
+  const framingText = { full: "full body shot", upper: "upper body shot from waist up", bust: "bust shot", close: "extreme close-up on face" }[currentFraming];
+  const pose = pick(BODY_POSES);
+  const gesture = pick(HAND_GESTURES);
+  const expression = pick(FACIAL_EXPRESSIONS);
+  const light = pick(LIGHTING);
+
+  const parts = [
+    "young Japanese person (modern street style)",
+    framingText, pose, gesture, expression, light,
+    `wearing ${style} outfit`,
+    top, bottom,
+    ...(outer ? [outer] : []),
+    `${fabric} fabric details`,
+    `color palette: ${color}`,
+    `accessories: ${acc}`,
+    shoe,
+    `location: ${loc}`,
+    season_scene, time, weather,
+    `mood: ${mood}`,
+    camera, styleScene,
+    ...(perception ? [perception] : []),
+    CORE_FIXED,
+    ...(variation ? [variation] : []),
+    "hyper-realistic, high detail urban photography"
+  ];
+
+  lastVals = { style, top, bottom, outer, fabric, color, acc, shoe, loc, time, weather, season_scene, mood, camera, styleScene, perception, variation, pose, gesture, expression, light };
+
+  currentPrompt = parts.join(", ");
+  document.getElementById("finalPrompt").value = currentPrompt;
+  renderFields();
+  document.getElementById("saveBtn").style.display = "block";
+}
+
+function copyPrompt() {
+  if (!currentPrompt) return;
+  navigator.clipboard.writeText(currentPrompt).then(() => {
+    const btn = document.getElementById("copyBtn");
+    btn.textContent = "Copied ✓"; btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copy Prompt"; btn.classList.remove("copied"); }, 2000);
+  });
+}
+
+function savePrompt() {
+  if (!currentPrompt) return;
+  let saved = JSON.parse(localStorage.getItem("uja_v1") || "[]");
+  if (saved.includes(currentPrompt)) return;
+  saved.unshift(currentPrompt);
+  localStorage.setItem("uja_v1", JSON.stringify(saved.slice(0, 30)));
+  renderSaved();
+}
+
+function renderSaved() {
+  const saved = JSON.parse(localStorage.getItem("uja_v1") || "[]");
+  const section = document.getElementById("savedSection");
+  const list = document.getElementById("savedList");
+  if (saved.length === 0) { section.style.display = "none"; return; }
+  section.style.display = "block";
+  list.innerHTML = saved.map((p, i) => `<div class="saved-item" data-index="${i}">${p}</div>`).join("");
+  document.querySelectorAll(".saved-item").forEach(el => {
+    el.onclick = () => navigator.clipboard.writeText(saved[el.dataset.index]);
+  });
+}
+
+renderSaved();
+</script>
+
+</body>
+</html>
