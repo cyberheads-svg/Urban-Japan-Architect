@@ -121,7 +121,6 @@
   <div id="promptBox" style="display:none">
     <hr class="divider">
     <div class="prompt-label">画像AIにコピー</div>
-    <!-- クリックで全選択してコピーしてください -->
     <textarea class="prompt-textarea" id="finalPrompt" readonly onclick="this.select()"></textarea>
     <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy Prompt</button>
   </div>
@@ -452,9 +451,236 @@ function pickAccessories(styleType) {
 }
 
 // Figure & camera (old)
-const BODY_POSES = ["contrapposto stance, hip pop","mid-stride, relaxed swagger","leaning against concrete wall, weight shifted","standing still, background slightly blurred","hands buried deep in pockets, slight slouch","looking away, distracted"];
-const HAND_GESTURES = ["holding smartphone loosely","adjusting headphone or earbud","hand resting on bag strap","fingers touching collar","one hand in pocket","holding canned coffee","adjusting glasses"];
-const FACIAL_EXPRESSIONS = ["cool, detached, neutral","slight mysterious smirk","deep in thought, gaze lowered","confident direct stare","relaxed and observant","melancholic, looking into distance"];
+const BODY_POSES = [
+  // 立ち姿勢・基本
+  "contrapposto stance, hip pop",
+  "standing straight, weight evenly distributed",
+  "standing still, background slightly blurred",
+  "feet shoulder-width apart, grounded stance",
+  "one foot slightly forward, casual",
+  "weight shifted to one leg, hip out",
+  "standing with legs crossed at ankles",
+  
+  // 歩行系
+  "mid-stride, relaxed swagger",
+  "walking towards camera, slight motion blur",
+  "walking away, looking back over shoulder",
+  "caught mid-step, natural gait",
+  "power walking, purposeful stride",
+  "slow stroll, hands in pockets",
+  "walking while looking at phone",
+  
+  // 寄りかかり系
+  "leaning against concrete wall, weight shifted",
+  "leaning on railing, elbows resting",
+  "shoulder against building, one leg bent",
+  "leaning back against vending machine",
+  "propped against street pole",
+  "leaning on bicycle handlebars",
+  "back against brick wall, head tilted",
+  
+  // 座り系
+  "sitting on curb, knees pulled up",
+  "sitting on park bench, legs crossed",
+  "perched on low wall, feet dangling",
+  "sitting on stairs, elbows on knees",
+  "squatting on heels, street style",
+  "sitting on ground, back against wall",
+  "perched on bicycle seat, one foot down",
+  
+  // しゃがみ・屈み系
+  "crouching down, tying shoe",
+  "squatting low, arms resting on knees",
+  "bending over to pick up bag",
+  "kneeling on one knee",
+  "sitting seiza-style on floor (indoor)",
+  
+  // 動きのあるポーズ
+  "mid-turn, hair swinging",
+  "stepping off curb",
+  "ducking under low awning",
+  "reaching up to adjust hair",
+  "stretching arms overhead",
+  "spinning slightly, skirt flare implied",
+  "jumping off last stair",
+  
+  // 日本的な「縮こまり」系
+  "hands buried deep in pockets, slight slouch",
+  "shoulders hunched against cold",
+  "making herself small, arms wrapped around",
+  "standing with knees together, pigeon-toed",
+  "huddled in oversized coat",
+  "curled up on chair (indoor)",
+  
+  // 自信・開放系
+  "hands on hips, confident stance",
+  "arms spread wide, embracing space",
+  "standing tall, chin up",
+  "one hand on hip, other gesturing",
+  "power pose, feet apart",
+  
+  // 寄り・もたれ系（室内）
+  "leaning in doorway, one shoulder",
+  "sitting on kitchen counter",
+  "lying on bed, propped on elbows",
+  "perched on desk edge",
+  "leaning over balcony railing",
+  "sitting cross-legged on floor",
+  
+  // 自然体・無造作系
+  "looking away, distracted",
+  "caught off-balance, natural",
+  "shifting weight, adjusting stance",
+  "standing with one leg bent, foot against wall",
+  "mid-movement, unposed",
+  "slouching comfortably",
+  "standing with arms loosely at sides",
+  
+  // 対人・インタラクション暗示
+  "leaning in to listen",
+  "standing close to someone (out of frame)",
+  "turned three-quarters away",
+  "looking over shoulder at someone"
+];
+const HAND_GESTURES = [
+  // スマホ系
+  "holding smartphone loosely",
+  "both hands holding phone, thumbs typing",
+  "checking phone screen, slight frown",
+  "holding phone to ear, mid-call",
+  "taking selfie angle (phone out of frame implied)",
+  "scrolling with one thumb",
+  "phone in back pocket, hand resting on it",
+  
+  // バッグ・持ち物系
+  "hand resting on bag strap",
+  "holding tote bag handles with both hands",
+  "adjusting backpack strap",
+  "clutching crossbody bag close",
+  "holding paper cup from cafe",
+  "holding plastic bottle tea",
+  "carrying convenience store plastic bag",
+  "holding folded umbrella",
+  
+  // ポケット・袖系
+  "one hand in pocket",
+  "both hands in pockets, shoulders hunched",
+  "hands tucked into oversized hoodie sleeves",
+  "hands in coat pockets, elbows out",
+  "thumb hooked in pocket edge",
+  
+  // 髪・顔・アクセサリー調整
+  "fingers touching collar",
+  "adjusting glasses",
+  "touching hair behind ear",
+  "fixing hair tie",
+  "adjusting face mask",
+  "pulling hoodie hood up slightly",
+  "adjusting beanie",
+  "fingers playing with necklace chain",
+  "touching earring",
+  "brushing hair from face",
+  
+  // 身体的・姿勢系
+  "arms crossed loosely",
+  "hand on hip, casual confidence",
+  "hands clasped in front",
+  "one arm hugging self",
+  "stretching arms overhead (implied motion)",
+  "rolling up sleeve",
+  "pulling down hem of top",
+  "adjusting waistband",
+  "hands behind back",
+  "leaning weight on one leg, hand on thigh",
+  
+  // 対人・コミュニケーション系
+  "waving slightly (to someone out of frame)",
+  "hand raised to get attention",
+  "covering mouth while laughing",
+  "hand over heart, surprised expression",
+  "pointing at something (casual, not aggressive)",
+  "giving peace sign low near waist",
+  "hand outstretched as if to take something",
+  "brushing past hair while looking away (flirty)",
+  "hand on friend's shoulder (implied other person)",
+  "adjusting someone else's collar (intimate gesture)",
+  
+  // 感情・癖系
+  "biting thumbnail lightly",
+  "fidgeting with ring",
+  "tapping fingers on thigh",
+  "holding wrist with other hand",
+  "playing with hoodie strings",
+  "hugging arms in cold",
+  "shielding eyes from light",
+  "hand on chin, thinking pose"
+];
+const FACIAL_EXPRESSIONS = [
+  // クール・無表情系（ベース）
+  "cool, detached, neutral",
+  "slight mysterious smirk",
+  "confident direct stare",
+  "relaxed and observant",
+  "melancholic, looking into distance",
+  "blank stare, lost in thought",
+  "stoic, unreadable expression",
+  "subtle side-eye glance",
+  
+  // 柔らかい・微笑み系
+  "soft gentle smile, eyes slightly narrowed",
+  "small closed-mouth smile",
+  "warm smile reaching eyes",
+  "shy smile, looking down",
+  "content slight smile while looking away",
+  "tender expression, lips parted slightly",
+  "peaceful serene face",
+  
+  // 考え事・内省系
+  "deep in thought, gaze lowered",
+  "pensive, brow slightly furrowed",
+  "contemplative, staring into middle distance",
+  "distracted, mind elsewhere",
+  "worried slight frown",
+  "daydreaming, soft focus eyes",
+  "introspective, looking down",
+  
+  // 感情豊か系
+  "genuine laugh, eyes crinkled",
+  "surprised, eyebrows raised slightly",
+  "amused smirk, one corner of mouth up",
+  "playful grin",
+  "slightly annoyed, pout",
+  "tired, heavy-lidded eyes",
+  "relieved soft exhale expression",
+  "curious, head tilted slightly",
+  
+  // 日本的な「作らない」表情
+  "natural resting face, no posing",
+  "caught off-guard, authentic moment",
+  "mid-blink, candid feel",
+  "looking away, uninterested in camera",
+  "slight squint from bright light",
+  "wind-blown hair, eyes half-closed",
+  "yawning subtly, hand near mouth",
+  
+  // 対人・コミュニケーション系
+  "listening intently, slight nod",
+  "reacting to someone off-camera, smile forming",
+  "embarrassed, cheeks slightly flushed implied",
+  "teasing expression, tongue slightly visible",
+  "affectionate gaze at someone nearby",
+  "laughing at joke, head back slightly",
+  
+  // ムード系
+  "lonely, vulnerable expression",
+  "defiant, chin slightly raised",
+  "dreamy, soft gaze",
+  "bored, checking time implied",
+  "hopeful, eyes bright",
+  "nostalgic, distant smile",
+  "determined, jaw set lightly",
+  "vulnerable, eyes watery (not crying)"
+];
 const LIGHTING = ["harsh artificial LED from above","soft bounce off concrete surface","neon rim light on profile","flat natural light, low contrast","golden hour backlight, slight silhouette","harsh camera flash aesthetic","magenta vending machine sidelight"];
 const CAMERA = ["35mm focal length, environmental portrait","85mm lens, shallow depth of field, bokeh background","wide angle 24mm, leading lines of architecture","low angle, architectural dominance","telephoto compression, subject against background"];
 const STYLE_SCENE = ["Takashi Homma style suburban minimalism","modern Japanese indie film aesthetic","cinematic street photography, cool blue shadows and warm highlights","Rinko Kawauchi soft light, ephemeral urban details","cyberpunk-adjacent but grounded in reality, neon reflections"];
