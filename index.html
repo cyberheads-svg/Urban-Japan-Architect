@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="ja" style="background:#0c0b0e">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Urban Japan Architect v4 — Merged</title>
+<title>Urban Japan Architect v5</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap');
   :root{
     --bg:#0c0b0e;--panel:#131118;--border:#22202a;--border2:#332f40;
     --text:#d4cee0;--muted:#6a6278;--dim:#2a2535;
@@ -24,15 +25,14 @@
   .selector-group{width:100%;max-width:680px;margin-bottom:12px}
   .selector-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
   .selector{display:flex;gap:8px;width:100%;flex-wrap:wrap}
-  .selector-btn{flex:1;min-width:110px;padding:11px 0;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+  .selector-btn{flex:1;min-width:100px;padding:11px 0;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s}
   .selector-btn:hover{border-color:var(--border2);color:var(--text)}
   .selector-btn.active-spring{border-color:var(--spring);color:var(--spring);background:#1a0f14}
   .selector-btn.active-summer{border-color:var(--summer);color:var(--summer);background:#0f1a12}
   .selector-btn.active-autumn{border-color:var(--autumn);color:var(--autumn);background:#1a1710}
   .selector-btn.active-winter{border-color:var(--winter);color:var(--winter);background:#0f1218}
-  .frame-btn.active{border-color:var(--accent);color:var(--accent);background:#16101a}
-  .scene-btn.active, .filter-btn.active{border-color:var(--accent);color:var(--accent);background:#16101a}
-  .boost-panel{width:100%;max-width:680px;background:#0f0e12;border:1px solid var(--border);padding:20px;margin-bottom:20px}
+  .frame-btn.active,.scene-btn.active,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:#16101a}
+  .boost-panel{width:100%;max-width:680px;background:#0f0e12;border:1px solid var(--border);padding:20px;margin-bottom:12px}
   .card{width:100%;max-width:680px;background:var(--panel);border:1px solid var(--border);padding:32px;margin-bottom:20px}
   .empty-state{text-align:center;padding:40px 0;color:var(--dim);font-size:12px;letter-spacing:.05em;line-height:1.7}
   .fields{display:flex;flex-direction:column;gap:0}
@@ -40,17 +40,20 @@
   .field-row:last-child{border-bottom:none}
   .field-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding-top:4px}
   .field-value{font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.4}
-  .rare-badge{font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;padding:1px 6px;border:1px solid currentColor;opacity:.6;margin-left:8px;vertical-align:middle;font-style:normal}
+  .rare-badge{font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;padding:1px 6px;border:1px solid currentColor;opacity:.9;margin-left:8px;vertical-align:middle;font-style:normal;text-shadow:0 0 8px currentColor}
   .divider{border:none;border-top:1px solid var(--border);margin:20px 0}
-  .prompt-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-  .prompt-textarea{width:100%;background:#0a080c;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11px;line-height:1.9;padding:12px;resize:vertical;min-height:120px;margin-bottom:14px;word-break:break-word}
+  .prompt-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .copy-hint{font-size:9px;color:var(--dim);letter-spacing:.1em;margin-bottom:8px}
+  .prompt-textarea{width:100%;background:#0a080c;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11px;line-height:1.9;padding:12px;resize:vertical;min-height:120px;margin-bottom:14px;word-break:break-word;cursor:pointer}
   .prompt-textarea:focus{outline:none;border-color:var(--accent)}
   .copy-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:8px 20px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;font-family:var(--mono);transition:all .2s}
   .copy-btn:hover{border-color:var(--accent);color:var(--accent)}
   .copy-btn.copied{border-color:var(--summer);color:var(--summer)}
   .generate-btn{width:100%;max-width:680px;background:var(--accent);color:#000;font-weight:700;border:none;padding:20px;font-size:12px;letter-spacing:.4em;text-transform:uppercase;cursor:pointer;font-family:var(--mono);transition:all .2s;margin-bottom:12px}
   .generate-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+  .generate-btn:active{transform:translateY(0)}
   .save-btn{width:100%;max-width:680px;background:transparent;border:1px solid var(--border);color:var(--muted);padding:12px;font-size:10px;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;font-family:var(--mono);transition:all .2s;margin-bottom:40px}
+  .save-btn:hover{border-color:var(--border2);color:var(--text)}
   .saved-section{width:100%;max-width:680px}
   .saved-title{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
   .saved-item{background:var(--panel);border:1px solid var(--border);padding:12px 16px;margin-bottom:8px;font-size:11px;color:var(--muted);line-height:1.7;cursor:pointer;transition:border-color .15s}
@@ -60,14 +63,20 @@
   .animate-in{animation:fadeIn .3s ease forwards}
   .reroll-btn{background:transparent;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px 6px;line-height:1;transition:color .15s;flex-shrink:0}
   .reroll-btn:hover{color:var(--accent)}
+  .lock-btn{background:transparent;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:2px 3px;line-height:1;transition:all .15s;flex-shrink:0}
+  .lock-btn:hover{color:var(--muted)}
+  .lock-btn.locked{color:var(--accent);text-shadow:0 0 6px var(--accent)}
+  .field-row.is-locked{background:#0e0c14}
+  @keyframes rarePulse{0%,100%{box-shadow:0 0 4px #c084fc55,0 0 12px #c084fc33}50%{box-shadow:0 0 12px #c084fc,0 0 28px #c084fc66}}
+  .rare-row{animation:rarePulse 1.8s ease-in-out infinite;border-color:#332f40}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="eyebrow">AI Prompt Suite · Female Edition • v4 Merged</div>
+  <div class="eyebrow">AI Prompt Suite · Female Edition · v5</div>
   <h1>Urban Japan <span>Architect</span></h1>
-  <div class="subtitle">Anonymous Cityscape · Techwear to Night-Out · Modern Tokyo + Private Room</div>
+  <div class="subtitle">Anonymous Cityscape · Techwear to Night-Out · Modern Tokyo</div>
   <div class="counter" id="counter">— generated</div>
 </header>
 
@@ -91,22 +100,23 @@
   </div>
 </div>
 
-<!-- NEW: Scene Type + Style Filter from v3.7 -->
 <div class="boost-panel">
   <div class="selector-group">
-    <div class="selector-label">Scene Type <span style="font-size:8px;opacity:0.6">情景種別</span></div>
+    <div class="selector-label">Scene Type</div>
     <div class="selector">
-      <button class="selector-btn scene-btn active" onclick="setSceneType('urban')" id="scene-urban">🏙️ Urban (City)</button>
-      <button class="selector-btn scene-btn" onclick="setSceneType('room')" id="scene-room">🏠 Private (Room)</button>
+      <button class="selector-btn scene-btn active" onclick="setSceneType('urban')" id="scene-urban">🏙️ Urban / City</button>
+      <button class="selector-btn scene-btn" onclick="setSceneType('room')" id="scene-room">🏠 Private / Room</button>
     </div>
   </div>
-
-  <div class="selector-group" style="margin-top:12px">
-    <div class="selector-label">Style Filter <span style="font-size:8px;opacity:0.6">質感フィルタ</span></div>
+  <div class="selector-group" style="margin-top:12px;margin-bottom:0">
+    <div class="selector-label">Style Filter</div>
     <div class="selector">
       <button class="selector-btn filter-btn active" onclick="setFilter('none')" id="filter-none">None</button>
       <button class="selector-btn filter-btn" onclick="setFilter('raw')" id="filter-raw">Raw Street</button>
       <button class="selector-btn filter-btn" onclick="setFilter('cine')" id="filter-cine">Cinematic</button>
+      <button class="selector-btn filter-btn" onclick="setFilter('analog')" id="filter-analog">Analog Film</button>
+      <button class="selector-btn filter-btn" onclick="setFilter('cctv')" id="filter-cctv">CCTV Lo-fi</button>
+      <button class="selector-btn filter-btn" onclick="setFilter('nightvision')" id="filter-nightvision">Night Vision</button>
     </div>
   </div>
 </div>
@@ -114,13 +124,13 @@
 <div class="card">
   <div class="empty-state" id="emptyState">
     <div style="font-size:32px;margin-bottom:12px;opacity:.4">✦</div>
-    都会的な匿名性と昼夜の空気感を生み出すアーバン特化型ジェネレーター<br>
-    旧v2の全機能 + v3.7のScene Type / Style Filterを統合
+    都会的な匿名性と昼夜の空気感を生み出すアーバン特化型ジェネレーター<br>モードからセクシー・病み・萌えまで、現代東京の全レイヤーを出力
   </div>
   <div id="displayFields" class="fields animate-in" style="display:none"></div>
   <div id="promptBox" style="display:none">
     <hr class="divider">
     <div class="prompt-label">画像AIにコピー</div>
+    <div class="copy-hint">▼ クリックで全選択 → Ctrl+C / Cmd+C</div>
     <textarea class="prompt-textarea" id="finalPrompt" readonly onclick="this.select()"></textarea>
     <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy Prompt</button>
   </div>
@@ -134,17 +144,18 @@
   <div id="savedList"></div>
 </div>
 
-<footer>MODERN CITYSCAPE + PRIVATE ROOM · ANONYMOUS TOKYO · TECHWEAR TO NIGHT-OUT</footer>
+<footer>MODERN CITYSCAPE · ANONYMOUS TOKYO · TECHWEAR TO NIGHT-OUT</footer>
 
 <script>
 // ==================== STATE ====================
 let currentSeason = "spring";
 let currentFraming = "full";
-let currentSceneType = "urban";   // NEW from v3.7
-let currentFilter = "none";       // NEW from v3.7
+let currentSceneType = "urban";
+let currentFilter = "none";
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
+let lockedFields = {}; // NEW: lock state
 
 // ==================== HELPERS ====================
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -157,82 +168,96 @@ const pickN = (arr, n) => {
   return a.slice(0, Math.min(n, a.length));
 };
 
-// ==================== OLD RICH DATA (kept & enhanced) ====================
-// Style categories (weighted)
+// ==================== STYLES ====================
+// MODE MINIMAL 30%
 const STYLES_MODE_MINIMAL = [
   "Tokyo minimal chic","Ura-Harajuku techwear","Daikanyama layered silhouette",
   "Aoyama sophisticated monochrome","techwear ninja","monochrome minimalist",
   "modern utilitarian","architectural avant-garde","quiet luxury Japanese brand",
-  "dark techwear","deconstructed tailoring","Omotesando polished casual"
+  "dark techwear","deconstructed tailoring","Omotesando polished casual",
+  "J-pop idol off-duty casual","indie band vocalist aesthetic","city pop singer vintage look",
+  "underground rapper Tokyo style","lo-fi producer oversized hoodie look",
+  "sound engineer chic all-black technical","Shimokitazawa live house regular"
 ];
+
+// MODE DECO 25%
 const STYLES_MODE_DECO = [
   "Harajuku mix-print maximalist","Shimokitazawa thrift layered mix","vintage floral tapestry look",
   "Tokyo bohemian Harajuku","heavy layered patterned streetwear","avant-garde frill street fashion",
   "Harajuku vintage layering","pop-kei candy color pattern mix","retro patterned street style",
-  "indie folk singer cottagecore Tokyo","complex layered silhouette with bold prints"
+  "indie folk singer cottagecore Tokyo","complex layered silhouette with bold prints",
+  "Harajuku rainbow coordination","fruits magazine era revival","neon Harajuku street",
+  "fairy kei pastel Tokyo","Lolita adjacent street casual","Laforet window display look"
 ];
+
+// SEXY 20%
 const STYLES_SEXY = [
   "Shibuya night-out glam","Y2K gyaru revival","jirai-kei dark cute",
   "Roppongi club-ready","Harajuku sexy kawaii","Kabukicho after-midnight",
   "gal-mode fusion","satin-and-skin Tokyo night","Shinjuku bar district style",
   "risque street casual","bodycon minimalist","provocative minimal Tokyo",
-  "agejo gyaru evening","sexy Y2K shimmer","glam rock Tokyo night"
+  "agejo gyaru evening","sexy Y2K shimmer","glam rock Tokyo night",
+  "party girl Azabu aesthetic","velvet club Roppongi","Shibuya109 going-out look"
 ];
+
+// 病み系 15%
 const STYLES_YAMI = [
   "yami kawaii dark pastel","menhera-kei street look","dark jirai aesthetic",
   "hospital kei lite street","bandage accessory dark cute","pastel goth Tokyo",
   "black lace gothic lolita street","dark fairy aesthetic Tokyo","broken doll aesthetic street",
-  "dark decora with medical motif","dark academia Tokyo version","witchcore street Japan"
+  "dark decora with medical motif","dark academia Tokyo version","witchcore street Japan",
+  "gloomy bear aesthetic","sad girl Tokyo aesthetic","dark fairy wing street"
 ];
+
+// 萌え系 10%
 const STYLES_MOE = [
   "moe casual schoolgirl off-duty","soft moe aesthetic pastel",
   "maid cafe aesthetic street version","magical girl civilian mode",
   "Tokyo moe layered pastel","twin-tail ribbon casual",
   "soft girl Tokyo edition","Akihabara idol fan fashion",
-  "heavily frilled dreamy pastel aesthetic"
+  "heavily frilled dreamy pastel aesthetic","kawaii character fan meetup look"
 ];
 
 function pickStyle() {
   const r = Math.random();
   if (r < 0.30) return { name: pick(STYLES_MODE_MINIMAL), type: 'mode_minimal' };
-  if (r < 0.55) return { name: pick(STYLES_MODE_DECO), type: 'mode_deco' };
-  if (r < 0.75) return { name: pick(STYLES_SEXY), type: 'sexy' };
-  if (r < 0.90) return { name: pick(STYLES_YAMI), type: 'yami' };
-  return { name: pick(STYLES_MOE), type: 'moe' };
+  if (r < 0.55) return { name: pick(STYLES_MODE_DECO),    type: 'mode_deco' };
+  if (r < 0.75) return { name: pick(STYLES_SEXY),         type: 'sexy' };
+  if (r < 0.90) return { name: pick(STYLES_YAMI),         type: 'yami' };
+  return           { name: pick(STYLES_MOE),              type: 'moe' };
 }
 
-// Tops per style (old rich data + some new additions)
+// ==================== TOPS ====================
 const TOPS_MINIMAL = [
   "oversized graphic tee","heavyweight loopwheel hoodie","technical multi-pocket vest",
   "crisp oversized button-down shirt","mock neck ribbed knit","structured asymmetrical crop top",
   "boxy fit short-sleeve shirt","nylon anorak half-zip","drop-shoulder sweatshirt",
   "technical fleece pullover","minimalist high-neck top","translucent organza shirt",
-  "paper-thin windbreaker","boiler suit top half tied at waist",
-  "technical softshell jacket","minimalist wool turtleneck","boxy fit linen shirt",
-  "high-neck ribbed tank","asymmetric hem sweatshirt","nylon utility vest",
-  "wide sleeve mock neck","paper bag waist cropped shirt","oversized technical polo",
-  "sheer high-neck base layer","deconstructed denim shirt","matte black performance top",
-  "sculptural neoprene crop","heavyweight french terry hoodie","minimal logo embroidered crewneck",
-  "tactical half-zip pullover","structured shoulder pad top","recycled nylon track top",
-  "high-density ripstop shirt","quiet luxury cashmere blend top","architectural folded collar blouse"
+  "paper-thin windbreaker","boiler suit top half tied at waist","technical softshell jacket",
+  "minimalist wool turtleneck","boxy fit linen shirt","high-neck ribbed tank",
+  "asymmetric hem sweatshirt","nylon utility vest","sculptural neoprene crop",
+  "heavyweight french terry hoodie","minimal logo embroidered crewneck","tactical half-zip pullover",
+  "structured shoulder pad top","recycled nylon track top","quiet luxury cashmere blend top",
+  "vintage band tee faded and worn","tour merch oversized hoodie","retro logo ringer tee","oversized jazz club tee"
 ];
+
 const TOPS_DECO = [
-  "highly detailed abstract print oversized shirt","voluminous layered pastel ruffle blouse",
+  "bold abstract print oversized shirt","voluminous layered pastel ruffle blouse",
   "large floral print open button-down","complex tie-dye washed hoodie",
   "intricate geometric pattern knit top","graffiti print oversized tee",
   "bold tropical print camp shirt","checkerboard pattern loose shirt",
   "houndstooth cropped blazer over tee","splatter paint print sweatshirt",
   "highly detailed vintage tapestry jacket","oversized paisley print blouse",
   "stripe-heavy marinière top","bold madras plaid crop shirt","camouflage pattern anorak",
-  "comic strip print tee","painterly watercolor print shirt",
   "lace collar vintage blouse with intricate embroidery","tulle-trimmed voluminous top",
-  "patchwork denim jacket","multi-colored candy-ribbed crop",
-  "maximalist baroque print blouse","multi-layer tulle frill top","vintage kimono sleeve patchwork",
-  "heavy embroidery folk pattern shirt","psychedelic swirl print hoodie","bold kanji graphic oversized tee",
+  "patchwork denim jacket","multi-colored candy-ribbed crop","maximalist baroque print blouse",
+  "multi-layer tulle frill top","vintage kimono sleeve patchwork",
+  "heavy embroidery folk pattern shirt","psychedelic swirl print hoodie",
   "floral jacquard puff sleeve","rainbow stripe knit cardigan","complex bead embroidery vest",
-  "harajuku mix print layered top","vintage bandana patchwork blouse","oversized bow detail print shirt",
-  "metallic thread woven top","candy color block ruffle blouse","detailed sakura pattern haori style"
+  "harajuku mix print layered top","vintage bandana patchwork blouse","candy color block ruffle blouse",
+  "detailed sakura pattern haori style","bold kanji graphic oversized tee","metallic thread woven top"
 ];
+
 const TOPS_SEXY = [
   "sequined tube top","satin bustier barely-there straps","plunge satin camisole",
   "cropped lace-up corset top","black lace-up top with puffy sleeves",
@@ -240,15 +265,14 @@ const TOPS_SEXY = [
   "deep-V ribbed knit top","one-shoulder glitter top","corset-style bustier with lace",
   "cut-out bodycon top","metallic halter open back","faux leather bralette under sheer",
   "off-shoulder ruffle crop","bandage-style knit crop","satin bow-front camisole",
-  "highly detailed leopard print off-shoulder crop","zebra stripe bandeau top",
-  "floral lace bustier","tiger print satin cami","sequin floral embroidered crop",
-  "multi-ruffle tiered crop top","baroque floral jacquard bustier",
-  "sheer mesh bodysuit with strategic cutouts","glittering halter neck crop","wet look PVC corset top",
-  "rhinestone encrusted bralette","deep plunge chain detail top","satin corset with garter straps",
-  "micro mini halter with fringe","crystal studded off-shoulder top","liquid metal effect camisole",
-  "lace-up side cutout crop","butterfly backless satin top","neon trim bodycon bandeau",
-  "faux fur trimmed bustier","high shine metallic mesh top","strappy cage detail bralette"
+  "leopard print off-shoulder crop","zebra stripe bandeau top","floral lace bustier",
+  "tiger print satin cami","sequin floral embroidered crop","multi-ruffle tiered crop top",
+  "baroque floral jacquard bustier","sheer mesh bodysuit with strategic cutouts",
+  "wet look PVC corset top","rhinestone encrusted bralette","deep plunge chain detail top",
+  "satin corset with garter straps","crystal studded off-shoulder top","liquid metal effect camisole",
+  "butterfly backless satin top","faux fur trimmed bustier","high shine metallic mesh top"
 ];
+
 const TOPS_YAMI = [
   "black lace high-neck top","oversized black hoodie with heavy text graphic",
   "distressed fishnet top over bralette","bandage wrap crop top black",
@@ -259,12 +283,14 @@ const TOPS_YAMI = [
   "bat wing print oversized tee","black tartan ruffle-neck blouse",
   "dark butterfly print sheer top","black tiered frill camisole",
   "cracked porcelain print dark tee","inverted cross jacquard knit",
-  "medical cross print oversized hoodie","black lace up corset with chains","distressed velvet babydoll",
-  "safety pin detailed mesh top","dark fairy wing print blouse","bandage style high neck crop",
-  "black rose jacquard knit top","torn lace overlay tee","hospital gown aesthetic layered top",
-  "dark academia pleated collar blouse","witchy velvet hooded top","menhera bear print oversized tee",
-  "black tiered ruffle with cross charm","gothic lolita inspired blouse","dark pastel striped knit with holes"
+  "medical cross print oversized hoodie","black lace up corset with chains",
+  "safety pin detailed mesh top","dark fairy wing print blouse",
+  "black rose jacquard knit top","torn lace overlay tee",
+  "dark academia pleated collar blouse","witchy velvet hooded top",
+  "menhera bear print oversized tee","gothic lolita inspired blouse",
+  "dark pastel striped knit with holes","black tiered ruffle with cross charm"
 ];
+
 const TOPS_MOE = [
   "pastel pink sailor uniform blouse","soft lavender knit sweater",
   "oversized cat-print hoodie","strawberry embroidered crop knit",
@@ -276,44 +302,44 @@ const TOPS_MOE = [
   "embroidered bunny blouse with large bow","pink rose jacquard knit top",
   "cherry blossom print chiffon blouse","multi-frill pastel camisole",
   "balloon-sleeve highly detailed floral print top","fairy kei mix-print layered top",
-  "pink gingham double-frill blouse",
-  "pastel teddy bear print oversized sweater","kawaii fruit print puff sleeve top","rainbow heart knit cardigan",
-  "strawberry shortcake print babydoll","lavender lace trim sailor blouse","bunny ear hoodie with tail detail",
-  "mint green ruffle collar blouse","pink gingham puff sleeve crop","detailed cherry blossom embroidery top",
-  "pastel fairy wing print tee","multi bow detail knit top","soft girl layered frill blouse",
-  "kawaii animal ear hoodie","pastel polka dot ruffle top","heart shaped button down blouse"
+  "pink gingham double-frill blouse","pastel teddy bear print oversized sweater",
+  "kawaii fruit print puff sleeve top","rainbow heart knit cardigan",
+  "lavender lace trim sailor blouse","mint green ruffle collar blouse",
+  "pastel fairy wing print tee","multi bow detail knit top","soft girl layered frill blouse"
 ];
 
 function pickTop(styleType) {
-  if (styleType === 'sexy') return pick(TOPS_SEXY);
-  if (styleType === 'yami') return pick(TOPS_YAMI);
-  if (styleType === 'moe') return pick(TOPS_MOE);
+  if (styleType === 'sexy')      return pick(TOPS_SEXY);
+  if (styleType === 'yami')      return pick(TOPS_YAMI);
+  if (styleType === 'moe')       return pick(TOPS_MOE);
   if (styleType === 'mode_deco') return pick(TOPS_DECO);
   return pick(TOPS_MINIMAL);
 }
 
-// Bottoms per style
+// ==================== BOTTOMS ====================
 const BOTTOMS_MINIMAL = [
   "wide-leg tailored trousers","parachute pants with drawstrings","raw Okayama selvage denim",
   "technical cargo pants","baggy washed denim","nylon track pants",
   "wide-leg linen pants","straight-leg corduroy trousers","high-waisted wide slacks",
   "A-line structured maxi skirt","balloon fit denim","culottes with side slits",
-  "cargo shorts baggy","tapered tech pants",
-  "high-waisted technical slacks","wide leg ripstop cargo","minimalist wool pleated trousers",
-  "straight leg selvedge chinos","technical nylon joggers","A-line midi tech skirt",
-  "high rise wide leg denim","structured pencil midi skirt","utilitarian carpenter pants",
-  "relaxed fit linen wide pants","matte black performance leggings","sculptural asymmetric skirt"
+  "cargo shorts baggy","tapered tech pants","high-waisted technical slacks",
+  "wide leg ripstop cargo","minimalist wool pleated trousers","straight leg selvedge chinos",
+  "technical nylon joggers","A-line midi tech skirt","utilitarian carpenter pants",
+  "matte black performance leggings","sculptural asymmetric skirt"
 ];
+
 const BOTTOMS_DECO = [
   "layered skirt over patterned trousers","pleated midi skirt asymmetrical mix-print",
   "paperbag waist trousers with bold stripes","asymmetric wrap trousers with geometric pattern",
   "utility kilt with patchwork over leggings","floor-length wide skirt with floral embroidery",
   "tie-dye wide leg pants","patchwork denim wide pants","tartan check pleated long skirt",
   "maximalist floral midi skirt","bold stripe wide leg trousers","vintage tapestry print palazzo pants",
-  "multi print layered midi skirt","geometric pattern pleated trousers","heavy embroidery wide skirt",
+  "multi print layered midi skirt","geometric pattern pleated trousers",
   "psychedelic print wide pants","patchwork denim midi skirt","rainbow stripe knit skirt",
-  "baroque floral jacquard trousers","candy color block wide pants","detailed sakura print midi skirt"
+  "baroque floral jacquard trousers","candy color block wide pants","detailed sakura print midi skirt",
+  "heavy embroidery wide skirt"
 ];
+
 const BOTTOMS_SEXY = [
   "leather-look micro mini skirt","low-rise denim micro mini","lace-trim shorts",
   "bodycon ribbed mini","thigh-slit satin midi","metallic micro skirt",
@@ -321,10 +347,11 @@ const BOTTOMS_SEXY = [
   "micro denim shorts rhinestones","cut-out hip skirt","sequin pencil mini",
   "mesh overlay mini","ruched side mini with bow","split-thigh knit skirt",
   "wet look PVC micro skirt","high waist hot pants with chains","rhinestone fringe mini skirt",
-  "bodycon bandage midi with slit","metallic pleated micro skirt","sheer mesh overlay micro shorts",
+  "bodycon bandage midi with slit","metallic pleated micro skirt",
   "strappy high waist mini","glitter vinyl pencil skirt","cutout side bodycon mini",
-  "lace up front micro skirt","high shine satin mini with bow","thigh high slit satin pencil"
+  "thigh high slit satin pencil","high shine satin mini with bow"
 ];
+
 const BOTTOMS_YAMI = [
   "black asymmetric layered skirt","ripped black denim","black tutu skirt over tights",
   "bandage skirt black","black pleated midi with chains","distressed black cargo pants",
@@ -332,32 +359,31 @@ const BOTTOMS_YAMI = [
   "black wrap skirt with safety pins","dark tartan mini skirt",
   "black balloon skirt with straps","patchwork black denim",
   "black lace up corset skirt","distressed velvet midi with chains","black tiered ruffle maxi",
-  "safety pin detailed denim mini","dark rose print pleated skirt","bandage wrap midi skirt",
-  "black tutu with cross charms","ripped fishnet overlay skirt","dark academia pleated midi",
-  "black vinyl pencil with zipper","torn lace layered maxi","gothic lolita inspired skirt"
+  "dark rose print pleated skirt","black tutu with cross charms",
+  "dark academia pleated midi","gothic lolita inspired skirt","ripped fishnet overlay skirt"
 ];
+
 const BOTTOMS_MOE = [
   "pastel pleated mini skirt","cream A-line midi skirt","pink gingham mini",
   "lavender tiered voluminous ruffle skirt","white lace trim shorts",
   "sky blue sailor skirt","highly detailed strawberry print mini skirt",
   "peach high-waist shorts with large bow","mint green culottes",
-  "white tennis pleated skirt","rainbow striped mini",
-  "candy polka-dot mini","pastel floral midi",
-  "pastel teddy bear print pleated skirt","kawaii fruit print mini skirt","lavender lace trim midi",
-  "pink gingham tiered ruffle skirt","strawberry print wide leg shorts","rainbow stripe knit midi",
-  "bunny ear detail shorts","pastel polka dot pleated mini","heart print A-line skirt",
-  "fairy kei layered tulle skirt","mint green sailor pleated skirt","pastel floral tiered maxi"
+  "white tennis pleated skirt","rainbow striped mini","candy polka-dot mini",
+  "pastel floral midi","pastel teddy bear print pleated skirt",
+  "kawaii fruit print mini skirt","pink gingham tiered ruffle skirt",
+  "fairy kei layered tulle skirt","mint green sailor pleated skirt",
+  "pastel floral tiered maxi","heart print A-line skirt","bunny ear detail shorts"
 ];
 
 function pickBottom(styleType) {
-  if (styleType === 'sexy') return pick(BOTTOMS_SEXY);
-  if (styleType === 'yami') return pick(BOTTOMS_YAMI);
-  if (styleType === 'moe') return pick(BOTTOMS_MOE);
+  if (styleType === 'sexy')      return pick(BOTTOMS_SEXY);
+  if (styleType === 'yami')      return pick(BOTTOMS_YAMI);
+  if (styleType === 'moe')       return pick(BOTTOMS_MOE);
   if (styleType === 'mode_deco') return pick(BOTTOMS_DECO);
   return pick(BOTTOMS_MINIMAL);
 }
 
-// Outerwear by season (old)
+// ==================== OUTERWEAR ====================
 const OUTERWEAR = {
   spring: ["oversized trench coat","lightweight nylon shell jacket","denim trucker jacket","unstructured minimalist blazer","coach jacket","sheer blouson","faux fur cropped jacket"],
   summer: ["short-sleeve open-collar shirt worn open","sheer mesh outer layer","lightweight technical vest","translucent rain jacket"],
@@ -365,75 +391,50 @@ const OUTERWEAR = {
   winter: ["long sleek wool overcoat","voluminous puffer jacket","GORE-TEX technical parka","shearling collar aviator jacket","heavy wool duffle coat","velvet blazer"]
 };
 
-// NEW: Scene Type locations from v3.7 (enhanced)
-const LOC_URBAN = [
-  "narrow asphalt backstreet with tangled overhead power lines","multistory bicycle parking with thousands of silver spokes","coin parking lot with yellow wheel stoppers","residential street with utility poles","concrete overpass underside with pigeons","elevated highway overpass with massive concrete pillars","train station platform edge with yellow tactile paving","narrow gap between office buildings","Nakameguro-style riverside with branches overhead","izakaya alley, red paper lanterns","konbini parking lot, cold white fluorescent","pachinko parlor exterior, aggressive signage","vending machine corner in a quiet dark alley","coin laundry interior, rows of dryers humming","narrow residential alley with bicycles parked haphazardly","concrete staircase of old apartment building, rusted handrail","underneath railway bridge, graffiti and pigeon feathers","rooftop with drying laundry and satellite dishes","back entrance of building, delivery bikes and trash area","narrow gap between convenience store and apartment, vending machines","elevator lobby of old mixed-use building, dim fluorescent","underground bicycle parking, concrete and echo","fire escape stairs on building exterior, evening light","deserted playground at night","abandoned gas station under neon","shutter-closed traditional shopping street","crowded Shibuya crossing bokeh","pedestrian bridge over main road","wet asphalt alley with neon reflections","industrial harbor area","park bench under a single streetlamp","narrow stone-paved slope in old Tokyo","modernist glass building entrance","metro station ticket gates","busy bus stop under rain","sloped road with city view","construction site with blue tarps","canal side walk with iron railings","elevated train track shadow","rooftop helipad area","small shrine squeezed between skyscrapers","public phone booth in the rain","vending machine row at a bus terminal","empty parking tower","narrow tunnel for pedestrians","overlooking a massive rail yard","terrace of a high-rise building","spiral staircase of a fashion mall","backstage of a small live house","graffiti-covered skate park","canal bridge with stone pillars","quiet suburban train crossing","hillside residential area with stairs","riverbank with long grass"
+// ==================== FABRICS ====================
+const FABRICS = [
+  "Japanese technical nylon","heavyweight loopwheel cotton","crisp paper-touch poplin",
+  "Okayama selvage denim","matte recycled polyester","ripstop nylon","sheer organza",
+  "high-density gabardine","washed canvas","GORE-TEX","ribbed knit jersey",
+  "technical fleece","matte faux leather","reflective tech fabric","velvet burnout",
+  "liquid satin","latex-adjacent stretch","crinkled metallic taffeta","patent vinyl",
+  "holographic PVC","crushed velvet","iridescent organza","wet-look coated denim"
 ];
 
-const LOC_ROOM = [
-  "small one-room apartment, futon folded, clothes rack overflowing","bedroom with unmade bed, morning light through cheap curtains","tiny kitchen with dishes in sink, refrigerator covered in magnets","desk corner with laptop open, coffee cup rings on wood","bathroom with small tub, toiletries lined up, steam","closet doorway, clothes spilling out, hangers mixed","living room floor, cushions and low table, TV glow","balcony with potted plants and drying rack, city view beyond","entrance genkan with shoes scattered, umbrella stand","room at night, only desk lamp on, laundry hanging indoors","cluttered vanity mirror with cosmetics","dimly lit hallway of a wooden apartment","morning kitchen, steam from a rice cooker","bedside table with tangled charging cables","piles of fashion magazines on floor","sun-drenched window with dust motes","interior with warm wood and minimalist furniture","small home studio with synth and cables","cozy nook with beanbag and bookshelves","laundry drying on hangers in a cramped room"
+// ==================== ACCESSORIES ====================
+const ACCESSORIES_MODE = [
+  "crossbody technical sling bag","wireless earbuds","silver chain necklace","minimalist silver rings",
+  "bucket hat","black face mask","tinted sunglasses","clear frame glasses","indie bookstore tote bag",
+  "carabiner with keys on belt loop","chunky headphones worn around neck","nylon backpack",
+  "cap with subtle logo","silver ear cuffs","smartwatch with technical band"
 ];
 
-const RARE_TOKYO = ["abandoned family mart plastic umbrella nearby","pachinko neon bleeding into urban fog","Don Quijote plastic bag hanging from wrist","construction LED flashing magenta","rain-soaked convenience store receipt","blurred taxi tail lights in the bokeh"];
+const ACCESSORIES_SEXY = [
+  "heart choker","micro metallic bag on chain","thigh-high sheer tights",
+  "rhinestone barrette","fishnet gloves","satin bow in hair","pearl layered necklace",
+  "strappy heeled sandals","crystal ear cuffs","mini shoulder bag with logo",
+  "leg garter with chain","over-knee socks with bows","platform boots with buckles"
+];
 
-// Time phase + season data (kept from old for depth)
-const SCENE_DATA = {
-  day: {
-    times: ["10 AM, crisp morning light, long soft shadows","midday, harsh overhead light, deep geometric shadows","early afternoon, flat bright light","lunch hour, city in motion, bright","weekend afternoon, quiet streets, sharp sunlight"]
-  },
-  evening: {
-    times: ["late afternoon, golden hour, amber reflecting off windows","5 PM, rush hour beginning, warm slanted light","golden hour, last sunlight cutting between buildings","dusk, sky turning indigo, shop lights flickering on","twilight, boundary between natural and artificial light"]
-  },
-  night: {
-    times: ["early evening, 8 PM, city fully lit","midnight, deserted streets, solitary light sources","3 AM, eerie stillness, orange sodium streetlights","2 AM, post-closing-time emptiness","blue hour transitioning to dark night"]
-  }
-};
+const ACCESSORIES_YAMI = [
+  "bandage wrapped wrist accessory","black cross pendant necklace","syringe hair clip",
+  "dark lace gloves","black ribbon choker","menhera pin badge collection",
+  "hospital wristband accessory","dark star hair clips","chain anklet"
+];
 
-const SEASONS_SCENE = {
-  spring: ["urban spring, cherry blossom petals scattered","mild spring morning/evening, fresh clear air","spring atmosphere, pale green leaves","light spring breeze"],
-  summer: ["midsummer city heat, thick atmosphere","humid summer, hazy distant buildings","summer evening/day, heavy air","post-thunderstorm clarity, wet city surfaces"],
-  autumn: ["autumn metropolis, yellow ginkgo leaves","crisp autumn air, sharp geometric shadows","cool autumn, low golden/street light","autumn evening/day, clear atmosphere"],
-  winter: ["winter city, crisp air, sharp silhouettes","cold winter, flat light, stark contrast","stark winter landscape","dry winter wind, cold atmosphere"]
-};
-
-const WEATHER = {
-  spring: ["post-rain clarity, wet asphalt","soft overcast atmosphere","clear and bright ambiance","breezy, petals in the air"],
-  summer: ["heavy humidity, hazy background","sudden urban downpour, wet concrete","high contrast, saturated colors","clear dry heat atmosphere"],
-  autumn: ["crisp and dry, high visibility","light autumn drizzle, muted tones","windy and clear, fast-moving clouds","atmospheric urban haze"],
-  winter: ["clear and freezing, high contrast shadows","light snow barely sticking to asphalt","thick overcast, flat shadowless city","dry cold, sharp edges on everything"]
-};
-
-// Color system (old)
-const COLORS_BASE = {
-  spring: ["dusty rose and concrete grey","sage green and off-white","navy and crisp white","beige tonal","lavender and warm white","mint green and blush pink","powder blue and pale yellow"],
-  summer: ["stark white and pitch black","washed denim blue and white","charcoal monochrome","crisp ivory","hot coral and white","electric yellow and black","vivid cobalt blue head-to-toe"],
-  autumn: ["olive drab and black","brown tonal","deep burgundy and black","khaki and stark white","rust orange and navy","terracotta and cream","forest green and camel"],
-  winter: ["all black","slate grey and silver","midnight blue monochrome","charcoal and dark olive","ivory and camel","deep emerald and black","cobalt and white"]
-};
-const ACCENT_COLORS = ["neon pink sock accent","electric blue hair clip","safety orange detail","acid green phone case","hot pink inner lining flash","neon yellow sole edge","cobalt blue hair tie","fluorescent orange zipper pull","magenta bra strap visible","chrome silver mini bag"];
-const AMBIENT_COLORS = {
-  spring: ["magenta vending machine glow","pale streetlamp warmth","soft diffused light bounce"],
-  summer: ["harsh LED wash","green traffic light reflection","deep blue atmospheric shadows"],
-  autumn: ["warm sodium streetlamp cast","amber light reflections","cold blue shadow contrasting warm patches"],
-  winter: ["cold blue fluorescent spill","white LED harsh and clinical","steel grey ambient with high contrast"]
-};
-
-function buildColorDescription(season) {
-  const base = pick(COLORS_BASE[season]);
-  const accent = pick(ACCENT_COLORS);
-  const ambient = pick(AMBIENT_COLORS[season]);
-  return `${base}, ${accent}, ${ambient}`;
-}
-
-// Fabrics, accessories, shoes (old)
-const FABRICS = ["Japanese technical nylon","heavyweight loopwheel cotton","crisp paper-touch poplin","Okayama selvage denim","matte recycled polyester","ripstop nylon","sheer organza","high-density gabardine","washed canvas","GORE-TEX","ribbed knit jersey","technical fleece","matte faux leather","reflective tech fabric","velvet burnout"];
-
-const ACCESSORIES_MODE = ["crossbody technical sling bag","wireless earbuds","silver chain necklace","minimalist silver rings","bucket hat","black face mask","tinted sunglasses","clear frame glasses","indie bookstore tote bag","carabiner with keys on belt loop","chunky headphones worn around neck","nylon backpack","cap with subtle logo","silver ear cuffs"];
-const ACCESSORIES_SEXY = ["heart choker","micro metallic bag on chain","platform Mary Janes","thigh-high sheer tights","rhinestone barrette","fishnet gloves","satin bow in hair","pearl layered necklace","strappy heeled sandals","dramatic false lashes implied","crystal ear cuffs","mini shoulder bag with logo"];
-const SHOES = ["chunky platform sneakers","GORE-TEX hiking sneakers","sleek leather derbies","tabi boots","technical running shoes","slip-on suede mules","chunky lug-sole loafers","canvas classic sneakers","utilitarian combat boots","minimalist white sneakers","platform Mary Janes","thigh-high boots"];
+const ACCESSORIES_MOE = [
+  "large pastel bow hair clip","strawberry hair pins","heart-shaped sunglasses",
+  "pastel phone case with charms","lace gloves","bunny ear headband",
+  "rainbow layered bead bracelets","star-shaped barrettes","pastel mini backpack with charms"
+];
 
 function pickAccessories(styleType) {
-  const pool = styleType === 'sexy' ? ACCESSORIES_SEXY : ACCESSORIES_MODE;
+  let pool;
+  if (styleType === 'sexy')      pool = ACCESSORIES_SEXY;
+  else if (styleType === 'yami') pool = ACCESSORIES_YAMI;
+  else if (styleType === 'moe')  pool = ACCESSORIES_MOE;
+  else                           pool = ACCESSORIES_MODE;
+
   const count = Math.random() < 0.5 ? 1 : 2;
   let selected = [];
   let available = [...pool];
@@ -443,250 +444,340 @@ function pickAccessories(styleType) {
     if (hasBag) available = available.filter(a => !a.match(/bag|backpack|tote/i));
     if (available.length === 0) break;
     const idx = Math.floor(Math.random() * available.length);
-    const picked = available.splice(idx, 1)[0];
-    selected.push(picked);
-    if (picked.match(/bag|backpack|tote/i)) hasBag = true;
+    const item = available.splice(idx, 1)[0];
+    selected.push(item);
+    if (item.match(/bag|backpack|tote/i)) hasBag = true;
   }
   return selected.join(", ");
 }
 
-// Figure & camera (old)
+// ==================== SHOES ====================
+const SHOES = [
+  "chunky platform sneakers","GORE-TEX hiking sneakers","sleek leather derbies","tabi boots",
+  "technical running shoes","slip-on suede mules","chunky lug-sole loafers","canvas classic sneakers",
+  "utilitarian combat boots","minimalist white sneakers","platform Mary Janes","thigh-high boots",
+  "designer tech sneakers","leather side-gore boots","strappy heeled sandals","chunky slingback heels"
+];
+
+// ==================== SCENE ====================
+const LOC_URBAN = [
+  // 昼・屋外
+  "narrow backstreet, tangled power lines, midday sun casting hard shadows",
+  "multistory bicycle parking, thousands of silver spokes, bright afternoon",
+  "narrow asphalt road, yellow Stop characters, clear daytime",
+  "coin parking lot wedged between buildings, yellow wheel stoppers, noon",
+  "suburban pedestrian footbridge over multi-lane road, blue sky",
+  "modern glass-facade building exterior, reflections of clouds",
+  "empty crossing in anonymous business district, weekend afternoon",
+  "concrete riverbank guardrail, distant city skyline, clear day",
+  "rooftop of commercial building, HVAC units, chain-link fence, midday",
+  "urban park with concrete benches, single ginkgo tree, afternoon light",
+  "residential street lined with utility poles, quiet afternoon",
+  "elevated train track shadow on asphalt below, daytime",
+  "open-air shopping arcade, daylight filtering through roof panels",
+  "concrete overpass underside, filtered light, pigeons",
+  "city block corner, convenience store awning, lunch hour",
+  "underneath railway bridge, graffiti and pigeons",
+  "narrow stone-paved slope in old Tokyo neighbourhood",
+  // 夕方
+  "elevated highway overpass, concrete pillars, golden hour shadows",
+  "minimalist cafe interior, concrete walls, warm afternoon light through glass",
+  "train station platform edge, yellow tactile paving, late afternoon",
+  "modern public library exterior, glass and concrete, dusk",
+  "narrow gap between two office buildings, amber sliver of sky",
+  "Nakameguro-style riverside, branches overhead, late afternoon",
+  "suburban station exit, crowd thinning, 5pm slanted light",
+  "open rooftop, empty chairs, golden city backdrop",
+  "school athletic field fence, dust in the late sun",
+  "canal side walk with iron railings, golden reflections",
+  // 夜
+  "konbini parking lot, cold fluorescent rectangle in the dark",
+  "pachinko parlor exterior, aggressive neon signage, cracked asphalt",
+  "underground walkway, white tiles, flickering fluorescent",
+  "coin laundry interior at midnight, fluorescent glow on machines",
+  "vending machine corner in a quiet alley, glowing in the dark",
+  "subterranean shopping mall corridor, closed shutters after hours",
+  "interior of empty subway car, green velour seats, night run",
+  "stairwell of a 1990s apartment complex, dim ceiling light",
+  "back alley, wet asphalt, vending machine glow, midnight"
+];
+
+const LOC_ROOM = [
+  "small one-room apartment, futon folded, clothes rack overflowing",
+  "bedroom with unmade bed, morning light through cheap curtains",
+  "tiny kitchen with dishes in sink, refrigerator covered in magnets",
+  "desk corner with laptop open, coffee cup rings on wood",
+  "bathroom with small tub, toiletries lined up, steam",
+  "closet doorway, clothes spilling out, hangers mixed",
+  "living room floor, cushions and low table, TV glow",
+  "balcony with potted plants and drying rack, city view beyond",
+  "room at night, only desk lamp on, laundry hanging indoors",
+  "cluttered vanity mirror with cosmetics and trinkets",
+  "dimly lit hallway of a wooden apartment",
+  "morning kitchen, steam from a rice cooker",
+  "bedside table with tangled charging cables",
+  "piles of fashion magazines on floor",
+  "sun-drenched window with dust motes",
+  "small home studio with synth and cables",
+  "cozy nook with beanbag and bookshelves"
+];
+
+const SEASONS_SCENE = {
+  spring: [
+    "urban spring, cherry blossom petals scattered on damp asphalt",
+    "mild spring morning in the city, fresh clear air",
+    "overcast spring day, soft diffused light on concrete",
+    "spring afternoon, pale green leaves just opening on city trees",
+    "light spring drizzle, wet pavement reflecting shop signs"
+  ],
+  summer: [
+    "midsummer city heat, heat shimmer rising from asphalt",
+    "humid summer afternoon, hazy distant buildings",
+    "blazing summer sun reflecting off glass facades",
+    "summer evening, heavy warm air",
+    "post-thunderstorm clarity, wet city surfaces sparkling"
+  ],
+  autumn: [
+    "autumn metropolis, yellow ginkgo leaves collecting on pavement",
+    "crisp autumn air, sharp geometric building shadows",
+    "cool autumn afternoon, low golden light across concrete",
+    "late autumn, bare branches against grey city sky",
+    "autumn evening, city lights warming up early"
+  ],
+  winter: [
+    "winter city, crisp air, sharp building silhouettes against pale sky",
+    "cold winter afternoon, flat grey light, long shadows",
+    "stark winter overcast, shadowless urban landscape",
+    "clear winter morning, frost on metal railings",
+    "dry winter wind, dead leaves scraping empty pavement"
+  ]
+};
+
+const WEATHER = {
+  spring: ["post-rain clarity, wet asphalt reflecting sky","soft overcast, flat even lighting","clear sunny, sharp building shadows","breezy and bright, petals in the air"],
+  summer: ["heavy humidity, hazy background","sudden urban downpour, wet concrete","blinding midday sun, bleached shadows","clear dry heat, saturated colors"],
+  autumn: ["crisp and dry, high visibility","golden hour light piercing between buildings","light autumn drizzle, muted tones","windy and clear, fast-moving clouds"],
+  winter: ["clear and freezing, high contrast shadows","light snow barely sticking to asphalt","thick grey overcast, flat shadowless city","dry cold, sharp edges on everything"]
+};
+
+// 時間帯を昼40%/夕方30%/夜30%で制御
+const SCENE_TIMES = {
+  day:     ["10 AM, crisp morning light, long soft shadows","midday, harsh overhead sun, deep geometric shadows","early afternoon, flat bright light","lunch hour, city in motion","weekend afternoon, quiet streets, sharp sunlight"],
+  evening: ["late afternoon, golden hour, amber reflecting off windows","5 PM, rush hour beginning, warm slanted light","golden hour, last sunlight cutting between buildings","dusk, sky turning indigo, shop lights flickering on","twilight, boundary between natural and artificial light"],
+  night:   ["early evening, 8 PM, city fully lit","midnight, deserted streets, solitary vending machine glow","3 AM, eerie stillness, orange sodium streetlights","2 AM, post-closing-time emptiness","blue hour transitioning to dark night"]
+};
+
+function pickTimePhase() {
+  const r = Math.random();
+  if (r < 0.40) return 'day';
+  if (r < 0.70) return 'evening';
+  return 'night';
+}
+
+// ==================== RARE TOKYO ====================
+const RARE_TOKYO = [
+  "plastic umbrella abandoned on bench nearby",
+  "pachinko neon bleeding into fog behind subject",
+  "Don Quijote plastic bag hanging from wrist",
+  "construction LED flashing magenta in background",
+  "rain-soaked convenience store receipt on ground",
+  "unattended bicycle with faded basket in frame edge",
+  "vending machine casting colored light on one side of face",
+  "distant salaryman umbrella dissolving in rain",
+  "broken fluorescent tube on the concrete floor",
+  "faint steam rising from a ramen shop vent in the background",
+  "reflection of a blue emergency exit sign on a wet railing",
+  "single discarded yellow train ticket on grey asphalt"
+];
+
+// ==================== COLOR ====================
+const COLORS_BASE = {
+  spring: ["dusty rose and concrete grey","sage green and off-white","navy and crisp white","beige tonal","lavender and warm white","mint green and blush pink","powder blue and pale yellow","cherry blossom pink head-to-toe","soft coral and ivory","lilac and silver grey"],
+  summer: ["stark white and pitch black","washed denim blue and white","charcoal monochrome","crisp ivory","hot coral and white","electric yellow and black","vivid cobalt blue head-to-toe","neon lime and black","tomato red and off-white","turquoise and cream"],
+  autumn: ["olive drab and black","brown tonal","deep burgundy and black","khaki and stark white","rust orange and navy","terracotta and cream","forest green and camel","wine red head-to-toe","copper and black","deep teal and burgundy"],
+  winter: ["all black","slate grey and silver","midnight blue monochrome","charcoal and dark olive","ivory and camel","deep emerald and black","cobalt and white","rich purple and black","icy blue head-to-toe","crimson and black"]
+};
+const ACCENT_COLORS = [
+  "neon pink sock accent","electric blue hair clip","safety orange bag strap",
+  "acid green phone case","hot pink inner lining flash","neon yellow sole edge",
+  "cobalt blue hair tie","fluorescent orange zipper pull","magenta bra strap visible",
+  "chrome silver mini bag","iridescent butterfly clip","blood red lip contrast",
+  "holographic belt","neon coral earrings","lime green lanyard"
+];
+const AMBIENT_COLORS = {
+  spring: ["magenta vending machine glow on one side","pale streetlamp warmth","soft diffused light bounce off concrete"],
+  summer: ["harsh LED wash from above","green traffic light reflection","deep blue atmospheric shadows"],
+  autumn: ["warm sodium streetlamp cast","amber light reflections","cold blue shadow contrasting warm patches"],
+  winter: ["cold blue fluorescent overhead spill","white LED harsh and clinical","steel grey ambient with high contrast"]
+};
+
+function buildColorDescription(season) {
+  return `${pick(COLORS_BASE[season])}, ${pick(ACCENT_COLORS)}, ${pick(AMBIENT_COLORS[season])}`;
+}
+
+// ==================== FIGURE ====================
 const BODY_POSES = [
-  // 立ち姿勢・基本
-  "contrapposto stance, hip pop",
-  "standing straight, weight evenly distributed",
-  "standing still, background slightly blurred",
-  "feet shoulder-width apart, grounded stance",
-  "one foot slightly forward, casual",
-  "weight shifted to one leg, hip out",
-  "standing with legs crossed at ankles",
-  
-  // 歩行系
-  "mid-stride, relaxed swagger",
-  "walking towards camera, slight motion blur",
-  "walking away, looking back over shoulder",
-  "caught mid-step, natural gait",
-  "power walking, purposeful stride",
-  "slow stroll, hands in pockets",
-  "walking while looking at phone",
-  
-  // 寄りかかり系
-  "leaning against concrete wall, weight shifted",
-  "leaning on railing, elbows resting",
-  "shoulder against building, one leg bent",
-  "leaning back against vending machine",
-  "propped against street pole",
-  "leaning on bicycle handlebars",
-  "back against brick wall, head tilted",
-  
-  // 座り系
-  "sitting on curb, knees pulled up",
-  "sitting on park bench, legs crossed",
-  "perched on low wall, feet dangling",
-  "sitting on stairs, elbows on knees",
-  "squatting on heels, street style",
-  "sitting on ground, back against wall",
-  "perched on bicycle seat, one foot down",
-  
-  // しゃがみ・屈み系
-  "crouching down, tying shoe",
-  "squatting low, arms resting on knees",
-  "bending over to pick up bag",
-  "kneeling on one knee",
-  "sitting seiza-style on floor (indoor)",
-  
-  // 動きのあるポーズ
-  "mid-turn, hair swinging",
-  "stepping off curb",
-  "ducking under low awning",
-  "reaching up to adjust hair",
-  "stretching arms overhead",
-  "spinning slightly, skirt flare implied",
-  "jumping off last stair",
-  
-  // 日本的な「縮こまり」系
-  "hands buried deep in pockets, slight slouch",
-  "shoulders hunched against cold",
-  "making herself small, arms wrapped around",
-  "standing with knees together, pigeon-toed",
-  "huddled in oversized coat",
-  "curled up on chair (indoor)",
-  
-  // 自信・開放系
-  "hands on hips, confident stance",
-  "arms spread wide, embracing space",
-  "standing tall, chin up",
-  "one hand on hip, other gesturing",
-  "power pose, feet apart",
-  
-  // 寄り・もたれ系（室内）
-  "leaning in doorway, one shoulder",
-  "sitting on kitchen counter",
-  "lying on bed, propped on elbows",
-  "perched on desk edge",
-  "leaning over balcony railing",
-  "sitting cross-legged on floor",
-  
-  // 自然体・無造作系
-  "looking away, distracted",
-  "caught off-balance, natural",
-  "shifting weight, adjusting stance",
-  "standing with one leg bent, foot against wall",
-  "mid-movement, unposed",
-  "slouching comfortably",
-  "standing with arms loosely at sides",
-  
-  // 対人・インタラクション暗示
-  "leaning in to listen",
-  "standing close to someone (out of frame)",
-  "turned three-quarters away",
-  "looking over shoulder at someone"
+  "contrapposto stance, hip pop","standing straight, weight evenly distributed",
+  "standing still, background slightly blurred","weight shifted to one leg, hip out",
+  "standing with legs crossed at ankles","mid-stride, relaxed swagger",
+  "walking towards camera, slight motion blur","walking away, looking back over shoulder",
+  "power walking, purposeful stride","slow stroll, hands in pockets",
+  "leaning against concrete wall, weight shifted","leaning on railing, elbows resting",
+  "shoulder against building, one leg bent","leaning back against vending machine",
+  "back against wall, head tilted","sitting on curb, knees pulled up",
+  "sitting on park bench, legs crossed","perched on low wall, feet dangling",
+  "sitting on stairs, elbows on knees","squatting on heels, street style",
+  "crouching down, tying shoe","mid-turn, hair swinging",
+  "reaching up to adjust hair","spinning slightly, skirt flare implied",
+  "hands buried deep in pockets, slight slouch","shoulders hunched against cold",
+  "standing with knees together, pigeon-toed","hands on hips, confident stance",
+  "standing tall, chin up","looking away, distracted",
+  "caught off-balance, natural","standing with one leg bent, foot against wall",
+  "sitting cross-legged on floor (indoor)","leaning in doorway, one shoulder",
+  "lying on bed, propped on elbows (indoor)","perched on desk edge (indoor)"
 ];
+
 const HAND_GESTURES = [
-  // スマホ系
-  "holding smartphone loosely",
-  "both hands holding phone, thumbs typing",
-  "checking phone screen, slight frown",
-  "holding phone to ear, mid-call",
-  "taking selfie angle (phone out of frame implied)",
-  "scrolling with one thumb",
-  "phone in back pocket, hand resting on it",
-  
-  // バッグ・持ち物系
-  "hand resting on bag strap",
-  "holding tote bag handles with both hands",
-  "adjusting backpack strap",
-  "clutching crossbody bag close",
-  "holding paper cup from cafe",
-  "holding plastic bottle tea",
-  "carrying convenience store plastic bag",
-  "holding folded umbrella",
-  
-  // ポケット・袖系
-  "one hand in pocket",
-  "both hands in pockets, shoulders hunched",
-  "hands tucked into oversized hoodie sleeves",
-  "hands in coat pockets, elbows out",
-  "thumb hooked in pocket edge",
-  
-  // 髪・顔・アクセサリー調整
-  "fingers touching collar",
-  "adjusting glasses",
-  "touching hair behind ear",
-  "fixing hair tie",
-  "adjusting face mask",
-  "pulling hoodie hood up slightly",
-  "adjusting beanie",
-  "fingers playing with necklace chain",
-  "touching earring",
-  "brushing hair from face",
-  
-  // 身体的・姿勢系
-  "arms crossed loosely",
-  "hand on hip, casual confidence",
-  "hands clasped in front",
-  "one arm hugging self",
-  "stretching arms overhead (implied motion)",
-  "rolling up sleeve",
-  "pulling down hem of top",
-  "adjusting waistband",
-  "hands behind back",
-  "leaning weight on one leg, hand on thigh",
-  
-  // 対人・コミュニケーション系
-  "waving slightly (to someone out of frame)",
-  "hand raised to get attention",
-  "covering mouth while laughing",
-  "hand over heart, surprised expression",
-  "pointing at something (casual, not aggressive)",
-  "giving peace sign low near waist",
-  "hand outstretched as if to take something",
-  "brushing past hair while looking away (flirty)",
-  "hand on friend's shoulder (implied other person)",
-  "adjusting someone else's collar (intimate gesture)",
-  
-  // 感情・癖系
-  "biting thumbnail lightly",
-  "fidgeting with ring",
-  "tapping fingers on thigh",
-  "holding wrist with other hand",
-  "playing with hoodie strings",
-  "hugging arms in cold",
-  "shielding eyes from light",
-  "hand on chin, thinking pose"
+  "holding smartphone loosely","both hands holding phone, thumbs typing",
+  "checking phone screen, slight frown","scrolling with one thumb",
+  "hand resting on bag strap","holding tote bag handles with both hands",
+  "clutching crossbody bag close","holding paper cup from cafe",
+  "holding plastic bottle tea","carrying convenience store plastic bag",
+  "one hand in pocket","both hands in pockets, shoulders hunched",
+  "hands tucked into oversized hoodie sleeves","thumb hooked in pocket edge",
+  "fingers touching collar","adjusting glasses","touching hair behind ear",
+  "fixing hair tie","pulling hoodie hood up slightly","fingers playing with necklace chain",
+  "touching earring","brushing hair from face","arms crossed loosely",
+  "hand on hip, casual confidence","hands clasped in front","one arm hugging self",
+  "rolling up sleeve","pulling down hem of top","hands behind back",
+  "covering mouth while laughing","giving peace sign low near waist",
+  "biting thumbnail lightly","fidgeting with ring","tapping fingers on thigh",
+  "holding wrist with other hand","hugging arms in cold","shielding eyes from light"
 ];
+
 const FACIAL_EXPRESSIONS = [
-  // クール・無表情系（ベース）
-  "cool, detached, neutral",
-  "slight mysterious smirk",
-  "confident direct stare",
-  "relaxed and observant",
-  "melancholic, looking into distance",
-  "blank stare, lost in thought",
-  "stoic, unreadable expression",
-  "subtle side-eye glance",
-  
-  // 柔らかい・微笑み系
-  "soft gentle smile, eyes slightly narrowed",
-  "small closed-mouth smile",
-  "warm smile reaching eyes",
-  "shy smile, looking down",
-  "content slight smile while looking away",
-  "tender expression, lips parted slightly",
-  "peaceful serene face",
-  
-  // 考え事・内省系
-  "deep in thought, gaze lowered",
-  "pensive, brow slightly furrowed",
-  "contemplative, staring into middle distance",
-  "distracted, mind elsewhere",
-  "worried slight frown",
-  "daydreaming, soft focus eyes",
-  "introspective, looking down",
-  
-  // 感情豊か系
-  "genuine laugh, eyes crinkled",
-  "surprised, eyebrows raised slightly",
-  "amused smirk, one corner of mouth up",
-  "playful grin",
-  "slightly annoyed, pout",
-  "tired, heavy-lidded eyes",
-  "relieved soft exhale expression",
-  "curious, head tilted slightly",
-  
-  // 日本的な「作らない」表情
-  "natural resting face, no posing",
-  "caught off-guard, authentic moment",
-  "mid-blink, candid feel",
-  "looking away, uninterested in camera",
-  "slight squint from bright light",
-  "wind-blown hair, eyes half-closed",
-  "yawning subtly, hand near mouth",
-  
-  // 対人・コミュニケーション系
-  "listening intently, slight nod",
-  "reacting to someone off-camera, smile forming",
-  "embarrassed, cheeks slightly flushed implied",
-  "teasing expression, tongue slightly visible",
-  "affectionate gaze at someone nearby",
-  "laughing at joke, head back slightly",
-  
-  // ムード系
-  "lonely, vulnerable expression",
-  "defiant, chin slightly raised",
-  "dreamy, soft gaze",
-  "bored, checking time implied",
-  "hopeful, eyes bright",
-  "nostalgic, distant smile",
-  "determined, jaw set lightly",
-  "vulnerable, eyes watery (not crying)"
+  "cool, detached, neutral","slight mysterious smirk","confident direct stare",
+  "relaxed and observant","melancholic, looking into distance","blank stare, lost in thought",
+  "stoic, unreadable expression","subtle side-eye glance",
+  "soft gentle smile, eyes slightly narrowed","small closed-mouth smile",
+  "warm smile reaching eyes","shy smile, looking down",
+  "content slight smile while looking away","peaceful serene face",
+  "deep in thought, gaze lowered","pensive, brow slightly furrowed",
+  "contemplative, staring into middle distance","distracted, mind elsewhere",
+  "daydreaming, soft focus eyes","genuine laugh, eyes crinkled",
+  "surprised, eyebrows raised slightly","amused smirk, one corner up",
+  "playful grin","slightly annoyed, pout","tired, heavy-lidded eyes",
+  "curious, head tilted slightly","natural resting face, no posing",
+  "caught off-guard, authentic moment","mid-blink, candid feel",
+  "looking away, uninterested in camera","slight squint from bright light",
+  "lonely, vulnerable expression","defiant, chin slightly raised",
+  "dreamy, soft gaze","nostalgic, distant smile","determined, jaw set lightly"
 ];
-const LIGHTING = ["harsh artificial LED from above","soft bounce off concrete surface","neon rim light on profile","flat natural light, low contrast","golden hour backlight, slight silhouette","harsh camera flash aesthetic","magenta vending machine sidelight"];
-const CAMERA = ["35mm focal length, environmental portrait","85mm lens, shallow depth of field, bokeh background","wide angle 24mm, leading lines of architecture","low angle, architectural dominance","telephoto compression, subject against background"];
-const STYLE_SCENE = ["Takashi Homma style suburban minimalism","modern Japanese indie film aesthetic","cinematic street photography, cool blue shadows and warm highlights","Rinko Kawauchi soft light, ephemeral urban details","cyberpunk-adjacent but grounded in reality, neon reflections"];
+
+const LIGHTING = [
+  "harsh artificial LED from above","soft bounce off concrete surface",
+  "neon rim light on profile","flat overcast natural light, low contrast",
+  "golden hour backlight, slight silhouette","harsh camera flash aesthetic",
+  "mixed: warm streetlamp and cool sky","magenta vending machine sidelight",
+  "cold convenience store overhead spill","volumetric light through narrow building gap",
+  "dappled afternoon light through leaves","flat bright midday overcast"
+];
+
+const CAMERA = [
+  "35mm focal length, environmental portrait",
+  "85mm lens, shallow depth of field, bokeh background",
+  "wide angle 24mm, leading lines of architecture",
+  "low angle, architectural dominance",
+  "security camera aesthetic, elevated and detached",
+  "handheld documentary style, raw and intimate",
+  "telephoto compression, subject against background",
+  "perfectly leveled architectural photography framing"
+];
+
+const STYLE_SCENE = [
+  "Takashi Homma style suburban minimalism",
+  "modern Japanese indie film aesthetic",
+  "cinematic street photography, cool blue shadows and warm highlights",
+  "Rinko Kawauchi soft light, ephemeral urban details",
+  "high-fashion editorial, stark contrast",
+  "cyberpunk-adjacent but grounded in reality, neon reflections",
+  "Wong Kar-wai inspired color bleed",
+  "Daido Moriyama gritty grain texture"
+];
+
 const CAMERA_FIXED = "cinematic color grade, Fujifilm X-T4, 23mm f2, natural skin texture, unretouched";
 
-// ==================== UI FUNCTIONS ====================
+// ==================== HAIR ====================
+const HAIRSTYLES = [
+  // ショート
+  "short cropped pixie cut","textured short wolf cut","blunt bob chin-length",
+  "asymmetric short bob","shaggy short cut with curtain bangs","buzz cut with soft fade",
+  "short undercut with longer top","ear-length bob with natural texture",
+  // ミディアム
+  "medium length wolf cut, messy layers","collarbone-length straight cut, center part",
+  "wavy lob with loose texture","medium shag with heavy curtain bangs",
+  "blunt collarbone bob","half-up half-down messy bun",
+  "medium length with visible bleach damage and regrowth",
+  // ロング
+  "long straight hair, blunt cut","long wavy hair loosely falling",
+  "long layered hair with face-framing pieces","high ponytail, sleek and tight",
+  "low messy bun, loose strands falling","long hair pulled to one side",
+  "braided sections mixed into loose long hair",
+  // ツインテール・お団子系
+  "twin tails, low and loose","twin tails, high and tight",
+  "two space buns on top","one side bun, asymmetric","low pigtails, slightly messy",
+  // カラー・加工系
+  "bleached platinum blonde, slightly grown-out roots",
+  "black hair with faded blue-grey ends","vivid dyed hair, two-tone split dye",
+  "pastel pink dyed ends on dark base","silver-white dyed hair",
+  "natural black with subtle dark brown highlights",
+  // 特徴的なスタイル
+  "hime cut, straight bangs and side curtains","retro 70s feathered layers",
+  "wet-look slicked back hair","extremely voluminous teased hair"
+];
+
+// ==================== MAKEUP ====================
+const MAKEUPS = [
+  // ナチュラル・素肌感
+  "no-makeup makeup, dewy skin, barely-there tint",
+  "clean skin, glossy lip, brushed-up brows",
+  "natural base, soft pink cheek flush, clear gloss",
+  "minimal makeup, moisturized skin glow, light mascara",
+  // 白・マット・整肌系
+  "porcelain-white foundation, matte finish, high coverage",
+  "ultra pale base, powdered matte skin, whitened complexion",
+  "full coverage matte base, flawless finish, no-shimmer",
+  // チーク強め系
+  "flushed cheeks high on cheekbones, gradient blush effect",
+  "heavy coral blush placed high, gyaru-inspired",
+  "deep rose blush, heavily swept across nose bridge",
+  "gradient cheek blush blending into light contour",
+  "soft pink blush dusted over entire face, doll-like",
+  // 目元・アイシャドー系
+  "heavy smoky eye, deep charcoal and black",
+  "bold cut-crease eye, sharp liner wing, dramatic",
+  "warm brown smoky eye, sun-kissed effect",
+  "iridescent shimmer lid, champagne and rose gold",
+  "thick black eyeliner all around, goth-adjacent",
+  "double eyelid tape visible, dramatic eye enlargement",
+  "vivid colored eyeshadow, electric blue or violet lid",
+  // 涙袋・デカ目系
+  "pronounced aegyo-sal (lower eye bag highlight), enlarged eye effect",
+  "aegyo-sal shimmer under eye, puppy eye makeup",
+  "circle lens effect, irises appear enlarged, glossy",
+  "heavy lash extensions, visible flutter",
+  // 病み系・個性派
+  "dark undereye circles emphasized, intentional tired look",
+  "sfumato bruise-toned undereye, menhera aesthetic",
+  "graphic liner in colour, geometric under-eye art",
+  "black lip, matte dark finish","deep plum lip, full coverage",
+  // ギャル系
+  "gyaru makeup, heavy white inner corner, bronzed skin",
+  "agejo makeup, thick lashes, bright highlight, glossy lip",
+  "dark tan foundation, neon pink gloss, false lashes"
+];
+
+// ==================== UI ====================
 function setSeason(s) {
   currentSeason = s;
   document.querySelectorAll(".selector-btn[data-season]").forEach(b => {
@@ -694,81 +785,59 @@ function setSeason(s) {
     if (b.dataset.season === s) b.classList.add("active-" + s);
   });
 }
-
 function setFraming(f) {
   currentFraming = f;
   document.querySelectorAll(".frame-btn").forEach(b => b.classList.remove("active"));
   document.getElementById("frame-" + f).classList.add("active");
 }
-
-// NEW from v3.7
 function setSceneType(t) {
   currentSceneType = t;
-  updateBoostUI();
+  document.querySelectorAll(".scene-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("scene-" + t).classList.add("active");
 }
-
 function setFilter(f) {
   currentFilter = f;
-  updateBoostUI();
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("filter-" + f).classList.add("active");
 }
 
-function updateBoostUI() {
-  document.querySelectorAll(".scene-btn, .filter-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById(`scene-${currentSceneType}`).classList.add("active");
-  document.getElementById(`filter-${currentFilter}`).classList.add("active");
+// ==================== LOCK SYSTEM ====================
+function toggleLock(key) {
+  lockedFields[key] = !lockedFields[key];
+  renderFields();
 }
 
-// ==================== CORE LOGIC ====================
-function pickTimePhase() {
-  const r = Math.random();
-  if (r < 0.4) return 'day';
-  if (r < 0.7) return 'evening';
-  return 'night';
+function isLocked(key) {
+  return !!lockedFields[key];
 }
 
+// ==================== GENERATE ====================
 function reroll(key) {
+  if (isLocked(key)) return; // locked → do nothing
+
   if (key === 'style') {
     const s = pickStyle();
-    lastVals.style = s.name;
-    lastVals.styleType = s.type;
-  } else if (key === 'top') {
-    lastVals.top = pickTop(lastVals.styleType);
-  } else if (key === 'bottom') {
-    lastVals.bottom = pickBottom(lastVals.styleType);
-  } else if (key === 'fabric') {
-    lastVals.fabric = pick(FABRICS);
-  } else if (key === 'shoe') {
-    lastVals.shoe = pick(SHOES);
-  } else if (key === 'loc') {
-    const pool = currentSceneType === 'urban' ? LOC_URBAN : LOC_ROOM;
-    lastVals.loc = pick(pool);
-  } else if (key === 'time') {
-    lastVals.time = pick(SCENE_DATA[lastVals.timePhase].times);
-  } else if (key === 'mood_color') {
-    lastVals.mood_color = buildColorDescription(currentSeason);
-  } else if (key === 'weather') {
-    lastVals.weather = pick(WEATHER[currentSeason]);
-  } else if (key === 'season_scene') {
-    lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]);
-  } else if (key === 'acc') {
-    lastVals.acc = pickAccessories(lastVals.styleType);
-  } else if (key === 'outer') {
-    lastVals.outer = Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null;
-  } else if (key === 'rare') {
-    lastVals.rare = Math.random() < 0.35 ? pick(RARE_TOKYO) : null;
-  } else if (key === 'camera') {
-    lastVals.camera = pick(CAMERA);
-  } else if (key === 'styleScene') {
-    lastVals.styleScene = pick(STYLE_SCENE);
-  } else if (key === 'pose') {
-    lastVals.pose = pick(BODY_POSES);
-  } else if (key === 'gesture') {
-    lastVals.gesture = pick(HAND_GESTURES);
-  } else if (key === 'expression') {
-    lastVals.expression = pick(FACIAL_EXPRESSIONS);
-  } else if (key === 'light') {
-    lastVals.light = pick(LIGHTING);
-  }
+    lastVals.style = s.name; lastVals.styleType = s.type;
+  } else if (key === 'top')         { lastVals.top = pickTop(lastVals.styleType); }
+  else if (key === 'bottom')        { lastVals.bottom = pickBottom(lastVals.styleType); }
+  else if (key === 'fabric')        { lastVals.fabric = pick(FABRICS); }
+  else if (key === 'shoe')          { lastVals.shoe = pick(SHOES); }
+  else if (key === 'loc')           { lastVals.loc = pick(currentSceneType === 'urban' ? LOC_URBAN : LOC_ROOM); }
+  else if (key === 'time')          { lastVals.time = pick(SCENE_TIMES[lastVals.timePhase]); }
+  else if (key === 'mood_color')    { lastVals.mood_color = buildColorDescription(currentSeason); }
+  else if (key === 'weather')       { lastVals.weather = pick(WEATHER[currentSeason]); }
+  else if (key === 'season_scene')  { lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]); }
+  else if (key === 'acc')           { lastVals.acc = pickAccessories(lastVals.styleType); }
+  else if (key === 'outer')         { lastVals.outer = Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null; }
+  else if (key === 'rare')          { lastVals.rare = Math.random() < 0.35 ? pick(RARE_TOKYO) : null; }
+  else if (key === 'camera')        { lastVals.camera = pick(CAMERA); }
+  else if (key === 'styleScene')    { lastVals.styleScene = pick(STYLE_SCENE); }
+  else if (key === 'pose')          { lastVals.pose = pick(BODY_POSES); }
+  else if (key === 'gesture')       { lastVals.gesture = pick(HAND_GESTURES); }
+  else if (key === 'expression')    { lastVals.expression = pick(FACIAL_EXPRESSIONS); }
+  else if (key === 'light')         { lastVals.light = pick(LIGHTING); }
+  else if (key === 'hair')          { lastVals.hair = pick(HAIRSTYLES); }
+  else if (key === 'makeup')        { lastVals.makeup = pick(MAKEUPS); }
   rebuildPromptAndDisplay();
 }
 
@@ -777,72 +846,84 @@ function rebuildPromptAndDisplay() {
   const framingText = { full: "full body shot", upper: "upper body shot from waist up", bust: "bust shot", close: "extreme close-up on face" }[currentFraming];
 
   let filterTags = "";
-  if (currentFilter === 'raw') filterTags = "raw street photography, heavy film grain, candid snapshot, slight motion blur, lo-fi aesthetic";
-  if (currentFilter === 'cine') filterTags = "cinematic street photography, teal and orange color grade, volumetric lighting, atmospheric depth";
+  if (currentFilter === 'raw') filterTags = "raw street photography, heavy film grain, candid snapshot, slight motion blur";
+  if (currentFilter === 'cine') filterTags = "cinematic color grade, teal and orange, volumetric lighting, atmospheric depth";
+  if (currentFilter === 'analog') filterTags = "1990s Japanese street photography, nostalgic film look, authentic film grain, slight color fading, Fujifilm Superia aesthetic";
+  if (currentFilter === 'cctv') filterTags = "security camera footage aesthetic, CCTV lo-fi, high angle surveillance, grainy video frame, timestamp overlay, slightly pixelated";
+  if (currentFilter === 'nightvision') filterTags = "monochrome green tint, night vision infrared, high ISO noise, tactical tech aesthetic, glowing eyes, military-grade optics";
+
+  const sceneNote = currentSceneType === 'room'? "intimate private room, personal space" : "anonymous urban environment";
 
   const parts = [
     `location: ${v.loc}`,
-    v.season_scene,
-    v.time,
-    v.weather,
+    v.season_scene, v.time, v.weather,
     "young Japanese woman",
-    framingText,
-    v.pose,
-    v.gesture,
-    v.expression,
-    v.light,
+    framingText, v.pose, v.gesture, v.expression, v.light,
+    v.hair? `hairstyle: ${v.hair}` : null,
+    v.makeup? `makeup: ${v.makeup}` : null,
     `wearing ${v.style} outfit`,
-    v.top,
-    v.bottom,
-    ...(v.outer ? [v.outer] : []),
+    v.top, v.bottom,
+   ...(v.outer? [v.outer] : []),
     `${v.fabric} fabric`,
     `color palette: ${v.mood_color}`,
     `accessories: ${v.acc}`,
     v.shoe,
-    v.camera,
-    v.styleScene,
-    CAMERA_FIXED,
-    ...(v.rare ? [v.rare] : []),
+    v.camera, v.styleScene, CAMERA_FIXED,
+   ...(v.rare? [v.rare] : []),
     filterTags,
-    "anonymous urban beauty, quiet poetry of modern Japanese infrastructure + private room intimacy, hyper-realistic, high detail urban photography"
-  ];
+    sceneNote,
+    "hyper-realistic, high detail photography"
+  ].filter(Boolean);
 
-  currentPrompt = parts.filter(Boolean).join(", ");
+  currentPrompt = parts.join(", ");
   document.getElementById("finalPrompt").value = currentPrompt;
   renderFields();
 }
 
 function renderFields() {
   const v = lastVals;
-  document.getElementById("displayFields").innerHTML = [
-    { label: "Style", value: v.style, color: "#f9a8d4", key: "style" },
-    { label: "Top", value: v.top, color: "#c084fc", key: "top" },
-    { label: "Bottom", value: v.bottom, color: "#c084fc", key: "bottom" },
-    { label: "Outer", value: v.outer || "— none —", color: v.outer ? "#93c5fd" : "#2a2535", key: "outer" },
-    { label: "Fabric", value: v.fabric, color: "#fcd34d", key: "fabric" },
-    { label: "Color", value: v.mood_color, color: "#fcd34d", key: "mood_color" },
-    { label: "Accessories", value: v.acc, color: "#86efac", key: "acc" },
-    { label: "Shoes", value: v.shoe, color: "#67e8f9", key: "shoe" },
-    { label: "Scene", value: v.loc, color: "#fda4af", key: "loc" },
-    { label: "Season", value: v.season_scene, color: "#fcd34d", key: "season_scene" },
-    { label: "Time", value: v.time, color: "#fcd34d", key: "time" },
-    { label: "Weather", value: v.weather, color: "#a5f3fc", key: "weather" },
-    { label: "Camera", value: v.camera, color: "#fed7aa", key: "camera" },
-    { label: "Film Style", value: v.styleScene, color: "#fda4af", key: "styleScene" },
-    { label: "Figure", value: v.pose, color: "#c084fc", key: "pose" },
-    { label: "Gesture", value: v.gesture, color: "#f9a8d4", key: "gesture" },
-    { label: "Expression", value: v.expression, color: "#86efac", key: "expression" },
-    { label: "Lighting", value: v.light, color: "#fcd34d", key: "light" },
+  const fields = [
+    { label: "Style",      value: v.style,        color: "#f9a8d4", key: "style" },
+    { label: "Top",        value: v.top,           color: "#c084fc", key: "top" },
+    { label: "Bottom",     value: v.bottom,        color: "#c084fc", key: "bottom" },
+    { label: "Outer",      value: v.outer || "— none —", color: v.outer ? "#93c5fd" : "#2a2535", key: "outer" },
+    { label: "Fabric",     value: v.fabric,        color: "#fcd34d", key: "fabric" },
+    { label: "Color",      value: v.mood_color,    color: "#fcd34d", key: "mood_color" },
+    { label: "Accessories",value: v.acc,           color: "#86efac", key: "acc" },
+    { label: "Shoes",      value: v.shoe,          color: "#67e8f9", key: "shoe" },
+    { label: "Scene",      value: v.loc,           color: "#fda4af", key: "loc" },
+    { label: "Season",     value: v.season_scene,  color: "#fcd34d", key: "season_scene" },
+    { label: "Time",       value: v.time,          color: "#fcd34d", key: "time" },
+    { label: "Weather",    value: v.weather,       color: "#a5f3fc", key: "weather" },
+    { label: "Camera",     value: v.camera,        color: "#fed7aa", key: "camera" },
+    { label: "Film Style", value: v.styleScene,    color: "#fda4af", key: "styleScene" },
+    { label: "Figure",     value: v.pose,          color: "#c084fc", key: "pose" },
+    { label: "Gesture",    value: v.gesture,       color: "#f9a8d4", key: "gesture" },
+    { label: "Expression", value: v.expression,    color: "#86efac", key: "expression" },
+    { label: "Lighting",   value: v.light,         color: "#fcd34d", key: "light" },
+    { label: "Hair",       value: v.hair,          color: "#f9a8d4", key: "hair" },
+    { label: "Makeup",     value: v.makeup,        color: "#fda4af", key: "makeup" },
     ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
-  ].map(f => `
-    <div class="field-row">
-      <div class="field-label">${f.label}</div>
-      <div class="field-value" style="color:${f.color}">
-        ${f.value}${f.rare ? '<span class="rare-badge" style="color:#c084fc">rare</span>' : ''}
+  ];
+
+  document.getElementById("displayFields").innerHTML = fields.map(f => {
+    const locked = isLocked(f.key);
+    const isRare = f.rare;
+    return `
+      <div class="field-row ${locked ? 'is-locked' : ''} ${isRare ? 'rare-row' : ''}">
+        <div class="field-label">${f.label}</div>
+        <div class="field-value" style="color:${f.color}">
+          ${f.value}${isRare ? '<span class="rare-badge" style="color:#c084fc">rare</span>' : ''}
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="lock-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${f.key}')" title="${locked ? 'Unlock' : 'Lock'}">
+            ${locked ? '🔒' : '🔓'}
+          </button>
+          <button class="reroll-btn" onclick="reroll('${f.key}')" title="Re-roll">🔄</button>
+        </div>
       </div>
-      <button class="reroll-btn" onclick="reroll('${f.key}')" title="Re-roll">🔄</button>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function generateAll() {
@@ -853,34 +934,39 @@ function generateAll() {
   document.getElementById("promptBox").style.display = "block";
 
   const s = pickStyle();
-  const style = s.name;
-  const styleType = s.type;
-  
-  const top = pickTop(styleType);
-  const bottom = pickBottom(styleType);
-  const outer = Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null;
-  const fabric = pick(FABRICS);
-  const mood_color = buildColorDescription(currentSeason);
-  const acc = pickAccessories(styleType);
-  const shoe = pick(SHOES);
-
+  const style = s.name, styleType = s.type;
   const timePhase = pickTimePhase();
   const locPool = currentSceneType === 'urban' ? LOC_URBAN : LOC_ROOM;
-  const loc = pick(locPool);
-  const time = pick(SCENE_DATA[timePhase].times);
-  
-  const weather = pick(WEATHER[currentSeason]);
-  const season_scene = pick(SEASONS_SCENE[currentSeason]);
-  const camera = pick(CAMERA);
-  const styleScene = pick(STYLE_SCENE);
-  const rare = Math.random() < 0.35 ? pick(RARE_TOKYO) : null;
 
-  const pose = pick(BODY_POSES);
-  const gesture = pick(HAND_GESTURES);
-  const expression = pick(FACIAL_EXPRESSIONS);
-  const light = pick(LIGHTING);
+  // preserve locked values
+  const preserved = {};
+  Object.keys(lockedFields).forEach(k => {
+    if (lockedFields[k] && lastVals[k] !== undefined) preserved[k] = lastVals[k];
+  });
 
-  lastVals = { style, styleType, timePhase, top, bottom, outer, fabric, mood_color, acc, shoe, loc, time, weather, season_scene, camera, styleScene, rare, pose, gesture, expression, light };
+  lastVals = {
+    style, styleType, timePhase,
+    top:          preserved.top || pickTop(styleType),
+    bottom:       preserved.bottom || pickBottom(styleType),
+    outer:        preserved.outer !== undefined ? preserved.outer : (Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null),
+    fabric:       preserved.fabric || pick(FABRICS),
+    mood_color:   preserved.mood_color || buildColorDescription(currentSeason),
+    acc:          preserved.acc || pickAccessories(styleType),
+    shoe:         preserved.shoe || pick(SHOES),
+    loc:          preserved.loc || pick(locPool),
+    time:         preserved.time || pick(SCENE_TIMES[timePhase]),
+    weather:      preserved.weather || pick(WEATHER[currentSeason]),
+    season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
+    camera:       preserved.camera || pick(CAMERA),
+    styleScene:   preserved.styleScene || pick(STYLE_SCENE),
+    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? pick(RARE_TOKYO) : null),
+    pose:         preserved.pose || pick(BODY_POSES),
+    gesture:      preserved.gesture || pick(HAND_GESTURES),
+    expression:   preserved.expression || pick(FACIAL_EXPRESSIONS),
+    light:        preserved.light || pick(LIGHTING),
+    hair:         preserved.hair || pick(HAIRSTYLES),
+    makeup:       preserved.makeup || pick(MAKEUPS)
+  };
 
   rebuildPromptAndDisplay();
   document.getElementById("saveBtn").style.display = "block";
@@ -899,33 +985,26 @@ function copyPrompt() {
 
 function savePrompt() {
   if (!currentPrompt) return;
-  let saved = JSON.parse(localStorage.getItem("uja_v4_merged") || "[]");
+  let saved = JSON.parse(localStorage.getItem("uja_v5") || "[]");
   if (saved.includes(currentPrompt)) return;
   saved.unshift(currentPrompt);
-  localStorage.setItem("uja_v4_merged", JSON.stringify(saved.slice(0, 30)));
+  localStorage.setItem("uja_v5", JSON.stringify(saved.slice(0, 30)));
   renderSaved();
 }
 
 function renderSaved() {
-  const saved = JSON.parse(localStorage.getItem("uja_v4_merged") || "[]");
+  const saved = JSON.parse(localStorage.getItem("uja_v5") || "[]");
   const section = document.getElementById("savedSection");
   const list = document.getElementById("savedList");
   if (saved.length === 0) { section.style.display = "none"; return; }
   section.style.display = "block";
   list.innerHTML = saved.map((p, i) => `<div class="saved-item" data-index="${i}">${p}</div>`).join("");
   document.querySelectorAll(".saved-item").forEach(el => {
-    el.onclick = () => navigator.clipboard.writeText(saved[el.dataset.index]);
+    el.onclick = () => { const ta = document.getElementById("finalPrompt"); ta.value = saved[el.dataset.index]; ta.select(); try { document.execCommand("copy"); } catch(e) {} };
   });
 }
 
-// Init
-function init() {
-  updateBoostUI();
-  renderSaved();
-  // Optional: auto-generate one on load for demo
-  // generateAll();
-}
-init();
+renderSaved();
 </script>
 
 </body>
