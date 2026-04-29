@@ -725,6 +725,25 @@ function getTemporalLighting(time) {
   return pick(pool);
 }
 
+// New: Environment Boundary (indoor/outdoor weather logic)
+function isIndoorLocation(loc) {
+  return /room|apartment|bedroom|kitchen|bathroom|living|desk|closet|balcony|studio|vanity/.test(loc);
+}
+
+function getEnvironmentalWeather(loc, weather) {
+  const isIndoor = isIndoorLocation(loc);
+  
+  if (isIndoor) {
+    if (weather.includes("rain")) return "soft rain visible through window";
+    if (weather.includes("snow")) return "snow falling outside, cozy indoor light";
+    if (weather.includes("wind")) return "wind visible through curtains";
+    if (weather.includes("sun")) return "bright sunlight streaming through window";
+    return "soft indoor ambient light with window view";
+  }
+  
+  return weather;
+}
+
 // ==================== COLOR ====================
 const COLORS_BASE = {
   spring: ["dusty rose and concrete grey","sage green and off-white","navy and crisp white","beige tonal","lavender and warm white","mint green and blush pink","powder blue and pale yellow","cherry blossom pink head-to-toe","soft coral and ivory","lilac and silver grey"],
@@ -1090,7 +1109,7 @@ function generateAll() {
     shoe:         preserved.shoe || pick(SHOES),
     loc:          preserved.loc || pick(locPool),
     time:         preserved.time || pick(SCENE_TIMES[timePhase]),
-    weather:      preserved.weather || pick(WEATHER[currentSeason]),
+    weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])),
     season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
