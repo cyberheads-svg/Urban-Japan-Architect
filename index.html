@@ -478,23 +478,29 @@ function pickAccessories(styleType, sceneType = "urban") {
     }
   }
 
-  const count = Math.random() < 0.5 ? 1 : 2;
-  let selected = [];
+  // Always pick 1 primary, 50% chance for secondary
   let available = [...pool];
   let hasBag = false;
 
-  for (let i = 0; i < count; i++) {
-    if (available.length === 0) break;
-    if (hasBag) available = available.filter(a => !a.match(/bag|backpack|tote/i));
-    if (available.length === 0) break;
-
+  // Pick primary (always)
+  let primary = null;
+  if (available.length > 0) {
     const idx = Math.floor(Math.random() * available.length);
-    const item = available.splice(idx, 1)[0];
-    selected.push(item);
-    if (item.match(/bag|backpack|tote/i)) hasBag = true;
+    primary = available.splice(idx, 1)[0];
+    if (primary.match(/bag|backpack|tote/i)) hasBag = true;
   }
 
-  return selected.join(", ");
+  // Pick secondary (50% chance)
+  let secondary = null;
+  if (Math.random() < 0.5 && available.length > 0) {
+    if (hasBag) available = available.filter(a => !a.match(/bag|backpack|tote/i));
+    if (available.length > 0) {
+      const idx = Math.floor(Math.random() * available.length);
+      secondary = available.splice(idx, 1)[0];
+    }
+  }
+
+  return { primary, secondary };
 }
 
 // New: Context-aware noise (room vs urban, time of day)
@@ -1100,7 +1106,8 @@ function reroll(key) {
   else if (key === 'mood_color')    { lastVals.mood_color = buildColorDescription(currentSeason); }
   else if (key === 'weather')       { lastVals.weather = pick(WEATHER[currentSeason]); }
   else if (key === 'season_scene')  { lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]); }
-  else if (key === 'acc')           { lastVals.acc = pickAccessories(lastVals.styleType, currentSceneType); }
+  else if (key === 'accessory1')    { const a = pickAccessories(lastVals.styleType, currentSceneType); lastVals.accessory1 = a.primary; }
+  else if (key === 'accessory2')    { const a = pickAccessories(lastVals.styleType, currentSceneType); lastVals.accessory2 = a.secondary; }
   else if (key === 'outer')         { lastVals.outer = pickOuterwear(currentSeason, lastVals.weather || ""); }
   else if (key === 'rare')          { lastVals.rare = Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
   else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming); }
@@ -1140,7 +1147,7 @@ function rebuildPromptAndDisplay() {
    ...(v.outer? [v.outer] : []),
     `${v.fabric} fabric`,
     `color palette: ${v.mood_color}`,
-    `accessories: ${v.acc}`,
+    `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
     v.shoe,
     v.camera, v.styleScene, CAMERA_FIXED,
    ...(v.rare? [v.rare] : []),
@@ -1164,7 +1171,8 @@ function renderFields() {
     { label: "Outer",      value: v.outer || "— none —", color: v.outer ? "#93c5fd" : "#2a2535", key: "outer" },
     { label: "Fabric",     value: v.fabric,        color: "#fcd34d", key: "fabric" },
     { label: "Color",      value: v.mood_color,    color: "#fcd34d", key: "mood_color" },
-    { label: "Accessories",value: v.acc,           color: "#86efac", key: "acc" },
+    ...(v.accessory1 ? [{ label: "Accessory 1", value: v.accessory1, color: "#86efac", key: "accessory1" }] : []),
+    ...(v.accessory2 ? [{ label: "Accessory 2", value: v.accessory2, color: "#86efac", key: "accessory2" }] : []),
     { label: "Shoes",      value: v.shoe,          color: "#67e8f9", key: "shoe" },
     { label: "Scene",      value: v.loc,           color: "#fda4af", key: "loc" },
     { label: "Season",     value: v.season_scene,  color: "#fcd34d", key: "season_scene" },
@@ -1227,7 +1235,9 @@ function generateAll() {
     outer:        preserved.outer !== undefined ? preserved.outer : pickOuterwear(currentSeason, preserved.weather || pick(WEATHER[currentSeason])),
     fabric:       preserved.fabric || pick(FABRICS),
     mood_color:   preserved.mood_color || buildColorDescription(currentSeason),
-    acc:          preserved.acc || pickAccessories(styleType, currentSceneType),
+    acc:          preserved.acc || pickAccessories(styleType, currentSceneType), // legacy, will be replaced
+    accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
+    accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
     loc:          preserved.loc || pick(locPool),
     time:         preserved.time || pick(SCENE_TIMES[timePhase]),
