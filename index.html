@@ -115,7 +115,7 @@
       <button class="selector-btn filter-btn" onclick="setFilter('raw')" id="filter-raw">Raw Street</button>
       <button class="selector-btn filter-btn" onclick="setFilter('cine')" id="filter-cine">Cinematic</button>
       <button class="selector-btn filter-btn" onclick="setFilter('analog')" id="filter-analog">Analog Film</button>
-      <button class="selector-btn filter-btn" onclick="setFilter('cctv')" id="filter-cctv">CCTV Lo-fi</button>
+      <button class="selector-btn filter-btn" onclick="setFilter('toycam')" id="filter-toycam">Toy Camera</button>
       <button class="selector-btn filter-btn" onclick="setFilter('nightvision')" id="filter-nightvision">Night Vision</button>
     </div>
   </div>
@@ -1065,7 +1065,7 @@ function rebuildPromptAndDisplay() {
   if (currentFilter === 'raw') filterTags = "raw street photography, heavy film grain, candid snapshot, slight motion blur";
   if (currentFilter === 'cine') filterTags = "cinematic color grade, teal and orange, volumetric lighting, atmospheric depth";
   if (currentFilter === 'analog') filterTags = "1990s Japanese street photography, nostalgic film look, authentic film grain, slight color fading, Fujifilm Superia aesthetic";
-  if (currentFilter === 'cctv') filterTags = "security camera footage aesthetic, CCTV lo-fi, high angle surveillance, grainy video frame, slightly pixelated";
+  if (currentFilter === 'toycam') filterTags = "toy camera aesthetic, plastic lens, vignetting, color shift, light leak, soft focus, slightly overexposed";
   if (currentFilter === 'nightvision') filterTags = "monochrome green tint, night vision infrared, high ISO noise, tactical tech aesthetic, glowing eyes, military-grade optics";
 
   const sceneNote = currentSceneType === 'room'? "intimate private room, personal space" : "anonymous urban environment";
