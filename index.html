@@ -561,7 +561,8 @@ function getContextualBottom(season, styleType, sceneType = "urban") {
   return pick(pool);
 }
 
-// ==================== COLOR ====================
+// ==================== SHOES ====================
+const SHOES = [
   "chunky platform sneakers","GORE-TEX hiking sneakers","sleek leather derbies","tabi boots",
   "technical running shoes","slip-on suede mules","chunky lug-sole loafers","canvas classic sneakers",
   "utilitarian combat boots","minimalist white sneakers","platform Mary Janes","thigh-high boots",
@@ -1068,7 +1069,7 @@ function generateAll() {
     season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
-    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, preserved.time || pick(SCENE_TIMES[timePhase])) : null),
+    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, lastVals.time || "") : null),
     pose:         preserved.pose || pick(BODY_POSES),
     gesture:      preserved.gesture || pick(HAND_GESTURES),
     expression:   preserved.expression || pick(FACIAL_EXPRESSIONS),
