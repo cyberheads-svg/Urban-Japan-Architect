@@ -1172,7 +1172,7 @@ function renderFields() {
     { label: "Fabric",     value: v.fabric,        color: "#fcd34d", key: "fabric" },
     { label: "Color",      value: v.mood_color,    color: "#fcd34d", key: "mood_color" },
     ...(v.accessory1 ? [{ label: "Accessory 1", value: v.accessory1, color: "#86efac", key: "accessory1" }] : []),
-    ...(v.accessory2 ? [{ label: "Accessory 2", value: v.accessory2, color: "#86efac", key: "accessory2" }] : []),
+    { label: "Accessory 2", value: v.accessory2 || "— none —", color: v.accessory2 ? "#86efac" : "#2a2535", key: "accessory2" },
     { label: "Shoes",      value: v.shoe,          color: "#67e8f9", key: "shoe" },
     { label: "Scene",      value: v.loc,           color: "#fda4af", key: "loc" },
     { label: "Season",     value: v.season_scene,  color: "#fcd34d", key: "season_scene" },
