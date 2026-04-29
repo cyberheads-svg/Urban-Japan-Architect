@@ -700,6 +700,31 @@ const RARE_TOKYO = [
   "single discarded yellow train ticket on grey asphalt"
 ];
 
+// New: Temporal Lighting Sync (time-based lighting filter)
+function getTemporalLighting(time) {
+  const isNight = /night|midnight|3am|2am/.test(time);
+  const isEvening = /evening|dusk|twilight|5 PM|8 PM/.test(time);
+  const isGolden = /golden hour|late afternoon/.test(time);
+
+  let pool = [...LIGHTING];
+
+  if (isNight) {
+    const nightPool = pool.filter(l => 
+      l.includes("neon") || l.includes("fluorescent") || l.includes("vending") || 
+      l.includes("streetlamp") || l.includes("sodium") || l.includes("LED")
+    );
+    if (nightPool.length > 0) pool = nightPool;
+  } else if (isEvening || isGolden) {
+    const goldenPool = pool.filter(l => 
+      l.includes("golden") || l.includes("warm") || l.includes("amber") || 
+      l.includes("slant") || l.includes("sunset")
+    );
+    if (goldenPool.length > 0) pool = goldenPool;
+  }
+
+  return pick(pool);
+}
+
 // ==================== COLOR ====================
 const COLORS_BASE = {
   spring: ["dusty rose and concrete grey","sage green and off-white","navy and crisp white","beige tonal","lavender and warm white","mint green and blush pink","powder blue and pale yellow","cherry blossom pink head-to-toe","soft coral and ivory","lilac and silver grey"],
@@ -945,7 +970,7 @@ function reroll(key) {
   else if (key === 'pose')          { lastVals.pose = pick(BODY_POSES); }
   else if (key === 'gesture')       { lastVals.gesture = pick(HAND_GESTURES); }
   else if (key === 'expression')    { lastVals.expression = pick(FACIAL_EXPRESSIONS); }
-  else if (key === 'light')         { lastVals.light = pick(LIGHTING); }
+  else if (key === 'light')         { lastVals.light = getTemporalLighting(lastVals.time || ""); }
   else if (key === 'hair')          { lastVals.hair = pick(HAIRSTYLES); }
   else if (key === 'makeup')        { lastVals.makeup = pick(MAKEUPS); }
   rebuildPromptAndDisplay();
@@ -1073,7 +1098,7 @@ function generateAll() {
     pose:         preserved.pose || pick(BODY_POSES),
     gesture:      preserved.gesture || pick(HAND_GESTURES),
     expression:   preserved.expression || pick(FACIAL_EXPRESSIONS),
-    light:        preserved.light || pick(LIGHTING),
+    light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
     hair:         preserved.hair || pick(HAIRSTYLES),
     makeup:       preserved.makeup || pick(MAKEUPS)
   };
