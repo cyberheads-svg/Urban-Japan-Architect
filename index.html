@@ -1214,7 +1214,7 @@ function generateAll() {
     shoe:         preserved.shoe || pick(SHOES),
     loc:          preserved.loc || pick(locPool),
     time:         preserved.time || pick(SCENE_TIMES[timePhase]),
-    weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || loc, pick(WEATHER[currentSeason])),
+    weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])),
     season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
     camera:       preserved.camera || getOpticalCamera(currentFraming),
     styleScene:   preserved.styleScene || getThemedStyleScene(styleType, pick(STYLE_SCENE)),
