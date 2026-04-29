@@ -686,6 +686,20 @@ const SEASONS_SCENE = {
   ]
 };
 
+// New: Spring scene picker with reduced cherry blossom probability
+function pickSeasonScene(season) {
+  let pool = SEASONS_SCENE[season] || SEASONS_SCENE.spring;
+
+  if (season === "spring") {
+    // 30% chance to filter out cherry blossom items
+    if (Math.random() < 0.30) {
+      pool = pool.filter(s => !s.includes("cherry blossom"));
+    }
+  }
+
+  return pick(pool);
+}
+
 const WEATHER = {
   spring: ["post-rain clarity, wet asphalt reflecting sky","soft overcast, flat even lighting","clear sunny, sharp building shadows","breezy and bright, petals in the air"],
   summer: ["heavy humidity, hazy background","sudden urban downpour, wet concrete","blinding midday sun, bleached shadows","clear dry heat, saturated colors"],
@@ -702,8 +716,8 @@ const SCENE_TIMES = {
 
 function pickTimePhase() {
   const r = Math.random();
-  if (r < 0.40) return 'day';
-  if (r < 0.70) return 'evening';
+  if (r < 0.55) return 'day';
+  if (r < 0.80) return 'evening';
   return 'night';
 }
 
@@ -1061,7 +1075,7 @@ function reroll(key) {
   else if (key === 'season_scene')  { lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]); }
   else if (key === 'acc')           { lastVals.acc = pickAccessories(lastVals.styleType, currentSceneType); }
   else if (key === 'outer')         { lastVals.outer = pickOuterwear(currentSeason, lastVals.weather || ""); }
-  else if (key === 'rare')          { lastVals.rare = Math.random() < 0.25 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
+  else if (key === 'rare')          { lastVals.rare = Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
   else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming); }
   else if (key === 'camera')        { lastVals.camera = pick(CAMERA); }
   else if (key === 'styleScene')    { lastVals.styleScene = pick(STYLE_SCENE); }
@@ -1191,10 +1205,10 @@ function generateAll() {
     loc:          preserved.loc || pick(locPool),
     time:         preserved.time || pick(SCENE_TIMES[timePhase]),
     weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])),
-    season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
+    season_scene: preserved.season_scene || pickSeasonScene(currentSeason),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
-    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.25 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
+    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
     pose:         preserved.pose || pick(BODY_POSES),
     gesture:      preserved.gesture || pick(HAND_GESTURES),
