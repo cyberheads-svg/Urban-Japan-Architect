@@ -481,7 +481,7 @@ function pickAccessories(styleType, sceneType = "urban") {
 }
 
 // New: Context-aware noise (room vs urban, time of day)
-function getContextualNoise(sceneType, time) {
+function getContextualNoise(sceneType, time, loc = "") {
   const isRoom = sceneType === "room";
   const isNight = /night|midnight|3am|2am/.test(time);
   const isEvening = /evening|dusk|twilight|5 PM|8 PM/.test(time);
@@ -497,6 +497,12 @@ function getContextualNoise(sceneType, time) {
       !n.includes("train ticket") &&
       !n.includes("bicycle")
     );
+  }
+
+  // Vending machine location filter: only appear in konbini, vending machine corner, or back alley
+  const hasVendingLocation = /vending|konbini|back alley/.test(loc);
+  if (!hasVendingLocation) {
+    pool = pool.filter(n => !n.includes("vending machine"));
   }
 
   if (isNight || isEvening) {
@@ -1038,7 +1044,7 @@ function reroll(key) {
   else if (key === 'season_scene')  { lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]); }
   else if (key === 'acc')           { lastVals.acc = pickAccessories(lastVals.styleType, currentSceneType); }
   else if (key === 'outer')         { lastVals.outer = Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null; }
-  else if (key === 'rare')          { lastVals.rare = Math.random() < 0.35 ? pick(RARE_TOKYO) : null; }
+  else if (key === 'rare')          { lastVals.rare = Math.random() < 0.25 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
   else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming); }
   else if (key === 'camera')        { lastVals.camera = pick(CAMERA); }
   else if (key === 'styleScene')    { lastVals.styleScene = pick(STYLE_SCENE); }
@@ -1171,7 +1177,7 @@ function generateAll() {
     season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
-    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, lastVals.time || "") : null),
+    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.25 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
     pose:         preserved.pose || pick(BODY_POSES),
     gesture:      preserved.gesture || pick(HAND_GESTURES),
