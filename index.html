@@ -1218,11 +1218,11 @@ function generateAll() {
     season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
     camera:       preserved.camera || getOpticalCamera(currentFraming),
     styleScene:   preserved.styleScene || getThemedStyleScene(styleType, pick(STYLE_SCENE)),
-    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, lastVals.time || "") : null),
+    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, preserved.time || pick(SCENE_TIMES[timePhase])) : null),
     pose:         preserved.pose || pick(BODY_POSES),
     gesture:      preserved.gesture || pick(HAND_GESTURES),
     expression:   preserved.expression || pick(FACIAL_EXPRESSIONS),
-    light:        preserved.light || getTemporalLighting(lastVals.time || ""),
+    light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
     hair:         preserved.hair || pick(HAIRSTYLES),
     makeup:       preserved.makeup || pick(MAKEUPS)
   };
