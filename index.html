@@ -391,6 +391,19 @@ const OUTERWEAR = {
   winter: ["long sleek wool overcoat","voluminous puffer jacket","GORE-TEX technical parka","shearling collar aviator jacket","heavy wool duffle coat","velvet blazer"]
 };
 
+// New: Weather-aware outerwear picker (no raincoat if no rain)
+function pickOuterwear(season, weather) {
+  let pool = OUTERWEAR[season] || OUTERWEAR.spring;
+  const isRaining = weather && weather.includes("rain");
+
+  if (!isRaining) {
+    // No rain: filter out raincoats
+    pool = pool.filter(o => !o.includes("rain"));
+  }
+
+  return Math.random() < 0.7 ? pick(pool) : null;
+}
+
 // ==================== FABRICS ====================
 const FABRICS = [
   "Japanese technical nylon","heavyweight loopwheel cotton","crisp paper-touch poplin",
@@ -1043,7 +1056,7 @@ function reroll(key) {
   else if (key === 'weather')       { lastVals.weather = pick(WEATHER[currentSeason]); }
   else if (key === 'season_scene')  { lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]); }
   else if (key === 'acc')           { lastVals.acc = pickAccessories(lastVals.styleType, currentSceneType); }
-  else if (key === 'outer')         { lastVals.outer = Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null; }
+  else if (key === 'outer')         { lastVals.outer = pickOuterwear(currentSeason, lastVals.weather || ""); }
   else if (key === 'rare')          { lastVals.rare = Math.random() < 0.25 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
   else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming); }
   else if (key === 'camera')        { lastVals.camera = pick(CAMERA); }
@@ -1166,7 +1179,7 @@ function generateAll() {
     style, styleType, timePhase,
     top:          preserved.top || pickTop(styleType),
     bottom:       preserved.bottom || getContextualBottom(currentSeason, styleType, currentSceneType),
-    outer:        preserved.outer !== undefined ? preserved.outer : (Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null),
+    outer:        preserved.outer !== undefined ? preserved.outer : pickOuterwear(currentSeason, preserved.weather || pick(WEATHER[currentSeason])),
     fabric:       preserved.fabric || pick(FABRICS),
     mood_color:   preserved.mood_color || buildColorDescription(currentSeason),
     acc:          preserved.acc || pickAccessories(styleType, currentSceneType),
