@@ -480,7 +480,8 @@ function pickAccessories(styleType, sceneType = "urban") {
   return selected.join(", ");
 }
 
-// ==================== SHOES ====================
+// New: Context-aware noise (room vs urban, time of day)
+function getContextualNoise(sceneType, time) {
   const isRoom = sceneType === "room";
   const isNight = /night|midnight|3am|2am/.test(time);
   const isEvening = /evening|dusk|twilight|5 PM|8 PM/.test(time);
@@ -515,7 +516,53 @@ function pickAccessories(styleType, sceneType = "urban") {
 }
 
 // New: Seasonal & TPO-aware bottom correction
-// ==================== COLOR ====================
+function getContextualBottom(season, styleType, sceneType = "urban") {
+  let pool = [...(styleType === 'sexy' ? BOTTOMS_SEXY : 
+                 styleType === 'yami' ? BOTTOMS_YAMI : 
+                 styleType === 'moe'  ? BOTTOMS_MOE : 
+                 styleType === 'mode_deco' ? BOTTOMS_DECO : BOTTOMS_MINIMAL)];
+
+  const isWinter = season === "winter";
+  const isSummer = season === "summer";
+  const isRoom = sceneType === "room";
+
+  // Winter: reduce extremely revealing bottoms
+  if (isWinter) {
+    const revealing = pool.filter(b => 
+      b.includes("micro") || b.includes("ultra-short") || b.includes("hot pants") ||
+      b.includes("thigh-slit") || b.includes("bodycon mini") || b.includes("high waist hot")
+    );
+    if (revealing.length > 0 && Math.random() < 0.75) {
+      pool = pool.filter(b => !revealing.includes(b));
+    }
+  }
+
+  // Summer: reduce heavy winter-style bottoms (less strict than American version)
+  if (isSummer) {
+    const heavy = pool.filter(b => 
+      b.includes("wool") || b.includes("corduroy") || b.includes("velvet")
+    );
+    if (heavy.length > 0 && Math.random() < 0.6) {
+      pool = pool.filter(b => !heavy.includes(b));
+    }
+  }
+
+  // Room scenes: slightly prefer more comfortable bottoms
+  if (isRoom) {
+    const comfy = pool.filter(b => 
+      b.includes("wide") || b.includes("pleated") || b.includes("A-line") ||
+      b.includes("culottes") || b.includes("track")
+    );
+    if (comfy.length > 0 && Math.random() < 0.4) {
+      pool = [...pool, ...comfy];
+    }
+  }
+
+  return pick(pool);
+}
+
+// ==================== SHOES ====================
+const SHOES = [
   "chunky platform sneakers","GORE-TEX hiking sneakers","sleek leather derbies","tabi boots",
   "technical running shoes","slip-on suede mules","chunky lug-sole loafers","canvas classic sneakers",
   "utilitarian combat boots","minimalist white sneakers","platform Mary Janes","thigh-high boots",
@@ -652,87 +699,6 @@ const RARE_TOKYO = [
   "reflection of a blue emergency exit sign on a wet railing",
   "single discarded yellow train ticket on grey asphalt"
 ];
-
-// New: Context-aware noise (room vs urban, time of day)
-function getContextualNoise(sceneType, time) {
-  const isRoom = sceneType === "room";
-  const isNight = /night|midnight|3am|2am/.test(time);
-  const isEvening = /evening|dusk|twilight|5 PM|8 PM/.test(time);
-
-  let pool = [...RARE_TOKYO];
-
-  if (isRoom) {
-    // Room scenes: reduce outdoor/street specific noise
-    pool = pool.filter(n => 
-      !n.includes("vending machine") && 
-      !n.includes("pachinko") && 
-      !n.includes("construction LED") &&
-      !n.includes("train ticket") &&
-      !n.includes("bicycle")
-    );
-  }
-
-  if (isNight || isEvening) {
-    // Night/evening: boost neon/vending/machine glow items
-    const nightNoise = pool.filter(n => 
-      n.includes("vending machine") || 
-      n.includes("neon") || 
-      n.includes("fluorescent") ||
-      n.includes("pachinko")
-    );
-    if (nightNoise.length > 0 && Math.random() < 0.6) {
-      pool = [...pool, ...nightNoise];
-    }
-  }
-
-  return pool.length > 0 ? pick(pool) : null;
-}
-
-// New: Seasonal & TPO-aware bottom correction
-function getContextualBottom(season, styleType, sceneType = "urban") {
-  let pool = [...(styleType === 'sexy' ? BOTTOMS_SEXY : 
-                 styleType === 'yami' ? BOTTOMS_YAMI : 
-                 styleType === 'moe'  ? BOTTOMS_MOE : 
-                 styleType === 'mode_deco' ? BOTTOMS_DECO : BOTTOMS_MINIMAL)];
-
-  const isWinter = season === "winter";
-  const isSummer = season === "summer";
-  const isRoom = sceneType === "room";
-
-  // Winter: reduce extremely revealing bottoms
-  if (isWinter) {
-    const revealing = pool.filter(b => 
-      b.includes("micro") || b.includes("ultra-short") || b.includes("hot pants") ||
-      b.includes("thigh-slit") || b.includes("bodycon mini") || b.includes("high waist hot")
-    );
-    if (revealing.length > 0 && Math.random() < 0.75) {
-      pool = pool.filter(b => !revealing.includes(b));
-    }
-  }
-
-  // Summer: reduce heavy winter-style bottoms (less strict than American version)
-  if (isSummer) {
-    const heavy = pool.filter(b => 
-      b.includes("wool") || b.includes("corduroy") || b.includes("velvet")
-    );
-    if (heavy.length > 0 && Math.random() < 0.6) {
-      pool = pool.filter(b => !heavy.includes(b));
-    }
-  }
-
-  // Room scenes: slightly prefer more comfortable bottoms
-  if (isRoom) {
-    const comfy = pool.filter(b => 
-      b.includes("wide") || b.includes("pleated") || b.includes("A-line") ||
-      b.includes("culottes") || b.includes("track")
-    );
-    if (comfy.length > 0 && Math.random() < 0.4) {
-      pool = [...pool, ...comfy];
-    }
-  }
-
-  return pick(pool);
-}
 
 // ==================== COLOR ====================
 const COLORS_BASE = {
@@ -1103,7 +1069,7 @@ function generateAll() {
     season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
-    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, preserved.time || pick(SCENE_TIMES[timePhase])) : null),
+    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, lastVals.time || "") : null),
     pose:         preserved.pose || pick(BODY_POSES),
     gesture:      preserved.gesture || pick(HAND_GESTURES),
     expression:   preserved.expression || pick(FACIAL_EXPRESSIONS),
