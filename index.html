@@ -561,8 +561,157 @@ function getContextualBottom(season, styleType, sceneType = "urban") {
   return pick(pool);
 }
 
-// ==================== SHOES ====================
-const SHOES = [
+// ============================================
+// 5 Advanced Features (adapted for Japan version)
+// ============================================
+
+// 1. Temporal Lighting Sync
+function getTemporalLighting(time) {
+  const isNight = /night|midnight|3am|2am/.test(time);
+  const isEvening = /evening|dusk|twilight|5 PM|8 PM/.test(time);
+  const isGolden = /golden hour|late afternoon/.test(time);
+
+  let pool = [...LIGHTING];
+
+  if (isNight) {
+    const nightPool = pool.filter(l => 
+      l.includes("neon") || l.includes("fluorescent") || l.includes("vending") || 
+      l.includes("streetlamp") || l.includes("sodium") || l.includes("LED")
+    );
+    if (nightPool.length > 0) pool = nightPool;
+  } else if (isEvening || isGolden) {
+    const goldenPool = pool.filter(l => 
+      l.includes("golden") || l.includes("warm") || l.includes("amber") || 
+      l.includes("slant") || l.includes("sunset")
+    );
+    if (goldenPool.length > 0) pool = goldenPool;
+  }
+
+  return pick(pool);
+}
+
+// 2. Optical Integrity Logic
+function getOpticalCamera(framing) {
+  let pool = [...CAMERA];
+
+  if (framing === "close") {
+    const closePool = pool.filter(c => 
+      c.includes("85mm") || c.includes("portrait") || c.includes("shallow depth") || 
+      c.includes("intimate") || c.includes("bokeh")
+    );
+    if (closePool.length > 0 && Math.random() < 0.65) {
+      pool = [...pool, ...closePool];
+    }
+  } else if (framing === "full") {
+    const fullPool = pool.filter(c => 
+      c.includes("24mm") || c.includes("wide") || c.includes("environmental") || 
+      c.includes("leading lines")
+    );
+    if (fullPool.length > 0 && Math.random() < 0.55) {
+      pool = [...pool, ...fullPool];
+    }
+  } else if (framing === "bust") {
+    const bustPool = pool.filter(c => 
+      c.includes("50mm") || c.includes("natural perspective") || c.includes("mid-distance")
+    );
+    if (bustPool.length > 0 && Math.random() < 0.5) {
+      pool = [...pool, ...bustPool];
+    }
+  }
+
+  return pick(pool);
+}
+
+// 3. Environment Boundary
+function isIndoorLocation(loc) {
+  return /room|apartment|bedroom|kitchen|bathroom|living|desk|closet|balcony|studio|vanity/.test(loc);
+}
+
+function getEnvironmentalWeather(loc, weather) {
+  const isIndoor = isIndoorLocation(loc);
+  
+  if (isIndoor) {
+    if (weather.includes("rain")) return "soft rain visible through window";
+    if (weather.includes("snow")) return "snow falling outside, cozy indoor light";
+    if (weather.includes("wind")) return "wind visible through curtains";
+    if (weather.includes("sun")) return "bright sunlight streaming through window";
+    return "soft indoor ambient light with window view";
+  }
+  
+  return weather;
+}
+
+// 4. Negative Constraint Enforcement (enhanced)
+function hasNegativeConstraint(season, styleType, bottom, outer) {
+  const isWinter = season === "winter";
+  const isSummer = season === "summer";
+
+  // Winter + extremely revealing
+  if (isWinter && bottom && (
+    bottom.includes("micro") || bottom.includes("ultra-short") || 
+    bottom.includes("hot pants") || bottom.includes("thigh-slit") ||
+    bottom.includes("bodycon mini")
+  )) {
+    return true;
+  }
+
+  // Summer + heavy winter clothing
+  if (isSummer && outer && (
+    outer.includes("wool") || outer.includes("puffer") || 
+    outer.includes("shearling") || outer.includes("fur") ||
+    outer.includes("corduroy")
+  )) {
+    return true;
+  }
+
+  return false;
+}
+
+// 5. Emotional Tone Deepening (mode-based)
+function getThemedStyleScene(styleType, styleScene) {
+  let pool = [styleScene];
+
+  if (styleType === 'mode_minimal') {
+    const minimalStyles = [
+      "Takashi Homma style suburban minimalism",
+      "modern Japanese indie film aesthetic",
+      "high-fashion editorial, stark contrast"
+    ];
+    pool = [...pool, ...minimalStyles];
+  } else if (styleType === 'mode_deco') {
+    const decoStyles = [
+      "vibrant street photography, bold color",
+      "Harajuku maximalist color bleed",
+      "pop-kei candy color aesthetic"
+    ];
+    pool = [...pool, ...decoStyles];
+  } else if (styleType === 'sexy') {
+    const sexyStyles = [
+      "Wong Kar-wai inspired color bleed",
+      "cinematic night photography, neon reflections",
+      "high contrast, seductive lighting"
+    ];
+    pool = [...pool, ...sexyStyles];
+  } else if (styleType === 'yami') {
+    const yamiStyles = [
+      "Daido Moriyama gritty grain texture",
+      "dark atmospheric, high contrast",
+      "moody cinematic, desaturated tones"
+    ];
+    pool = [...pool, ...yamiStyles];
+  } else if (styleType === 'moe') {
+    const moeStyles = [
+      "soft pastel color grading",
+      "dreamy, light-filled aesthetic",
+      "cute and bright, high key lighting"
+    ];
+    pool = [...pool, ...moeStyles];
+  }
+
+  return pick(pool);
+}
+
+// ==================== COLOR ====================
   "chunky platform sneakers","GORE-TEX hiking sneakers","sleek leather derbies","tabi boots",
   "technical running shoes","slip-on suede mules","chunky lug-sole loafers","canvas classic sneakers",
   "utilitarian combat boots","minimalist white sneakers","platform Mary Janes","thigh-high boots",
@@ -1065,18 +1214,26 @@ function generateAll() {
     shoe:         preserved.shoe || pick(SHOES),
     loc:          preserved.loc || pick(locPool),
     time:         preserved.time || pick(SCENE_TIMES[timePhase]),
-    weather:      preserved.weather || pick(WEATHER[currentSeason]),
+    weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || loc, pick(WEATHER[currentSeason])),
     season_scene: preserved.season_scene || pick(SEASONS_SCENE[currentSeason]),
-    camera:       preserved.camera || pick(CAMERA),
-    styleScene:   preserved.styleScene || pick(STYLE_SCENE),
+    camera:       preserved.camera || getOpticalCamera(currentFraming),
+    styleScene:   preserved.styleScene || getThemedStyleScene(styleType, pick(STYLE_SCENE)),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, lastVals.time || "") : null),
     pose:         preserved.pose || pick(BODY_POSES),
     gesture:      preserved.gesture || pick(HAND_GESTURES),
     expression:   preserved.expression || pick(FACIAL_EXPRESSIONS),
-    light:        preserved.light || pick(LIGHTING),
+    light:        preserved.light || getTemporalLighting(lastVals.time || ""),
     hair:         preserved.hair || pick(HAIRSTYLES),
     makeup:       preserved.makeup || pick(MAKEUPS)
   };
+
+  // Negative Constraint Enforcement (auto-reroll if invalid)
+  let retryCount = 0;
+  while (hasNegativeConstraint(currentSeason, styleType, lastVals.bottom, lastVals.outer) && retryCount < 5) {
+    lastVals.bottom = getContextualBottom(currentSeason, styleType, currentSceneType);
+    lastVals.outer = (currentSeason === "summer") ? (Math.random() < 0.7 ? pick(OUTERWEAR.summer) : null) : (Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null);
+    retryCount++;
+  }
 
   rebuildPromptAndDisplay();
   document.getElementById("saveBtn").style.display = "block";
