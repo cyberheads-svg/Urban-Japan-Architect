@@ -744,6 +744,61 @@ function getEnvironmentalWeather(loc, weather) {
   return weather;
 }
 
+// New: Foreground Blur Gimmick (rare photographic effect)
+const FOREGROUND_BLUR = [
+  // Urban
+  "blurred coffee cup in foreground",
+  "out of focus leaves framing the shot",
+  "bokeh streetlight in foreground",
+  "soft focus window frame in foreground",
+  "blurred railing or fence in foreground",
+  "bokeh neon sign reflection in foreground",
+  "out of focus bicycle handle in foreground",
+  // Room
+  "blurred book or magazine in foreground",
+  "out of focus mug on desk",
+  "soft focus curtain edge in foreground",
+  "blurred plant leaves in foreground",
+  "bokeh window light in foreground",
+  // Close-up specific
+  "out of focus hair strands in extreme close-up",
+  "blurred shoulder or collar in foreground",
+  "soft focus fabric texture in foreground"
+];
+
+function getForegroundBlur(sceneType, framing) {
+  // Only 12% chance to appear (very rare)
+  if (Math.random() > 0.12) return null;
+
+  const isRoom = sceneType === "room";
+  const isClose = framing === "close" || framing === "bust";
+
+  let pool = [...FOREGROUND_BLUR];
+
+  if (isRoom) {
+    // Room: prefer indoor items
+    pool = pool.filter(b => 
+      b.includes("book") || b.includes("mug") || b.includes("curtain") || 
+      b.includes("plant") || b.includes("window light") || b.includes("fabric")
+    );
+  } else {
+    // Urban: prefer street items
+    pool = pool.filter(b => 
+      b.includes("coffee") || b.includes("leaves") || b.includes("streetlight") || 
+      b.includes("window frame") || b.includes("railing") || b.includes("neon") || 
+      b.includes("bicycle")
+    );
+  }
+
+  if (isClose && Math.random() < 0.5) {
+    // Close-up: boost close-up specific items
+    const closeItems = pool.filter(b => b.includes("hair") || b.includes("shoulder") || b.includes("fabric"));
+    if (closeItems.length > 0) pool = [...pool, ...closeItems];
+  }
+
+  return pool.length > 0 ? pick(pool) : null;
+}
+
 // ==================== COLOR ====================
 const COLORS_BASE = {
   spring: ["dusty rose and concrete grey","sage green and off-white","navy and crisp white","beige tonal","lavender and warm white","mint green and blush pink","powder blue and pale yellow","cherry blossom pink head-to-toe","soft coral and ivory","lilac and silver grey"],
@@ -984,6 +1039,7 @@ function reroll(key) {
   else if (key === 'acc')           { lastVals.acc = pickAccessories(lastVals.styleType, currentSceneType); }
   else if (key === 'outer')         { lastVals.outer = Math.random() < 0.7 ? pick(OUTERWEAR[currentSeason] || OUTERWEAR.spring) : null; }
   else if (key === 'rare')          { lastVals.rare = Math.random() < 0.35 ? pick(RARE_TOKYO) : null; }
+  else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming); }
   else if (key === 'camera')        { lastVals.camera = pick(CAMERA); }
   else if (key === 'styleScene')    { lastVals.styleScene = pick(STYLE_SCENE); }
   else if (key === 'pose')          { lastVals.pose = pick(BODY_POSES); }
@@ -1024,6 +1080,7 @@ function rebuildPromptAndDisplay() {
     v.shoe,
     v.camera, v.styleScene, CAMERA_FIXED,
    ...(v.rare? [v.rare] : []),
+    ...(v.foregroundBlur ? [v.foregroundBlur] : []),
     filterTags,
     sceneNote,
     "hyper-realistic, high detail photography"
@@ -1058,6 +1115,7 @@ function renderFields() {
     { label: "Hair",       value: v.hair,          color: "#f9a8d4", key: "hair" },
     { label: "Makeup",     value: v.makeup,        color: "#fda4af", key: "makeup" },
     ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
+    ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
   ];
 
   document.getElementById("displayFields").innerHTML = fields.map(f => {
@@ -1114,6 +1172,7 @@ function generateAll() {
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.35 ? getContextualNoise(currentSceneType, lastVals.time || "") : null),
+    foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
     pose:         preserved.pose || pick(BODY_POSES),
     gesture:      preserved.gesture || pick(HAND_GESTURES),
     expression:   preserved.expression || pick(FACIAL_EXPRESSIONS),
