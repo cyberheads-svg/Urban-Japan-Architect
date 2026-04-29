@@ -116,7 +116,7 @@
       <button class="selector-btn filter-btn" onclick="setFilter('cine')" id="filter-cine">Cinematic</button>
       <button class="selector-btn filter-btn" onclick="setFilter('analog')" id="filter-analog">Analog Film</button>
       <button class="selector-btn filter-btn" onclick="setFilter('toycam')" id="filter-toycam">Toy Camera</button>
-      <button class="selector-btn filter-btn" onclick="setFilter('nightvision')" id="filter-nightvision">Night Vision</button>
+      <button class="selector-btn filter-btn" onclick="setFilter('softfocus')" id="filter-softfocus">Soft Focus</button>
     </div>
   </div>
 </div>
@@ -1079,7 +1079,7 @@ function rebuildPromptAndDisplay() {
   if (currentFilter === 'cine') filterTags = "cinematic color grade, teal and orange, volumetric lighting, atmospheric depth";
   if (currentFilter === 'analog') filterTags = "1990s Japanese street photography, nostalgic film look, authentic film grain, slight color fading, Fujifilm Superia aesthetic";
   if (currentFilter === 'toycam') filterTags = "toy camera aesthetic, plastic lens, vignetting, color shift, light leak, soft focus, slightly overexposed";
-  if (currentFilter === 'nightvision') filterTags = "monochrome green tint, night vision infrared, high ISO noise, tactical tech aesthetic, glowing eyes, military-grade optics";
+  if (currentFilter === 'softfocus') filterTags = "strong soft focus, diffusion filter, dreamy blur, reduced contrast, cinematic portrait";
 
   const sceneNote = currentSceneType === 'room'? "intimate private room, personal space" : "anonymous urban environment";
 
