@@ -1505,7 +1505,7 @@ function rebuildPromptAndDisplay() {
     `location: ${v.loc}`,
     v.season_scene, v.time, v.weather,
     "young Japanese woman",
-    framingText, v.pose, v.gesture, v.expression, v.light,
+    framingText, v.pose, ...(v.gesture ? [v.gesture] : []), ...(v.expression ? [v.expression] : []), v.light,
     v.hair? `hairstyle: ${v.hair}` : null,
     v.makeup? `makeup: ${v.makeup}` : null,
     `wearing ${v.style} outfit`,
@@ -1622,11 +1622,11 @@ function generateAll() {
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
     pose:         gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES)),
-    gesture:      gluttonMode ? getGluttonGesture() : (preserved.gesture || pick(HAND_GESTURES)),
-    expression:   gluttonMode ? getGluttonExpression() : (preserved.expression || pick(FACIAL_EXPRESSIONS)),
+    gesture:      (gluttonMode && !('gesture' in preserved)) ? getGluttonGesture() : ('gesture' in preserved ? preserved.gesture : pick(HAND_GESTURES)),
+    expression:   (gluttonMode && !('expression' in preserved)) ? getGluttonExpression() : ('expression' in preserved ? preserved.expression : pick(FACIAL_EXPRESSIONS)),
     light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
-    hair:         preserved.hair || pick(HAIRSTYLES),
-    makeup:       preserved.makeup || pick(MAKEUPS)
+    hair:         'hair' in preserved ? preserved.hair : pick(HAIRSTYLES),
+    makeup:       'makeup' in preserved ? preserved.makeup : pick(MAKEUPS)
   };
 
   rebuildPromptAndDisplay();
