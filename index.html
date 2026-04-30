@@ -100,6 +100,18 @@
   </div>
 </div>
 
+<div class="selector-group">
+  <div class="selector-label">Camera Angle</div>
+  <div class="selector">
+    <button class="selector-btn angle-btn active" onclick="setCameraAngle('eye')" id="angle-eye">Eye Level</button>
+    <button class="selector-btn angle-btn" onclick="setCameraAngle('low')" id="angle-low">Low Angle</button>
+    <button class="selector-btn angle-btn" onclick="setCameraAngle('high')" id="angle-high">High Angle</button>
+    <button class="selector-btn angle-btn" onclick="setCameraAngle('dutch')" id="angle-dutch">Dutch Tilt</button>
+    <button class="selector-btn angle-btn" onclick="setCameraAngle('over')" id="angle-over">Over Shoulder</button>
+    <button class="selector-btn angle-btn" onclick="setCameraAngle('worm')" id="angle-worm">Worm's Eye</button>
+  </div>
+</div>
+
 <div class="boost-panel">
   <div class="selector-group">
     <div class="selector-label">Scene Type</div>
@@ -157,6 +169,7 @@
 // ==================== STATE ====================
 let currentSeason = "spring";
 let currentFraming = "full";
+let currentCameraAngle = "eye";
 let currentSceneType = "urban";
 let currentFilter = "none";
 let gluttonMode = false;
@@ -1425,6 +1438,12 @@ function setFraming(f) {
   document.querySelectorAll(".frame-btn").forEach(b => b.classList.remove("active"));
   document.getElementById("frame-" + f).classList.add("active");
 }
+
+function setCameraAngle(a) {
+  currentCameraAngle = a;
+  document.querySelectorAll(".angle-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("angle-" + a).classList.add("active");
+}
 function setSceneType(t) {
   currentSceneType = t;
   document.querySelectorAll(".scene-btn").forEach(b => b.classList.remove("active"));
@@ -1528,6 +1547,14 @@ function clearField(key) {
 function rebuildPromptAndDisplay() {
   const v = lastVals;
   const framingText = { full: "full body shot", upper: "upper body shot from waist up", bust: "bust shot", close: "extreme close-up on face" }[currentFraming];
+  const angleText = {
+    eye: "eye level shot, natural perspective",
+    low: "low angle shot, powerful and dominant perspective",
+    high: "high angle shot, vulnerable and small perspective",
+    dutch: "dutch angle tilt, dynamic and edgy cinematic feel",
+    over: "over the shoulder shot, intimate and voyeuristic",
+    worm: "worm's eye view from below, dramatic towering perspective"
+  }[currentCameraAngle];
 
   let filterTags = "";
   if (currentFilter === 'raw') filterTags = "raw street photography, heavy film grain, candid snapshot, slight motion blur";
@@ -1542,7 +1569,7 @@ function rebuildPromptAndDisplay() {
     `location: ${v.loc}`,
     v.season_scene, v.time, v.weather,
     "young Japanese woman",
-    framingText, v.pose, ...(v.gesture ? [v.gesture] : []), ...(v.expression ? [v.expression] : []), v.light,
+    framingText, angleText, v.pose, ...(v.gesture ? [v.gesture] : []), ...(v.expression ? [v.expression] : []), v.light,
     v.hair? `hairstyle: ${v.hair}` : null,
     v.makeup? `makeup: ${v.makeup}` : null,
     `wearing ${v.style} outfit`,
