@@ -1746,7 +1746,7 @@ function generateAll() {
     shoe:         preserved.shoe || pick(SHOES),
     loc:          albumMode ? albumScene.location : (artistMode ? artistScene.location : (gluttonMode ? gluttonScene.location : (preserved.loc || pick(locPool)))),
     time:         albumMode ? albumScene.time : (artistMode ? artistScene.time : (gluttonMode ? gluttonScene.time : (preserved.time || pick(SCENE_TIMES[timePhase])))),
-    weather:      albumMode ? albumScene.weather : (artistMode ? artistScene.weather : (gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])))),
+    weather:      albumMode ? albumScene.weather : (artistMode ? artistScene.weather : (gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason]))))),
     season_scene: (albumMode || artistMode || gluttonMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
