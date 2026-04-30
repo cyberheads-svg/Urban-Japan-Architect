@@ -921,7 +921,18 @@ const GLUTTON_LOCATIONS = [
   "convenience store eating area, small tables, late night",
   "food court, multiple stalls, busy atmosphere",
   "small cafe interior with wooden tables",
-  "cafe terrace with outdoor seating, city view"
+  "cafe terrace with outdoor seating, city view",
+  // Expanded locations
+  "italian restaurant, pasta and pizza, warm lighting",
+  "chinese restaurant, fried rice and dumplings, red lanterns",
+  "korean restaurant, korean bbq grill, smoky atmosphere",
+  "family restaurant, hamburger steak and pasta, bright lighting",
+  "fast food restaurant, burger and fries, plastic tables",
+  "donburi shop, rice bowl counter, quick service",
+  "udon soba shop, hot noodle bowls, wooden counter",
+  "curry restaurant, curry rice and katsu, spicy aroma",
+  "steakhouse, grilled steak, dim lighting",
+  "seafood restaurant, grilled fish and sashimi, fresh display"
 ];
 
 const GLUTTON_POSES = [
@@ -969,6 +980,47 @@ const GLUTTON_EXPRESSIONS = [
   "happy but unfocused while chewing",
   "lost in thought, still holding food"
 ];
+
+// Location to food mapping for coherent glutton mode
+const GLUTTON_LOCATION_FOOD_MAP = {
+  "ramen shop": ["eating ramen with chopsticks, slurping noodles, satisfied expression", "ramen noodles slipping from chopsticks"],
+  "izakaya": ["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy", "eating takoyaki with toothpick, sauce on lips"],
+  "sushi counter": ["eating sushi with chopsticks, single piece, focused"],
+  "cafe": ["eating cake with fork, small piece, delicate", "eating pancakes with fork and knife, syrup dripping, stack of pancakes", "eating parfait with long spoon, layers of cream and fruit, delicate", "eating pasta with fork, twirling noodles, sauce on lips"],
+  "food stall": ["eating takoyaki with toothpick, sauce on lips", "eating crepe while walking, holding with both hands", "eating skewer food, holding in one hand, casual"],
+  "bakery": ["eating sandwich, holding with both hands, big bite"],
+  "dessert cafe": ["eating parfait with long spoon, layers of cream and fruit, delicate", "eating pancakes with fork and knife, syrup dripping, stack of pancakes", "eating cake with fork, small piece, delicate"],
+  "bar": ["eating fried chicken, holding in hand, crispy", "eating french fries, dipping in ketchup, casual"],
+  "convenience store": ["eating onigiri with both hands, rice on cheek", "eating sandwich, holding with both hands, big bite"],
+  "food court": ["eating ramen with chopsticks, slurping noodles, satisfied expression", "eating pizza slice, folded, mid-bite", "eating burger with both hands, big bite, messy"],
+  "italian restaurant": ["eating pasta with fork, twirling noodles, sauce on lips", "eating carbonara, creamy sauce, parmesan on top", "eating spaghetti, slurping long noodles, tomato sauce", "eating penne arrabbiata, spicy sauce, focused expression", "eating pizza slice, folded, mid-bite"],
+  "chinese restaurant": ["eating fried chicken, holding in hand, crispy", "eating dumplings with chopsticks, sauce on side"],
+  "korean restaurant": ["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy"],
+  "family restaurant": ["eating hamburger steak, knife and fork, satisfied", "eating pasta with fork, twirling noodles, sauce on lips", "eating omurice, ketchup on top, focused"],
+  "fast food": ["eating burger with both hands, big bite, messy", "eating french fries, dipping in ketchup, casual", "eating fried chicken, holding in hand, crispy"],
+  "donburi shop": ["eating gyudon with chopsticks, rice bowl, satisfied", "eating katsudon, pork cutlet on rice, focused"],
+  "udon soba shop": ["eating udon with chopsticks, hot broth, satisfied", "eating soba, cold noodles, refreshing"],
+  "curry restaurant": ["eating curry rice with spoon, spicy aroma, satisfied", "eating katsu curry, cutlet on curry rice, focused"],
+  "steakhouse": ["eating steak, knife and fork, satisfied expression", "eating hamburger steak, knife and fork, satisfied"],
+  "seafood restaurant": ["eating grilled fish, chopsticks, fresh aroma", "eating sashimi, soy sauce dip, focused", "eating seafood pasta, creamy sauce, satisfied"]
+};
+
+function getGluttonLocationAndPose() {
+  const location = pick(GLUTTON_LOCATIONS);
+  
+  // Find matching foods for this location
+  let matchingPoses = GLUTTON_POSES; // fallback
+  
+  for (const [key, poses] of Object.entries(GLUTTON_LOCATION_FOOD_MAP)) {
+    if (location.includes(key)) {
+      matchingPoses = poses;
+      break;
+    }
+  }
+  
+  const pose = pick(matchingPoses);
+  return { location, pose };
+}
 
 function getGluttonLocation() {
   return pick(GLUTTON_LOCATIONS);
@@ -1433,7 +1485,7 @@ function generateAll() {
     accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
     accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
-    loc:          preserved.loc || (gluttonMode ? getGluttonLocation() : pick(locPool)),
+    loc:          preserved.loc || (gluttonMode ? getGluttonLocationAndPose().location : pick(locPool)),
     time:         preserved.time || pick(SCENE_TIMES[timePhase]),
     weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])),
     season_scene: preserved.season_scene || pickSeasonScene(currentSeason),
@@ -1441,7 +1493,7 @@ function generateAll() {
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
-    pose:         preserved.pose || (gluttonMode ? getGluttonPose() : pick(BODY_POSES)),
+    pose:         preserved.pose || (gluttonMode ? getGluttonLocationAndPose().pose : pick(BODY_POSES)),
     gesture:      preserved.gesture || (gluttonMode ? getGluttonGesture() : pick(HAND_GESTURES)),
     expression:   preserved.expression || (gluttonMode ? getGluttonExpression() : pick(FACIAL_EXPRESSIONS)),
     light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
