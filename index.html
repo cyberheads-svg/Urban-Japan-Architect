@@ -136,7 +136,7 @@
     <div class="selector">
       <button class="selector-btn" onclick="toggleGluttonMode()" id="glutton-btn">🍜 食いしん坊モード</button>
       <button class="selector-btn" onclick="toggleArtistMode()" id="artist-btn">🎸 アーティストモード</button>
-      <button class="selector-btn" onclick="toggleAlbumMode()" id="album-btn">🎨 アルバムジャケット</button>
+      <button class="selector-btn" onclick="toggleAlbumMode()" id="album-btn">🎵 Visual Mode</button>
     </div>
   </div>
 </div>
@@ -153,6 +153,44 @@
     <div class="copy-hint">▼ クリックで全選択 → Ctrl+C / Cmd+C</div>
     <textarea class="prompt-textarea" id="finalPrompt" readonly onclick="this.select()"></textarea>
     <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy Prompt</button>
+  </div>
+
+  <!-- Visual Mode専用入力欄 -->
+  <div id="albumInputs" style="display:none; margin-top:16px; padding:12px; background:#0f0e12; border:1px solid #332f40; border-radius:6px;">
+    <div style="font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#6a6278; margin-bottom:8px;">Visual Mode Info</div>
+    <input id="artistNameInput" type="text" placeholder="アーティスト名（例: 夜の果て）" 
+           style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:11px; padding:8px; margin-bottom:8px; border-radius:4px;">
+    <input id="albumTitleInput" type="text" placeholder="アルバムタイトル（例: 食いしん坊の夜）" 
+           style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:11px; padding:8px; border-radius:4px;">
+    
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <div style="flex:1">
+        <div style="font-size:8px; color:#6a6278; margin-bottom:4px;">文字サイズ</div>
+        <select id="textSizeSelect" style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:10px; padding:6px; border-radius:4px;">
+          <option value="medium">Medium (標準)</option>
+          <option value="small">Small (控えめ)</option>
+          <option value="large">Large (インパクト大)</option>
+          <option value="elegant">Elegant Script (おしゃれ)</option>
+          <option value="bold">Bold Sans (太めモダン)</option>
+          <option value="minimal">Minimal Thin (細めミニマル)</option>
+        </select>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:8px; color:#6a6278; margin-bottom:4px;">配置</div>
+        <select id="textPlacementSelect" style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:10px; padding:6px; border-radius:4px;">
+          <option value="topbottom">Top + Bottom (2行)</option>
+          <option value="top">Top Only (1行)</option>
+          <option value="bottom">Bottom Only (1行)</option>
+          <option value="center">Center (1行・大胆)</option>
+          <option value="centerSmall">Center Small (小さめ中央)</option>
+          <option value="split">Split (アーティスト上・タイトル下)</option>
+        </select>
+      </div>
+    </div>
+    
+    <div style="font-size:8px; color:#6a6278; margin-top:6px; line-height:1.4;">
+      ※ 入力するとプロンプトにテキスト配置が自動追加されます
+    </div>
   </div>
 </div>
 
@@ -1518,11 +1556,13 @@ function toggleArtistMode() {
 function toggleAlbumMode() {
   albumMode = !albumMode;
   const btn = document.getElementById("album-btn");
+  const inputs = document.getElementById("albumInputs");
   if (albumMode) {
     btn.classList.add("active");
     btn.style.borderColor = "#c084fc";
     btn.style.color = "#c084fc";
     btn.style.background = "#1a0f1a";
+    if (inputs) inputs.style.display = "block";
     // turn off other special modes
     if (gluttonMode) {
       gluttonMode = false;
@@ -1545,6 +1585,7 @@ function toggleAlbumMode() {
     btn.style.borderColor = "";
     btn.style.color = "";
     btn.style.background = "";
+    if (inputs) inputs.style.display = "none";
   }
 }
 
@@ -1617,7 +1658,56 @@ function rebuildPromptAndDisplay() {
 
   const sceneNote = currentSceneType === 'room'? "intimate private room, personal space" : "anonymous urban environment";
 
-  const albumTags = albumMode ? "album cover art, square composition, negative space for text at top or bottom, cinematic color grade, symbolic and artistic, high detail, moody atmospheric lighting" : "";
+  const albumTags = albumMode ? "visual art, cinematic composition, negative space for text, cinematic color grade, symbolic and artistic, high detail, moody atmospheric lighting" : "";
+
+  // アルバムジャケット用テキスト入力（サイズ・配置対応・プロ仕様）
+  let textOverlay = "";
+  if (albumMode) {
+    const artistInput = document.getElementById("artistNameInput");
+    const albumInput = document.getElementById("albumTitleInput");
+    const sizeSelect = document.getElementById("textSizeSelect");
+    const placementSelect = document.getElementById("textPlacementSelect");
+
+    const artistName = artistInput ? artistInput.value.trim() : "";
+    const albumTitle = albumInput ? albumInput.value.trim() : "";
+    const textSize = sizeSelect ? sizeSelect.value : "medium";
+    const placement = placementSelect ? placementSelect.value : "topbottom";
+
+    if (artistName || albumTitle) {
+      let sizeDesc = "elegant modern sans-serif font";
+      if (textSize === "small") sizeDesc = "subtle small modern font";
+      else if (textSize === "large") sizeDesc = "bold impactful modern font, album title larger";
+      else if (textSize === "elegant") sizeDesc = "elegant handwritten script font";
+      else if (textSize === "bold") sizeDesc = "bold modern sans-serif font, album title prominent";
+      else if (textSize === "minimal") sizeDesc = "minimal thin elegant font";
+
+      let placeDesc = "";
+      const hasBoth = artistName && albumTitle;
+      const hasOnlyArtist = artistName && !albumTitle;
+      const hasOnlyAlbum = !artistName && albumTitle;
+
+      if (placement === "topbottom") {
+        if (hasBoth) placeDesc = `text "${artistName}" at the top in smaller font, "${albumTitle}" at the bottom in larger prominent font`;
+        else if (hasOnlyArtist) placeDesc = `text "${artistName}" elegantly at the top`;
+        else if (hasOnlyAlbum) placeDesc = `text "${albumTitle}" at the bottom in prominent font`;
+      } else if (placement === "top") {
+        placeDesc = `text "${artistName || albumTitle}" elegantly at the top`;
+      } else if (placement === "bottom") {
+        placeDesc = `text "${albumTitle || artistName}" at the bottom in prominent font`;
+      } else if (placement === "center") {
+        if (hasBoth) placeDesc = `large centered text "${albumTitle}" with "${artistName}" below in smaller font`;
+        else placeDesc = `large centered text "${artistName || albumTitle}"`;
+      } else if (placement === "centerSmall") {
+        if (hasBoth) placeDesc = `small centered text "${artistName} ${albumTitle}"`;
+        else placeDesc = `small centered text "${artistName || albumTitle}"`;
+      } else if (placement === "split") {
+        if (hasBoth) placeDesc = `text "${artistName}" at the top in smaller font, "${albumTitle}" at the bottom in larger font`;
+        else placeDesc = `text "${artistName || albumTitle}" elegantly centered`;
+      }
+
+      textOverlay = `${placeDesc} in ${sizeDesc}, professional album cover typography, clean negative space for text, high-end design`;
+    }
+  }
 
   const parts = [
     `location: ${v.loc}`,
@@ -1639,6 +1729,7 @@ function rebuildPromptAndDisplay() {
     filterTags,
     sceneNote,
     albumTags,
+    textOverlay,
     "hyper-realistic, high detail photography"
   ].filter(Boolean);
 
