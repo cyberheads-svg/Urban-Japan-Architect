@@ -1589,6 +1589,7 @@ function generateAll() {
   const style = s.name, styleType = s.type;
   const timePhase = pickTimePhase();
   const locPool = currentSceneType === 'urban' ? LOC_URBAN : LOC_ROOM;
+  const gluttonPair = gluttonMode ? getGluttonLocationAndPose() : null;
 
   // preserve locked values
   const preserved = {};
@@ -1607,15 +1608,15 @@ function generateAll() {
     accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
     accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
-    loc:          preserved.loc || (gluttonMode ? getGluttonScene().location : pick(locPool)),
-    time:         preserved.time || (gluttonMode ? getGluttonScene().time : pick(SCENE_TIMES[timePhase])),
-    weather:      preserved.weather || (gluttonMode ? getGluttonScene().weather : getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason]))),
+    loc:          preserved.loc || (gluttonMode ? gluttonPair.location : pick(locPool)),
+    time:         preserved.time || (gluttonMode ? gluttonPair.time : pick(SCENE_TIMES[timePhase])),
+    weather:      preserved.weather || (gluttonMode ? gluttonPair.weather : getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason]))),
     season_scene: preserved.season_scene || pickSeasonScene(currentSeason),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
-    pose:         preserved.pose || (gluttonMode ? getGluttonScene().pose : pick(BODY_POSES)),
+    pose:         preserved.pose || (gluttonMode ? gluttonPair.pose : pick(BODY_POSES)),
     gesture:      preserved.gesture || (gluttonMode ? getGluttonGesture() : pick(HAND_GESTURES)),
     expression:   preserved.expression || (gluttonMode ? getGluttonExpression() : pick(FACIAL_EXPRESSIONS)),
     light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
