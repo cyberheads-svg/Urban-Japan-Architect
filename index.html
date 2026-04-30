@@ -781,11 +781,27 @@ const SCENE_TIMES = {
   night:   ["early evening, 8 PM, city fully lit","midnight, deserted streets, solitary vending machine glow","3 AM, eerie stillness, orange sodium streetlights","2 AM, post-closing-time emptiness","blue hour transitioning to dark night"]
 };
 
+// Glutton mode time pool (day + evening only, no late night)
+const GLUTTON_TIMES = [
+  "10 AM, crisp morning light, long soft shadows",
+  "midday, harsh overhead sun, deep geometric shadows",
+  "early afternoon, flat bright light",
+  "lunch hour, city in motion",
+  "late afternoon, golden hour, amber reflecting off windows",
+  "5 PM, rush hour beginning, warm slanted light",
+  "golden hour, last sunlight cutting between buildings",
+  "dusk, sky turning indigo, shop lights flickering on"
+];
+
 function pickTimePhase() {
   const r = Math.random();
   if (r < 0.55) return 'day';
   if (r < 0.80) return 'evening';
   return 'night';
+}
+
+function getGluttonTime() {
+  return pick(GLUTTON_TIMES);
 }
 
 // ==================== RARE TOKYO ====================
@@ -1486,7 +1502,7 @@ function generateAll() {
     accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
     loc:          preserved.loc || (gluttonMode ? getGluttonLocationAndPose().location : pick(locPool)),
-    time:         preserved.time || pick(SCENE_TIMES[timePhase]),
+    time:         preserved.time || (gluttonMode ? getGluttonTime() : pick(SCENE_TIMES[timePhase])),
     weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])),
     season_scene: preserved.season_scene || pickSeasonScene(currentSeason),
     camera:       preserved.camera || pick(CAMERA),
