@@ -1022,19 +1022,57 @@ const GLUTTON_LOCATION_FOOD_MAP = {
 };
 
 function getGluttonLocationAndPose() {
+  // Pick a location first
   const location = pick(GLUTTON_LOCATIONS);
   
-  // Find matching foods for this location
-  let matchingPoses = GLUTTON_POSES; // fallback
+  // Determine the food based on location keywords (strict matching)
+  let pose;
   
-  for (const [key, poses] of Object.entries(GLUTTON_LOCATION_FOOD_MAP)) {
-    if (location.includes(key)) {
-      matchingPoses = poses;
-      break;
-    }
+  if (location.includes("ramen shop")) {
+    pose = pick(["eating ramen with chopsticks, slurping noodles, satisfied expression", "ramen noodles slipping from chopsticks"]);
+  } else if (location.includes("sushi counter")) {
+    pose = "eating sushi with chopsticks, single piece, focused";
+  } else if (location.includes("donburi shop")) {
+    pose = pick(["eating gyudon with chopsticks, rice bowl, satisfied", "eating katsudon, pork cutlet on rice, focused"]);
+  } else if (location.includes("curry restaurant")) {
+    pose = pick(["eating curry rice with spoon, spicy aroma, satisfied", "eating katsu curry, cutlet on curry rice, focused"]);
+  } else if (location.includes("italian restaurant")) {
+    pose = pick(["eating pasta with fork, twirling noodles, sauce on lips", "eating carbonara, creamy sauce, parmesan on top", "eating spaghetti, slurping long noodles, tomato sauce", "eating penne arrabbiata, spicy sauce, focused expression", "eating pizza slice, folded, mid-bite"]);
+  } else if (location.includes("udon soba shop")) {
+    pose = pick(["eating udon with chopsticks, hot broth, satisfied", "eating soba, cold noodles, refreshing"]);
+  } else if (location.includes("chinese restaurant")) {
+    pose = pick(["eating fried chicken, holding in hand, crispy", "eating dumplings with chopsticks, sauce on side"]);
+  } else if (location.includes("korean restaurant")) {
+    pose = pick(["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy"]);
+  } else if (location.includes("steakhouse")) {
+    pose = pick(["eating steak, knife and fork, satisfied expression", "eating hamburger steak, knife and fork, satisfied"]);
+  } else if (location.includes("seafood restaurant")) {
+    pose = pick(["eating grilled fish, chopsticks, fresh aroma", "eating sashimi, soy sauce dip, focused", "eating seafood pasta, creamy sauce, satisfied"]);
+  } else if (location.includes("izakaya")) {
+    pose = pick(["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy", "eating takoyaki with toothpick, sauce on lips"]);
+  } else if (location.includes("dessert cafe")) {
+    pose = pick(["eating parfait with long spoon, layers of cream and fruit, delicate", "eating pancakes with fork and knife, syrup dripping, stack of pancakes", "eating cake with fork, small piece, delicate"]);
+  } else if (location.includes("cafe")) {
+    pose = pick(["eating cake with fork, small piece, delicate", "eating pancakes with fork and knife, syrup dripping, stack of pancakes", "eating parfait with long spoon, layers of cream and fruit, delicate", "eating pasta with fork, twirling noodles, sauce on lips"]);
+  } else if (location.includes("bakery")) {
+    pose = "eating sandwich, holding with both hands, big bite";
+  } else if (location.includes("food stall")) {
+    pose = pick(["eating takoyaki with toothpick, sauce on lips", "eating crepe while walking, holding with both hands", "eating skewer food, holding in one hand, casual"]);
+  } else if (location.includes("bar")) {
+    pose = pick(["eating fried chicken, holding in hand, crispy", "eating french fries, dipping in ketchup, casual"]);
+  } else if (location.includes("convenience store")) {
+    pose = pick(["eating onigiri with both hands, rice on cheek", "eating sandwich, holding with both hands, big bite"]);
+  } else if (location.includes("food court")) {
+    pose = pick(["eating ramen with chopsticks, slurping noodles, satisfied expression", "eating pizza slice, folded, mid-bite", "eating burger with both hands, big bite, messy"]);
+  } else if (location.includes("family restaurant")) {
+    pose = pick(["eating hamburger steak, knife and fork, satisfied", "eating pasta with fork, twirling noodles, sauce on lips", "eating omurice, ketchup on top, focused"]);
+  } else if (location.includes("fast food")) {
+    pose = pick(["eating burger with both hands, big bite, messy", "eating french fries, dipping in ketchup, casual", "eating fried chicken, holding in hand, crispy"]);
+  } else {
+    // Fallback: pick any glutton pose
+    pose = pick(GLUTTON_POSES);
   }
   
-  const pose = pick(matchingPoses);
   return { location, pose };
 }
 
