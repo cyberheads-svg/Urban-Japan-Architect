@@ -123,6 +123,7 @@
     <div class="selector-label">Special Mode</div>
     <div class="selector">
       <button class="selector-btn" onclick="toggleGluttonMode()" id="glutton-btn">🍜 食いしん坊モード</button>
+      <button class="selector-btn" onclick="toggleArtistMode()" id="artist-btn">🎸 アーティストモード</button>
     </div>
   </div>
 </div>
@@ -159,6 +160,7 @@ let currentFraming = "full";
 let currentSceneType = "urban";
 let currentFilter = "none";
 let gluttonMode = false;
+let artistMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
@@ -1082,6 +1084,23 @@ function getGluttonScene() {
   return pick(GLUTTON_SCENES);
 }
 
+const ARTIST_SCENES = [
+  // 自室作曲
+  { location: "small one-room apartment, futon folded, clothes rack overflowing, guitar leaning on wall, laptop open on low table with DAW software, headphones around neck, songwriting notebook open, half-eaten onigiri on plate", pose: "sitting cross-legged on floor, acoustic guitar on lap, humming melody while writing lyrics, focused and creative expression", time: "late night, 2 AM, only desk lamp on", weather: "cozy indoor light, city lights visible through window" },
+  { location: "bedroom with unmade bed, morning light through cheap curtains, acoustic guitar case open, laptop with music production software, coffee cup and snack wrappers scattered", pose: "lying on bed propped on elbows, playing soft chords on acoustic guitar, eyes closed, composing new song", time: "morning, 10 AM, soft sunlight", weather: "gentle morning light, peaceful creative atmosphere" },
+  // ライブ
+  { location: "street corner busking, guitar case open with coins and bills, small crowd gathering, city background", pose: "busking on street corner, playing acoustic guitar and singing passionately, guitar case open for tips, happy and energetic expression", time: "afternoon, 4 PM, golden hour", weather: "warm golden light, lively street atmosphere" },
+  { location: "small live house stage, dim lights, audience silhouettes, microphone stand", pose: "performing on small stage, singing with eyes closed, acoustic guitar strapped, emotional and powerful delivery", time: "evening, 8 PM, live house peak time", weather: "dim stage lighting with warm spotlight on performer" },
+  { location: "indie live venue, red brick wall, string lights, intimate crowd", pose: "on stage with acoustic guitar, singing original song, slight smile, connecting with audience", time: "night, 9 PM, sold-out show vibe", weather: "intimate venue lighting, enthusiastic crowd energy" },
+  // レコーディング
+  { location: "professional recording studio, soundproof booth, large condenser mic, headphones, mixing console visible through glass", pose: "in recording booth, wearing studio headphones, singing into microphone with focused expression, acoustic guitar nearby", time: "afternoon, 3 PM, studio session", weather: "clean studio lighting, professional focused atmosphere" },
+  { location: "home studio corner, synth keyboard, audio interface, computer monitor showing waveform, acoustic guitar on stand", pose: "sitting at desk, wearing headphones, producing track on laptop, tapping foot to beat, creative flow", time: "late night, 1 AM, home studio", weather: "blue screen glow mixed with warm desk lamp" },
+  // その他アーティストシーン
+  { location: "rooftop at sunset, city skyline, acoustic guitar, wind in hair", pose: "standing on rooftop, playing acoustic guitar and singing, hair blowing, dreamy and free expression", time: "sunset, 6 PM, golden hour", weather: "beautiful sunset light, inspiring open air" },
+  { location: "indie bookstore event space, small stage, bookshelves background, intimate audience", pose: "performing acoustic set in bookstore, singing softly, guitar in hand, warm connection with listeners", time: "evening, 7 PM, literary event", weather: "soft indoor lighting, intellectual cozy vibe" },
+  { location: "park bench under cherry blossom tree (spring), guitar case, notebook", pose: "sitting on park bench, acoustic guitar, writing lyrics inspired by the scenery, peaceful creative moment", time: "afternoon, 2 PM, spring day", weather: "gentle spring breeze, cherry blossom petals falling" }
+];
+
 function getGluttonLocationAndPose() {
   // Pick a location first
   const location = pick(GLUTTON_LOCATIONS);
@@ -1433,6 +1452,31 @@ function toggleGluttonMode() {
   }
 }
 
+function toggleArtistMode() {
+  artistMode = !artistMode;
+  const btn = document.getElementById("artist-btn");
+  if (artistMode) {
+    btn.classList.add("active");
+    btn.style.borderColor = "#60a5fa";
+    btn.style.color = "#60a5fa";
+    btn.style.background = "#0f172a";
+    // optional: turn off glutton if both conflict too much
+    if (gluttonMode) {
+      gluttonMode = false;
+      const gbtn = document.getElementById("glutton-btn");
+      gbtn.classList.remove("active");
+      gbtn.style.borderColor = "";
+      gbtn.style.color = "";
+      gbtn.style.background = "";
+    }
+  } else {
+    btn.classList.remove("active");
+    btn.style.borderColor = "";
+    btn.style.color = "";
+    btn.style.background = "";
+  }
+}
+
 // ==================== LOCK SYSTEM ====================
 function toggleLock(key) {
   lockedFields[key] = !lockedFields[key];
@@ -1589,10 +1633,16 @@ function generateAll() {
     if (lockedFields[k] && lastVals[k] !== undefined) preserved[k] = lastVals[k];
   });
 
-  // Pick glutton scene ONCE for full coherence (location + pose + time + weather/ambiance)
+  // Pick glutton scene ONCE for full coherence
   let gluttonScene = null;
   if (gluttonMode) {
     gluttonScene = getGluttonScene();
+  }
+
+  // Pick artist scene ONCE for music-themed coherence (シンガーソングライター)
+  let artistScene = null;
+  if (artistMode) {
+    artistScene = pick(ARTIST_SCENES);
   }
 
   lastVals = {
@@ -1606,17 +1656,17 @@ function generateAll() {
     accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
     accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
-    loc:          gluttonMode ? gluttonScene.location : (preserved.loc || pick(locPool)),
-    time:         gluttonMode ? gluttonScene.time : (preserved.time || pick(SCENE_TIMES[timePhase])),
-    weather:      gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason]))),
-    season_scene: gluttonMode ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
+    loc:          artistMode ? artistScene.location : (gluttonMode ? gluttonScene.location : (preserved.loc || pick(locPool))),
+    time:         artistMode ? artistScene.time : (gluttonMode ? gluttonScene.time : (preserved.time || pick(SCENE_TIMES[timePhase]))),
+    weather:      artistMode ? artistScene.weather : (gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])))),
+    season_scene: (artistMode || gluttonMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
-    pose:         gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES)),
-    gesture:      (gluttonMode && !('gesture' in preserved)) ? getGluttonGesture() : ('gesture' in preserved ? preserved.gesture : pick(HAND_GESTURES)),
-    expression:   (gluttonMode && !('expression' in preserved)) ? getGluttonExpression() : ('expression' in preserved ? preserved.expression : pick(FACIAL_EXPRESSIONS)),
+    pose:         artistMode ? artistScene.pose : (gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES))),
+    gesture:      artistMode ? (pick(["playing acoustic guitar softly", "humming melody while strumming", "tuning guitar with focused expression", "singing quietly while playing chords"]) ) : ((gluttonMode && !('gesture' in preserved)) ? getGluttonGesture() : ('gesture' in preserved ? preserved.gesture : pick(HAND_GESTURES))),
+    expression:   artistMode ? (pick(["dreamy and creative", "passionate and emotional while singing", "focused and inspired", "gentle smile while playing"]) ) : ((gluttonMode && !('expression' in preserved)) ? getGluttonExpression() : ('expression' in preserved ? preserved.expression : pick(FACIAL_EXPRESSIONS))),
     light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
     hair:         'hair' in preserved ? preserved.hair : pick(HAIRSTYLES),
     makeup:       'makeup' in preserved ? preserved.makeup : pick(MAKEUPS)
