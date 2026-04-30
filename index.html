@@ -1150,6 +1150,12 @@ function reroll(key) {
   rebuildPromptAndDisplay();
 }
 
+function clearField(key) {
+  if (isLocked(key)) return;
+  lastVals[key] = null;
+  rebuildPromptAndDisplay();
+}
+
 function rebuildPromptAndDisplay() {
   const v = lastVals;
   const framingText = { full: "full body shot", upper: "upper body shot from waist up", bust: "bust shot", close: "extreme close-up on face" }[currentFraming];
@@ -1232,6 +1238,8 @@ function renderFields() {
             ${locked ? '🔒' : '🔓'}
           </button>
           <button class="reroll-btn" onclick="reroll('${f.key}')" title="Re-roll">🔄</button>
+          ${(f.key === 'gesture' || f.key === 'hair' || f.key === 'makeup') && f.value !== '— none —' ? 
+            `<button class="reroll-btn" onclick="clearField('${f.key}')" title="Clear" style="color:#ef4444">✖</button>` : ''}
         </div>
       </div>
     `;
