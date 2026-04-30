@@ -1023,66 +1023,59 @@ const GLUTTON_LOCATION_FOOD_MAP = {
 
 // Pre-made coherent glutton scenes (location + pose + time + weather)
 const GLUTTON_SCENES = [
-  {
-    location: "ramen shop counter, steaming bowls, wooden stools",
-    pose: "eating ramen with chopsticks, slurping noodles, satisfied expression",
-    time: "lunch hour, city in motion",
-    weather: "clear and bright, lunch rush atmosphere"
-  },
-  {
-    location: "sushi counter, chef preparing, fresh fish",
-    pose: "eating sushi with chopsticks, single piece, focused",
-    time: "early evening, 6 PM, dinner rush beginning",
-    weather: "clear evening, soft restaurant lighting"
-  },
-  {
-    location: "curry restaurant, curry rice and katsu, spicy aroma",
-    pose: "eating curry rice with spoon, spicy aroma, satisfied",
-    time: "lunch hour, city in motion",
-    weather: "clear and bright, lunch rush atmosphere"
-  },
-  {
-    location: "italian restaurant, pasta and pizza, warm lighting",
-    pose: "eating pasta with fork, twirling noodles, sauce on lips",
-    time: "early evening, 7 PM, dinner time",
-    weather: "clear evening, warm restaurant ambiance"
-  },
-  {
-    location: "izakaya interior, wooden tables, lanterns",
-    pose: "eating dumplings with chopsticks, sauce on side",
-    time: "late evening, 8 PM, after-work crowd",
-    weather: "clear evening, warm izakaya lighting"
-  },
-  {
-    location: "cafe table with coffee and cake, cozy lighting",
-    pose: "eating cake with fork, small piece, delicate",
-    time: "afternoon, 3 PM, relaxed cafe time",
-    weather: "soft afternoon light, cozy cafe ambiance"
-  },
-  {
-    location: "dessert cafe, colorful sweets, pastel decor",
-    pose: "eating parfait with long spoon, layers of cream and fruit, delicate",
-    time: "afternoon, 4 PM, dessert time",
-    weather: "soft afternoon light, sweet cafe atmosphere"
-  },
-  {
-    location: "steakhouse, grilled steak, dim lighting",
-    pose: "eating steak, knife and fork, satisfied expression",
-    time: "evening, 7 PM, dinner time",
-    weather: "dim restaurant lighting, intimate atmosphere"
-  },
-  {
-    location: "food court, multiple stalls, busy atmosphere",
-    pose: "eating ramen with chopsticks, slurping noodles, satisfied expression",
-    time: "lunch hour, busy food court",
-    weather: "bright food court lighting, bustling atmosphere"
-  },
-  {
-    location: "convenience store eating area, small tables, late night",
-    pose: "eating onigiri with both hands, rice on cheek",
-    time: "late night, 11 PM, quiet convenience store",
-    weather: "bright convenience store lighting, quiet night"
-  }
+  // Ramen variations
+  { location: "ramen shop counter, steaming bowls, wooden stools", pose: "eating ramen with chopsticks, slurping noodles, satisfied expression", time: "lunch hour, city in motion", weather: "clear and bright, lunch rush atmosphere" },
+  { location: "ramen shop counter, steaming bowls, wooden stools", pose: "eating tsukemen, dipping noodles, focused", time: "evening, 7 PM, dinner time", weather: "warm ramen shop lighting, steamy atmosphere" },
+  { location: "late night ramen shop, bright lights, empty seats", pose: "eating miso ramen, slurping, tired but happy", time: "late night, 11 PM, quiet ramen shop", weather: "bright fluorescent lighting, calm night" },
+
+  // Sushi & Seafood
+  { location: "sushi counter, chef preparing, fresh fish", pose: "eating sushi with chopsticks, single piece, focused", time: "early evening, 6 PM, dinner rush beginning", weather: "clear evening, soft restaurant lighting" },
+  { location: "kaisen don shop, fresh sashimi bowl, bright counter", pose: "eating kaisen don with chopsticks, fresh and colorful", time: "lunch hour, busy kaisen don shop", weather: "bright shop lighting, fresh seafood vibe" },
+  { location: "seafood izakaya, grilled fish and sashimi, fresh display", pose: "eating grilled fish, chopsticks, fresh aroma", time: "early evening, 6 PM, dinner beginning", weather: "soft evening lighting, lively izakaya" },
+
+  // Donburi & Curry
+  { location: "donburi shop, rice bowl counter, quick service", pose: "eating gyudon with chopsticks, rice bowl, satisfied", time: "lunch hour, busy donburi shop", weather: "bright shop lighting, quick lunch atmosphere" },
+  { location: "donburi shop, rice bowl counter, quick service", pose: "eating katsudon, pork cutlet on rice, focused", time: "evening, 7 PM, dinner time", weather: "warm donburi shop lighting, satisfying meal" },
+  { location: "curry restaurant, curry rice and katsu, spicy aroma", pose: "eating curry rice with spoon, spicy aroma, satisfied", time: "lunch hour, city in motion", weather: "clear and bright, lunch rush atmosphere" },
+  { location: "curry restaurant, curry rice and katsu, spicy aroma", pose: "eating katsu curry, cutlet on curry rice, focused", time: "late evening, 8 PM, after-work crowd", weather: "warm curry restaurant lighting, spicy air" },
+
+  // Udon / Soba
+  { location: "udon soba shop, hot noodle bowls, wooden counter", pose: "eating udon with chopsticks, hot broth, satisfied", time: "lunch hour, city in motion", weather: "clear and bright, lunch rush atmosphere" },
+  { location: "udon soba shop, hot noodle bowls, wooden counter", pose: "eating cold soba, refreshing, summer vibe", time: "afternoon, 3 PM, hot summer day", weather: "cool shop interior, refreshing atmosphere" },
+
+  // Izakaya & Yakitori
+  { location: "izakaya interior, wooden tables, lanterns", pose: "eating dumplings with chopsticks, sauce on side", time: "late evening, 8 PM, after-work crowd", weather: "clear evening, warm izakaya lighting" },
+  { location: "izakaya interior, wooden tables, lanterns", pose: "eating yakitori skewers, satisfied, beer in hand", time: "evening, 9 PM, izakaya peak time", weather: "warm lantern lighting, lively after-work vibe" },
+  { location: "izakaya interior, wooden tables, lanterns", pose: "eating karaage, crispy and juicy, happy expression", time: "late night, 10 PM, drinking crowd", weather: "dim izakaya lighting, relaxed night" },
+
+  // Cafe & Dessert
+  { location: "cafe table with coffee and cake, cozy lighting", pose: "eating cake with fork, small piece, delicate", time: "afternoon, 3 PM, relaxed cafe time", weather: "soft afternoon light, cozy cafe ambiance" },
+  { location: "cafe table with coffee and cake, cozy lighting", pose: "eating pancakes with fork and knife, syrup dripping, stack of pancakes", time: "morning, 10 AM, brunch time", weather: "bright morning cafe light, sweet aroma" },
+  { location: "dessert cafe, colorful sweets, pastel decor", pose: "eating parfait with long spoon, layers of cream and fruit, delicate", time: "afternoon, 4 PM, dessert time", weather: "soft afternoon light, sweet cafe atmosphere" },
+  { location: "crepe stand, colorful crepes, sweet smell", pose: "eating crepe while walking, holding with both hands", time: "afternoon, 4 PM, dessert time", weather: "soft afternoon light, sweet street atmosphere" },
+
+  // Italian / Pizza / Pasta
+  { location: "italian restaurant, pasta and pizza, warm lighting", pose: "eating pasta with fork, twirling noodles, sauce on lips", time: "early evening, 7 PM, dinner time", weather: "clear evening, warm restaurant ambiance" },
+  { location: "italian restaurant, pasta and pizza, warm lighting", pose: "eating pizza slice, folded, mid-bite", time: "late evening, 9 PM, casual dinner", weather: "dim italian restaurant lighting, cozy night" },
+
+  // Asian (Korean / Chinese)
+  { location: "korean restaurant, korean bbq grill, smoky atmosphere", pose: "eating korean bbq with chopsticks and scissors, satisfied expression", time: "evening, 7 PM, dinner time", weather: "warm restaurant lighting, lively atmosphere" },
+  { location: "korean restaurant, korean bbq grill, smoky atmosphere", pose: "eating bibimbap, mixing with spoon, focused", time: "lunch hour, busy korean restaurant", weather: "bright korean restaurant lighting, appetizing" },
+  { location: "chinese restaurant, fried rice and dumplings, red lanterns", pose: "eating fried rice with spoon, focused", time: "late evening, 8 PM, after-work crowd", weather: "clear evening, warm chinese restaurant lighting" },
+  { location: "chinese restaurant, fried rice and dumplings, red lanterns", pose: "eating gyoza with chopsticks, sauce on side", time: "evening, 6 PM, early dinner", weather: "warm chinese restaurant lighting, dumpling steam" },
+
+  // Family / Fast food / Steak
+  { location: "family restaurant, hamburger steak and pasta, bright lighting", pose: "eating hamburger steak, knife and fork, satisfied", time: "afternoon, 5 PM, early dinner", weather: "bright family restaurant lighting, casual vibe" },
+  { location: "steakhouse, grilled steak, dim lighting", pose: "eating steak, knife and fork, satisfied expression", time: "evening, 7 PM, dinner time", weather: "dim restaurant lighting, intimate atmosphere" },
+  { location: "fast food restaurant, burger and fries, plastic tables", pose: "eating burger with both hands, big bite, messy", time: "late night, 10 PM, quick bite", weather: "bright fast food lighting, casual night" },
+  { location: "fast food restaurant, burger and fries, plastic tables", pose: "eating french fries, dipping in ketchup, casual", time: "afternoon, 2 PM, snack time", weather: "bright fast food lighting, relaxed" },
+
+  // Street food & Others
+  { location: "takoyaki food stall, steam rising, warm glow", pose: "eating takoyaki with toothpick, sauce on lips", time: "evening, 7 PM, street food time", weather: "warm streetlight glow, bustling night market" },
+  { location: "okonomiyaki shop, hot teppan, savory smell", pose: "eating okonomiyaki with spatula, satisfied", time: "evening, 8 PM, casual dinner", weather: "warm teppan lighting, savory aroma" },
+  { location: "bakery interior, bread shelves, warm lighting", pose: "eating sandwich, holding with both hands, big bite", time: "lunch hour, busy bakery", weather: "warm bakery lighting, fresh bread aroma" },
+  { location: "convenience store eating area, small tables, late night", pose: "eating onigiri with both hands, rice on cheek", time: "late night, 11 PM, quiet convenience store", weather: "bright convenience store lighting, quiet night" },
+  { location: "food court, multiple stalls, busy atmosphere", pose: "eating ramen with chopsticks, slurping noodles, satisfied expression", time: "lunch hour, busy food court", weather: "bright food court lighting, bustling atmosphere" }
 ];
 
 function getGluttonScene() {
