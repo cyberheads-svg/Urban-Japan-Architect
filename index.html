@@ -119,6 +119,12 @@
       <button class="selector-btn filter-btn" onclick="setFilter('softfocus')" id="filter-softfocus">Soft Focus</button>
     </div>
   </div>
+  <div class="selector-group" style="margin-top:12px;margin-bottom:0">
+    <div class="selector-label">Special Mode</div>
+    <div class="selector">
+      <button class="selector-btn" onclick="toggleGluttonMode()" id="glutton-btn">🍜 食いしん坊モード</button>
+    </div>
+  </div>
 </div>
 
 <div class="card">
@@ -152,6 +158,7 @@ let currentSeason = "spring";
 let currentFraming = "full";
 let currentSceneType = "urban";
 let currentFilter = "none";
+let gluttonMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
@@ -794,7 +801,12 @@ const RARE_TOKYO = [
   "broken fluorescent tube on the concrete floor",
   "faint steam rising from a ramen shop vent in the background",
   "reflection of a blue emergency exit sign on a wet railing",
-  "single discarded yellow train ticket on grey asphalt"
+  "single discarded yellow train ticket on grey asphalt",
+  // 食いしん坊キャラ強化（食の事故）
+  "sauce stain on sleeve unnoticed",
+  "crumbs scattered on table edge",
+  "half-melted ice cream dripping",
+  "steam fogging up glasses while eating"
 ];
 
 // New: Temporal Lighting Sync (time-based lighting filter)
@@ -896,6 +908,84 @@ function getForegroundBlur(sceneType, framing) {
   return pool.length > 0 ? pick(pool) : null;
 }
 
+// New: Glutton Mode helpers
+const GLUTTON_LOCATIONS = [
+  "ramen shop counter, steaming bowls, wooden stools",
+  "izakaya interior, wooden tables, lanterns",
+  "sushi counter, chef preparing, fresh fish",
+  "cafe table with coffee and cake, cozy lighting",
+  "food stall at night market, steam rising, warm glow",
+  "bakery interior, bread shelves, warm lighting",
+  "dessert cafe, colorful sweets, pastel decor",
+  "bar counter with snacks, dim lighting, cocktails",
+  "convenience store eating area, small tables, late night",
+  "food court, multiple stalls, busy atmosphere",
+  "small cafe interior with wooden tables",
+  "cafe terrace with outdoor seating, city view"
+];
+
+const GLUTTON_POSES = [
+  "eating ramen with chopsticks, slurping noodles, satisfied expression",
+  "eating sushi with chopsticks, single piece, focused",
+  "eating pizza slice, folded, mid-bite",
+  "eating burger with both hands, big bite, messy",
+  "eating cake with fork, small piece, delicate",
+  "eating onigiri with both hands, rice on cheek",
+  "eating takoyaki with toothpick, sauce on lips",
+  "eating crepe while walking, holding with both hands",
+  "eating ice cream cone, licking, happy face",
+  "eating skewer food, holding in one hand, casual",
+  "eating french fries, dipping in ketchup, casual",
+  "eating noodles with spoon and chopsticks, focused",
+  "eating sandwich, holding with both hands, big bite",
+  "eating dumplings with chopsticks, sauce on side",
+  "eating fried chicken, holding in hand, crispy",
+  "eating parfait with long spoon, layers of cream and fruit, delicate",
+  "eating parfait, scooping from top, whipped cream on lips",
+  "eating pancakes with fork and knife, syrup dripping, stack of pancakes",
+  "eating pancakes, cutting with fork, butter melting",
+  "eating pasta with fork, twirling noodles, sauce on lips",
+  "eating carbonara, creamy sauce, parmesan on top",
+  "eating spaghetti, slurping long noodles, tomato sauce",
+  "eating penne arrabbiata, spicy sauce, focused expression",
+  "eating too quickly, slight mess on lips",
+  "holding half-eaten snack, distracted",
+  "chewing while looking elsewhere",
+  "food in hand, forgot to finish talking",
+  "taking a bite mid-laugh, slightly clumsy",
+  "ramen noodles slipping from chopsticks"
+];
+
+const GLUTTON_GESTURES = [
+  "wiping mouth with sleeve absentmindedly",
+  "holding food awkwardly while checking phone",
+  "trying to balance drink and snack",
+  "fumbling slightly with chopsticks"
+];
+
+const GLUTTON_EXPRESSIONS = [
+  "absent-minded while eating",
+  "slightly embarrassed after messy bite",
+  "happy but unfocused while chewing",
+  "lost in thought, still holding food"
+];
+
+function getGluttonLocation() {
+  return pick(GLUTTON_LOCATIONS);
+}
+
+function getGluttonPose() {
+  return pick(GLUTTON_POSES);
+}
+
+function getGluttonGesture() {
+  return Math.random() < 0.7 ? pick(GLUTTON_GESTURES) : null;
+}
+
+function getGluttonExpression() {
+  return Math.random() < 0.7 ? pick(GLUTTON_EXPRESSIONS) : null;
+}
+
 // ==================== COLOR ====================
 const COLORS_BASE = {
   spring: ["dusty rose and concrete grey","sage green and off-white","navy and crisp white","beige tonal","lavender and warm white","mint green and blush pink","powder blue and pale yellow","cherry blossom pink head-to-toe","soft coral and ivory","lilac and silver grey"],
@@ -976,7 +1066,14 @@ const BODY_POSES = [
   "eating pasta with fork, twirling noodles, sauce on lips",
   "eating carbonara, creamy sauce, parmesan on top",
   "eating spaghetti, slurping long noodles, tomato sauce",
-  "eating penne arrabbiata, spicy sauce, focused expression"
+  "eating penne arrabbiata, spicy sauce, focused expression",
+  // 食いしん坊キャラ強化
+  "eating too quickly, slight mess on lips",
+  "holding half-eaten snack, distracted",
+  "chewing while looking elsewhere",
+  "food in hand, forgot to finish talking",
+  "taking a bite mid-laugh, slightly clumsy",
+  "ramen noodles slipping from chopsticks"
 ];
 
 const HAND_GESTURES = [
@@ -994,7 +1091,12 @@ const HAND_GESTURES = [
   "rolling up sleeve","pulling down hem of top","hands behind back",
   "covering mouth while laughing","giving peace sign low near waist",
   "biting thumbnail lightly","fidgeting with ring","tapping fingers on thigh",
-  "holding wrist with other hand","hugging arms in cold","shielding eyes from light"
+  "holding wrist with other hand","hugging arms in cold","shielding eyes from light",
+  // 食いしん坊キャラ強化
+  "wiping mouth with sleeve absentmindedly",
+  "holding food awkwardly while checking phone",
+  "trying to balance drink and snack",
+  "fumbling slightly with chopsticks"
 ];
 
 const FACIAL_EXPRESSIONS = [
@@ -1013,7 +1115,12 @@ const FACIAL_EXPRESSIONS = [
   "caught off-guard, authentic moment","mid-blink, candid feel",
   "looking away, uninterested in camera","slight squint from bright light",
   "lonely, vulnerable expression","defiant, chin slightly raised",
-  "dreamy, soft gaze","nostalgic, distant smile","determined, jaw set lightly"
+  "dreamy, soft gaze","nostalgic, distant smile","determined, jaw set lightly",
+  // 食いしん坊キャラ強化
+  "absent-minded while eating",
+  "slightly embarrassed after messy bite",
+  "happy but unfocused while chewing",
+  "lost in thought, still holding food"
 ];
 
 const LIGHTING = [
@@ -1141,6 +1248,22 @@ function setFilter(f) {
   currentFilter = f;
   document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
   document.getElementById("filter-" + f).classList.add("active");
+}
+
+function toggleGluttonMode() {
+  gluttonMode = !gluttonMode;
+  const btn = document.getElementById("glutton-btn");
+  if (gluttonMode) {
+    btn.classList.add("active");
+    btn.style.borderColor = "#f97316";
+    btn.style.color = "#f97316";
+    btn.style.background = "#1a120f";
+  } else {
+    btn.classList.remove("active");
+    btn.style.borderColor = "";
+    btn.style.color = "";
+    btn.style.background = "";
+  }
 }
 
 // ==================== LOCK SYSTEM ====================
@@ -1310,7 +1433,7 @@ function generateAll() {
     accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
     accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
-    loc:          preserved.loc || pick(locPool),
+    loc:          preserved.loc || (gluttonMode ? getGluttonLocation() : pick(locPool)),
     time:         preserved.time || pick(SCENE_TIMES[timePhase]),
     weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])),
     season_scene: preserved.season_scene || pickSeasonScene(currentSeason),
@@ -1318,9 +1441,9 @@ function generateAll() {
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
-    pose:         preserved.pose || pick(BODY_POSES),
-    gesture:      preserved.gesture || pick(HAND_GESTURES),
-    expression:   preserved.expression || pick(FACIAL_EXPRESSIONS),
+    pose:         preserved.pose || (gluttonMode ? getGluttonPose() : pick(BODY_POSES)),
+    gesture:      preserved.gesture || (gluttonMode ? getGluttonGesture() : pick(HAND_GESTURES)),
+    expression:   preserved.expression || (gluttonMode ? getGluttonExpression() : pick(FACIAL_EXPRESSIONS)),
     light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
     hair:         preserved.hair || pick(HAIRSTYLES),
     makeup:       preserved.makeup || pick(MAKEUPS)
