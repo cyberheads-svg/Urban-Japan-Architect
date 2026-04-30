@@ -136,6 +136,7 @@
     <div class="selector">
       <button class="selector-btn" onclick="toggleGluttonMode()" id="glutton-btn">🍜 食いしん坊モード</button>
       <button class="selector-btn" onclick="toggleArtistMode()" id="artist-btn">🎸 アーティストモード</button>
+      <button class="selector-btn" onclick="toggleAlbumMode()" id="album-btn">🎨 アルバムジャケット</button>
     </div>
   </div>
 </div>
@@ -174,6 +175,7 @@ let currentSceneType = "urban";
 let currentFilter = "none";
 let gluttonMode = false;
 let artistMode = false;
+let albumMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
@@ -1114,6 +1116,23 @@ const ARTIST_SCENES = [
   { location: "park bench under cherry blossom tree (spring), guitar case, notebook", pose: "sitting on park bench, acoustic guitar, writing lyrics inspired by the scenery, peaceful creative moment", time: "afternoon, 2 PM, spring day", weather: "gentle spring breeze, cherry blossom petals falling" }
 ];
 
+const ALBUM_SCENES = [
+  // Moody cinematic portraits
+  { location: "neon-lit back alley at night, rain on asphalt, reflections, guitar case", pose: "standing in rain, acoustic guitar slung over shoulder, looking up at neon signs, melancholic and cool expression, low angle dramatic lighting", time: "late night, 11 PM, rainy Tokyo", weather: "wet neon reflections, cinematic noir atmosphere" },
+  { location: "rooftop at blue hour, city lights below, wind, guitar", pose: "silhouette against city skyline, holding acoustic guitar, hair flowing, powerful and free pose, worm's eye view", time: "twilight, 7 PM, blue hour", weather: "cool blue tones, inspiring open sky" },
+  { location: "empty subway car at night, green seats, fluorescent light, guitar", pose: "sitting alone in empty train, acoustic guitar on lap, looking out window, introspective and lonely expression, high angle", time: "late night, 2 AM, last train", weather: "harsh fluorescent + cool night outside" },
+  // Symbolic / artistic
+  { location: "cherry blossom petals falling in dark room, single window light, guitar", pose: "sitting on floor surrounded by falling petals, playing guitar softly, dreamy and nostalgic expression, dutch tilt", time: "evening, 6 PM, spring", weather: "soft window light, symbolic cherry blossom rain" },
+  { location: "abandoned warehouse, broken windows, dramatic light beams, guitar", pose: "standing in light beam, guitar raised like a weapon, powerful and rebellious pose, low angle heroic", time: "afternoon, golden hour through windows", weather: "volumetric god rays, gritty industrial romance" },
+  { location: "mirror selfie in messy room, guitar, laptop, snacks, neon sign reflection", pose: "taking mirror selfie with guitar, cool and slightly messy aesthetic, confident expression, over shoulder angle", time: "late night, 1 AM, home", weather: "mixed neon + warm lamp light, authentic artist life" },
+  // Close-up artistic
+  { location: "extreme close-up on face and guitar headstock, shallow depth of field", pose: "face half in shadow, fingers on guitar frets, intense emotional expression, eye level intimate", time: "studio lighting", weather: "dramatic side lighting, film noir portrait" },
+  { location: "black background, single spotlight, guitar silhouette, smoke", pose: "silhouette with guitar, smoke curling, mysterious and iconic pose, low angle from below", time: "dark studio", weather: "single dramatic spotlight, high contrast" },
+  // Urban symbolic
+  { location: "Shibuya crossing at night, blurred crowd, guitar case, rain", pose: "standing still in moving crowd, guitar case at feet, looking straight at camera, powerful and isolated pose, high angle", time: "night, 10 PM, Shibuya", weather: "rainy neon chaos, cinematic urban loneliness" },
+  { location: "under elevated train tracks, graffiti, golden hour light, guitar", pose: "leaning against concrete pillar, guitar in hand, looking into distance, cool and contemplative, dutch tilt", time: "evening, 5 PM, golden hour", weather: "warm light through tracks, gritty romantic" }
+];
+
 function getGluttonLocationAndPose() {
   // Pick a location first
   const location = pick(GLUTTON_LOCATIONS);
@@ -1496,6 +1515,39 @@ function toggleArtistMode() {
   }
 }
 
+function toggleAlbumMode() {
+  albumMode = !albumMode;
+  const btn = document.getElementById("album-btn");
+  if (albumMode) {
+    btn.classList.add("active");
+    btn.style.borderColor = "#c084fc";
+    btn.style.color = "#c084fc";
+    btn.style.background = "#1a0f1a";
+    // turn off other special modes
+    if (gluttonMode) {
+      gluttonMode = false;
+      const gbtn = document.getElementById("glutton-btn");
+      gbtn.classList.remove("active");
+      gbtn.style.borderColor = "";
+      gbtn.style.color = "";
+      gbtn.style.background = "";
+    }
+    if (artistMode) {
+      artistMode = false;
+      const abtn = document.getElementById("artist-btn");
+      abtn.classList.remove("active");
+      abtn.style.borderColor = "";
+      abtn.style.color = "";
+      abtn.style.background = "";
+    }
+  } else {
+    btn.classList.remove("active");
+    btn.style.borderColor = "";
+    btn.style.color = "";
+    btn.style.background = "";
+  }
+}
+
 // ==================== LOCK SYSTEM ====================
 function toggleLock(key) {
   lockedFields[key] = !lockedFields[key];
@@ -1565,6 +1617,8 @@ function rebuildPromptAndDisplay() {
 
   const sceneNote = currentSceneType === 'room'? "intimate private room, personal space" : "anonymous urban environment";
 
+  const albumTags = albumMode ? "album cover art, square composition, negative space for text at top or bottom, cinematic color grade, symbolic and artistic, high detail, moody atmospheric lighting" : "";
+
   const parts = [
     `location: ${v.loc}`,
     v.season_scene, v.time, v.weather,
@@ -1584,6 +1638,7 @@ function rebuildPromptAndDisplay() {
     ...(v.foregroundBlur ? [v.foregroundBlur] : []),
     filterTags,
     sceneNote,
+    albumTags,
     "hyper-realistic, high detail photography"
   ].filter(Boolean);
 
@@ -1672,6 +1727,12 @@ function generateAll() {
     artistScene = pick(ARTIST_SCENES);
   }
 
+  // Pick album jacket scene (special dramatic angles + cool artistic poses)
+  let albumScene = null;
+  if (albumMode) {
+    albumScene = pick(ALBUM_SCENES);
+  }
+
   lastVals = {
     style, styleType, timePhase,
     top:          preserved.top || pickTop(styleType),
@@ -1683,15 +1744,15 @@ function generateAll() {
     accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
     accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
-    loc:          artistMode ? artistScene.location : (gluttonMode ? gluttonScene.location : (preserved.loc || pick(locPool))),
-    time:         artistMode ? artistScene.time : (gluttonMode ? gluttonScene.time : (preserved.time || pick(SCENE_TIMES[timePhase]))),
-    weather:      artistMode ? artistScene.weather : (gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])))),
-    season_scene: (artistMode || gluttonMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
+    loc:          albumMode ? albumScene.location : (artistMode ? artistScene.location : (gluttonMode ? gluttonScene.location : (preserved.loc || pick(locPool)))),
+    time:         albumMode ? albumScene.time : (artistMode ? artistScene.time : (gluttonMode ? gluttonScene.time : (preserved.time || pick(SCENE_TIMES[timePhase])))),
+    weather:      albumMode ? albumScene.weather : (artistMode ? artistScene.weather : (gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])))),
+    season_scene: (albumMode || artistMode || gluttonMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
-    pose:         artistMode ? artistScene.pose : (gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES))),
+    pose:         albumMode ? albumScene.pose : (artistMode ? artistScene.pose : (gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES)))),
     gesture:      artistMode ? (pick(["playing acoustic guitar softly", "humming melody while strumming", "tuning guitar with focused expression", "singing quietly while playing chords"]) ) : ((gluttonMode && !('gesture' in preserved)) ? getGluttonGesture() : ('gesture' in preserved ? preserved.gesture : pick(HAND_GESTURES))),
     expression:   artistMode ? (pick(["dreamy and creative", "passionate and emotional while singing", "focused and inspired", "gentle smile while playing"]) ) : ((gluttonMode && !('expression' in preserved)) ? getGluttonExpression() : ('expression' in preserved ? preserved.expression : pick(FACIAL_EXPRESSIONS))),
     light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
