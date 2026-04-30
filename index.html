@@ -1021,6 +1021,74 @@ const GLUTTON_LOCATION_FOOD_MAP = {
   "seafood restaurant": ["eating grilled fish, chopsticks, fresh aroma", "eating sashimi, soy sauce dip, focused", "eating seafood pasta, creamy sauce, satisfied"]
 };
 
+// Pre-made coherent glutton scenes (location + pose + time + weather)
+const GLUTTON_SCENES = [
+  {
+    location: "ramen shop counter, steaming bowls, wooden stools",
+    pose: "eating ramen with chopsticks, slurping noodles, satisfied expression",
+    time: "lunch hour, city in motion",
+    weather: "clear and bright, lunch rush atmosphere"
+  },
+  {
+    location: "sushi counter, chef preparing, fresh fish",
+    pose: "eating sushi with chopsticks, single piece, focused",
+    time: "early evening, 6 PM, dinner rush beginning",
+    weather: "clear evening, soft restaurant lighting"
+  },
+  {
+    location: "curry restaurant, curry rice and katsu, spicy aroma",
+    pose: "eating curry rice with spoon, spicy aroma, satisfied",
+    time: "lunch hour, city in motion",
+    weather: "clear and bright, lunch rush atmosphere"
+  },
+  {
+    location: "italian restaurant, pasta and pizza, warm lighting",
+    pose: "eating pasta with fork, twirling noodles, sauce on lips",
+    time: "early evening, 7 PM, dinner time",
+    weather: "clear evening, warm restaurant ambiance"
+  },
+  {
+    location: "izakaya interior, wooden tables, lanterns",
+    pose: "eating dumplings with chopsticks, sauce on side",
+    time: "late evening, 8 PM, after-work crowd",
+    weather: "clear evening, warm izakaya lighting"
+  },
+  {
+    location: "cafe table with coffee and cake, cozy lighting",
+    pose: "eating cake with fork, small piece, delicate",
+    time: "afternoon, 3 PM, relaxed cafe time",
+    weather: "soft afternoon light, cozy cafe ambiance"
+  },
+  {
+    location: "dessert cafe, colorful sweets, pastel decor",
+    pose: "eating parfait with long spoon, layers of cream and fruit, delicate",
+    time: "afternoon, 4 PM, dessert time",
+    weather: "soft afternoon light, sweet cafe atmosphere"
+  },
+  {
+    location: "steakhouse, grilled steak, dim lighting",
+    pose: "eating steak, knife and fork, satisfied expression",
+    time: "evening, 7 PM, dinner time",
+    weather: "dim restaurant lighting, intimate atmosphere"
+  },
+  {
+    location: "food court, multiple stalls, busy atmosphere",
+    pose: "eating ramen with chopsticks, slurping noodles, satisfied expression",
+    time: "lunch hour, busy food court",
+    weather: "bright food court lighting, bustling atmosphere"
+  },
+  {
+    location: "convenience store eating area, small tables, late night",
+    pose: "eating onigiri with both hands, rice on cheek",
+    time: "late night, 11 PM, quiet convenience store",
+    weather: "bright convenience store lighting, quiet night"
+  }
+];
+
+function getGluttonScene() {
+  return pick(GLUTTON_SCENES);
+}
+
 function getGluttonLocationAndPose() {
   // Pick a location first
   const location = pick(GLUTTON_LOCATIONS);
@@ -1539,15 +1607,15 @@ function generateAll() {
     accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
     accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
-    loc:          preserved.loc || (gluttonMode ? getGluttonLocationAndPose().location : pick(locPool)),
-    time:         preserved.time || (gluttonMode ? getGluttonTime() : pick(SCENE_TIMES[timePhase])),
-    weather:      preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])),
+    loc:          preserved.loc || (gluttonMode ? getGluttonScene().location : pick(locPool)),
+    time:         preserved.time || (gluttonMode ? getGluttonScene().time : pick(SCENE_TIMES[timePhase])),
+    weather:      preserved.weather || (gluttonMode ? getGluttonScene().weather : getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason]))),
     season_scene: preserved.season_scene || pickSeasonScene(currentSeason),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
-    pose:         preserved.pose || (gluttonMode ? getGluttonLocationAndPose().pose : pick(BODY_POSES)),
+    pose:         preserved.pose || (gluttonMode ? getGluttonScene().pose : pick(BODY_POSES)),
     gesture:      preserved.gesture || (gluttonMode ? getGluttonGesture() : pick(HAND_GESTURES)),
     expression:   preserved.expression || (gluttonMode ? getGluttonExpression() : pick(FACIAL_EXPRESSIONS)),
     light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
