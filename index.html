@@ -1193,6 +1193,30 @@ const HAND_GESTURES = [
   "holding wrist with other hand","hugging arms in cold","shielding eyes from light"
 ];
 
+// Kawaii cute poses (used when Kawaii Background is active in White Studio)
+const KAWAII_POSES = [
+  "making double peace signs near face, smiling brightly",
+  "tilting head cutely, one hand on cheek",
+  "both hands making finger hearts, head slightly tilted",
+  "twirling gently with arms out, happy expression",
+  "jumping slightly with excitement, hands in small fists",
+  "looking back over shoulder with cute smile",
+  "sitting on invisible chair pose, legs together, smiling",
+  "one hand making heart shape, other hand on hip",
+  "both hands framing face like a picture, big smile",
+  "head tilt with finger on lips, shy cute expression",
+  "peace sign with one hand, other hand holding skirt",
+  "twirling with one leg lifted, arms spread",
+  "making cat paw hands near face, playful expression",
+  "hands on cheeks, mouth open in cute surprise",
+  "leaning forward slightly with hands behind back, smiling",
+  "one leg bent, finger heart with both hands",
+  "sitting pose with knees together, hands on knees, smiling",
+  "standing on tiptoes, hands making small waves",
+  "head resting on one hand, other hand making peace sign",
+  "gentle twirl with skirt flare, looking at camera"
+];
+
 const FACIAL_EXPRESSIONS = [
   "cool, detached, neutral","slight mysterious smirk","confident direct stare",
   "relaxed and observant","melancholic, looking into distance","blank stare, lost in thought",
@@ -1544,7 +1568,7 @@ function rebuildPromptAndDisplay() {
       : "pure white seamless studio background",
     "young Japanese woman, fashion magazine editorial shot",
     framingText,
-    "confident fashion pose, slightly turned, hands on hips or one hand in hair",
+    v.pose,
     v.hair ? `hairstyle: ${v.hair}` : null,
     v.makeup ? `makeup: ${v.makeup}` : null,
     `wearing ${v.style} outfit`,
@@ -1732,10 +1756,11 @@ function generateAll() {
       ? preserved.foregroundBlur
       : getForegroundBlur(currentSceneType, currentFraming, resolvedLoc),
     pose:         preserved.pose ||
+      (whiteStudioMode && currentBackground ? pick(KAWAII_POSES) :
       (whiteStudioMode ? whiteStudioScene.pose :
       (albumMode ? albumScene.pose :
       (artistMode ? artistScene.pose :
-      (gluttonMode ? gluttonScene.pose : pick(BODY_POSES))))),
+      (gluttonMode ? gluttonScene.pose : pick(BODY_POSES)))))),
     gesture:      preserved.gesture !== undefined ? preserved.gesture :
       (whiteStudioMode ? null :
       (artistMode
