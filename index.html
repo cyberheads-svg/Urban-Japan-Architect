@@ -137,6 +137,7 @@
       <button class="selector-btn" onclick="toggleGluttonMode()" id="glutton-btn">🍜 食いしん坊モード</button>
       <button class="selector-btn" onclick="toggleArtistMode()" id="artist-btn">🎸 アーティストモード</button>
       <button class="selector-btn" onclick="toggleAlbumMode()" id="album-btn">🎵 Visual Mode</button>
+      <button class="selector-btn" onclick="toggleWhiteStudioMode()" id="white-btn">👕 白背景スタジオ</button>
     </div>
   </div>
 </div>
@@ -214,6 +215,7 @@ let currentFilter = "none";
 let gluttonMode = false;
 let artistMode = false;
 let albumMode = false;
+let whiteStudioMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
@@ -1597,12 +1599,63 @@ function toggleAlbumMode() {
       abtn.style.color = "";
       abtn.style.background = "";
     }
+    if (whiteStudioMode) {
+      whiteStudioMode = false;
+      const wbtn = document.getElementById("white-btn");
+      wbtn.classList.remove("active");
+      wbtn.style.borderColor = "";
+      wbtn.style.color = "";
+      wbtn.style.background = "";
+    }
   } else {
     btn.classList.remove("active");
     btn.style.borderColor = "";
     btn.style.color = "";
     btn.style.background = "";
     if (inputs) inputs.style.display = "none";
+  }
+}
+
+function toggleWhiteStudioMode() {
+  whiteStudioMode = !whiteStudioMode;
+  const btn = document.getElementById("white-btn");
+  if (whiteStudioMode) {
+    btn.classList.add("active");
+    btn.style.borderColor = "#ffffff";
+    btn.style.color = "#000000";
+    btn.style.background = "#f0f0f0";
+    // turn off other special modes
+    if (gluttonMode) {
+      gluttonMode = false;
+      const gbtn = document.getElementById("glutton-btn");
+      gbtn.classList.remove("active");
+      gbtn.style.borderColor = "";
+      gbtn.style.color = "";
+      gbtn.style.background = "";
+    }
+    if (artistMode) {
+      artistMode = false;
+      const abtn = document.getElementById("artist-btn");
+      abtn.classList.remove("active");
+      abtn.style.borderColor = "";
+      abtn.style.color = "";
+      abtn.style.background = "";
+    }
+    if (albumMode) {
+      albumMode = false;
+      const vbtn = document.getElementById("album-btn");
+      vbtn.classList.remove("active");
+      vbtn.style.borderColor = "";
+      vbtn.style.color = "";
+      vbtn.style.background = "";
+      const inputs = document.getElementById("albumInputs");
+      if (inputs) inputs.style.display = "none";
+    }
+  } else {
+    btn.classList.remove("active");
+    btn.style.borderColor = "";
+    btn.style.color = "";
+    btn.style.background = "";
   }
 }
 
@@ -1726,7 +1779,21 @@ function rebuildPromptAndDisplay() {
     }
   }
 
-  const parts = [
+  const parts = whiteStudioMode ? [
+    "studio white seamless background",
+    "young Japanese woman",
+    framingText,
+    "standing naturally, clean fashion pose",
+    v.hair? `hairstyle: ${v.hair}` : null,
+    v.makeup? `makeup: ${v.makeup}` : null,
+    `wearing ${v.style} outfit`,
+    v.top, v.bottom,
+   ...(v.outer? [v.outer] : []),
+    `${v.fabric} fabric`,
+    "color palette: clean neutral tones",
+    `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
+    v.shoe
+  ].filter(Boolean) : [
     `location: ${v.loc}`,
     v.season_scene, v.time, v.weather,
     "young Japanese woman",
@@ -1841,6 +1908,14 @@ function generateAll() {
     albumScene = pick(ALBUM_SCENES);
   }
 
+  // White Studio Mode: force clean white background for pure fashion focus
+  let whiteStudioScene = null;
+  if (whiteStudioMode) {
+    // Pick from the white/minimal scenes in ALBUM_SCENES (first 3)
+    const whiteScenes = ALBUM_SCENES.filter(s => s.location.includes("white") || s.location.includes("gradient") || s.location.includes("studio"));
+    whiteStudioScene = whiteScenes.length > 0 ? pick(whiteScenes) : pick(ALBUM_SCENES);
+  }
+
   lastVals = {
     style, styleType, timePhase,
     top:          preserved.top || pickTop(styleType),
@@ -1852,18 +1927,18 @@ function generateAll() {
     accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
     accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
     shoe:         preserved.shoe || pick(SHOES),
-    loc:          albumMode ? albumScene.location : (artistMode ? artistScene.location : (gluttonMode ? gluttonScene.location : (preserved.loc || pick(locPool)))),
-    time:         albumMode ? albumScene.time : (artistMode ? artistScene.time : (gluttonMode ? gluttonScene.time : (preserved.time || pick(SCENE_TIMES[timePhase])))),
-    weather:      albumMode ? albumScene.weather : (artistMode ? artistScene.weather : (gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason]))))),
-    season_scene: (albumMode || artistMode || gluttonMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
+    loc:          whiteStudioMode ? whiteStudioScene.location : (albumMode ? albumScene.location : (artistMode ? artistScene.location : (gluttonMode ? gluttonScene.location : (preserved.loc || pick(locPool))))),
+    time:         whiteStudioMode ? whiteStudioScene.time : (albumMode ? albumScene.time : (artistMode ? artistScene.time : (gluttonMode ? gluttonScene.time : (preserved.time || pick(SCENE_TIMES[timePhase]))))),
+    weather:      whiteStudioMode ? whiteStudioScene.weather : (albumMode ? albumScene.weather : (artistMode ? artistScene.weather : (gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])))))),
+    season_scene: (whiteStudioMode || albumMode || artistMode || gluttonMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
     foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming, preserved.loc || ""),
-    pose:         albumMode ? albumScene.pose : (artistMode ? artistScene.pose : (gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES)))),
+    pose:         whiteStudioMode ? whiteStudioScene.pose : (albumMode ? albumScene.pose : (artistMode ? artistScene.pose : (gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES))))),
     gesture:      artistMode ? (pick(["playing acoustic guitar softly", "humming melody while strumming", "tuning guitar with focused expression", "singing quietly while playing chords"]) ) : ((gluttonMode && !('gesture' in preserved)) ? getGluttonGesture() : ('gesture' in preserved ? preserved.gesture : pick(HAND_GESTURES))),
     expression:   artistMode ? (pick(["dreamy and creative", "passionate and emotional while singing", "focused and inspired", "gentle smile while playing"]) ) : ((gluttonMode && !('expression' in preserved)) ? getGluttonExpression() : ('expression' in preserved ? preserved.expression : pick(FACIAL_EXPRESSIONS))),
-    light:        preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase])),
+    light:        whiteStudioMode ? null : (preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase]))),
     hair:         'hair' in preserved ? preserved.hair : pick(HAIRSTYLES),
     makeup:       'makeup' in preserved ? preserved.makeup : pick(MAKEUPS)
   };
