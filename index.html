@@ -160,14 +160,17 @@
   <div id="albumInputs" style="display:none; margin-top:16px; padding:12px; background:#0f0e12; border:1px solid #332f40; border-radius:6px;">
     <div style="font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#6a6278; margin-bottom:8px;">Visual Mode Info</div>
     <input id="artistNameInput" type="text" placeholder="アーティスト名（例: 夜の果て）" 
-           style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:11px; padding:8px; margin-bottom:8px; border-radius:4px;">
+           style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:11px; padding:8px; margin-bottom:8px; border-radius:4px;"
+           oninput="if (albumMode) rebuildPromptAndDisplay()">
     <input id="albumTitleInput" type="text" placeholder="アルバムタイトル（例: 食いしん坊の夜）" 
-           style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:11px; padding:8px; border-radius:4px;">
+           style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:11px; padding:8px; border-radius:4px;"
+           oninput="if (albumMode) rebuildPromptAndDisplay()">
     
     <div style="display:flex; gap:8px; margin-top:8px;">
       <div style="flex:1">
         <div style="font-size:8px; color:#6a6278; margin-bottom:4px;">文字サイズ</div>
-        <select id="textSizeSelect" style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:10px; padding:6px; border-radius:4px;">
+        <select id="textSizeSelect" style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:10px; padding:6px; border-radius:4px;"
+                onchange="if (albumMode) rebuildPromptAndDisplay()">
           <option value="medium">Medium (標準)</option>
           <option value="small">Small (控えめ)</option>
           <option value="large">Large (インパクト大)</option>
@@ -178,7 +181,8 @@
       </div>
       <div style="flex:1">
         <div style="font-size:8px; color:#6a6278; margin-bottom:4px;">配置</div>
-        <select id="textPlacementSelect" style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:10px; padding:6px; border-radius:4px;">
+        <select id="textPlacementSelect" style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:10px; padding:6px; border-radius:4px;"
+                onchange="if (albumMode) rebuildPromptAndDisplay()">
           <option value="topbottom">Top + Bottom (2行)</option>
           <option value="top">Top Only (1行)</option>
           <option value="bottom">Bottom Only (1行)</option>
@@ -219,7 +223,7 @@ let whiteStudioMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
-let lockedFields = {}; // NEW: lock state
+let lockedFields = {};
 
 // ==================== HELPERS ====================
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -233,7 +237,6 @@ const pickN = (arr, n) => {
 };
 
 // ==================== STYLES ====================
-// MODE MINIMAL 30%
 const STYLES_MODE_MINIMAL = [
   "Tokyo minimal chic","Ura-Harajuku techwear","Daikanyama layered silhouette",
   "Aoyama sophisticated monochrome","techwear ninja","monochrome minimalist",
@@ -244,7 +247,6 @@ const STYLES_MODE_MINIMAL = [
   "sound engineer chic all-black technical","Shimokitazawa live house regular"
 ];
 
-// MODE DECO 25%
 const STYLES_MODE_DECO = [
   "Harajuku mix-print maximalist","Shimokitazawa thrift layered mix","vintage floral tapestry look",
   "Tokyo bohemian Harajuku","heavy layered patterned streetwear","avant-garde frill street fashion",
@@ -254,7 +256,6 @@ const STYLES_MODE_DECO = [
   "fairy kei pastel Tokyo","Lolita adjacent street casual","Laforet window display look"
 ];
 
-// SEXY 20%
 const STYLES_SEXY = [
   "Shibuya night-out glam","Y2K gyaru revival","jirai-kei dark cute",
   "Roppongi club-ready","Harajuku sexy kawaii","Kabukicho after-midnight",
@@ -264,7 +265,6 @@ const STYLES_SEXY = [
   "party girl Azabu aesthetic","velvet club Roppongi","Shibuya109 going-out look"
 ];
 
-// 病み系 15%
 const STYLES_YAMI = [
   "yami kawaii dark pastel","menhera-kei street look","dark jirai aesthetic",
   "hospital kei lite street","bandage accessory dark cute","pastel goth Tokyo",
@@ -273,7 +273,6 @@ const STYLES_YAMI = [
   "gloomy bear aesthetic","sad girl Tokyo aesthetic","dark fairy wing street"
 ];
 
-// 萌え系 10%
 const STYLES_MOE = [
   "moe casual schoolgirl off-duty","soft moe aesthetic pastel",
   "maid cafe aesthetic street version","magical girl civilian mode",
@@ -455,16 +454,13 @@ const OUTERWEAR = {
   winter: ["long sleek wool overcoat","voluminous puffer jacket","GORE-TEX technical parka","shearling collar aviator jacket","heavy wool duffle coat","velvet blazer"]
 };
 
-// New: Weather-aware outerwear picker (no raincoat if no rain)
+// FIX: weather引数を正しく受け取って使う
 function pickOuterwear(season, weather) {
   let pool = OUTERWEAR[season] || OUTERWEAR.spring;
   const isRaining = weather && weather.includes("rain");
-
   if (!isRaining) {
-    // No rain: filter out raincoats
     pool = pool.filter(o => !o.includes("rain"));
   }
-
   return Math.random() < 0.7 ? pick(pool) : null;
 }
 
@@ -509,18 +505,17 @@ const ACCESSORIES_MOE = [
   "stuffed animal charm","pastel teddy bear keychain"
 ];
 
+// FIX: 1回だけ呼び出して primary/secondary を返す（以前は3回独立呼び出しでバラバラだった）
 function pickAccessories(styleType, sceneType = "urban") {
   let pool;
-  if (styleType === 'sexy')      pool = ACCESSORIES_SEXY;
-  else if (styleType === 'yami') pool = ACCESSORIES_YAMI;
-  else if (styleType === 'moe')  pool = ACCESSORIES_MOE;
-  else                           pool = ACCESSORIES_MODE;
+  if (styleType === 'sexy')      pool = [...ACCESSORIES_SEXY];
+  else if (styleType === 'yami') pool = [...ACCESSORIES_YAMI];
+  else if (styleType === 'moe')  pool = [...ACCESSORIES_MOE];
+  else                           pool = [...ACCESSORIES_MODE];
 
   const isRoom = sceneType === "room";
 
-  // Context-aware filtering
   if (isRoom) {
-    // Room scenes: reduce very revealing / clubby / heavy outdoor items
     pool = pool.filter(a => 
       !a.includes("thigh-high") && 
       !a.includes("platform heels") && 
@@ -530,7 +525,6 @@ function pickAccessories(styleType, sceneType = "urban") {
       !a.includes("over-knee")
     );
   } else {
-    // Urban scenes: reduce overly cute / pastel / moe accessories
     if (styleType !== 'moe' && styleType !== 'yami') {
       pool = pool.filter(a => 
         !a.includes("strawberry") && 
@@ -542,32 +536,27 @@ function pickAccessories(styleType, sceneType = "urban") {
     }
   }
 
-  // Always pick 1 primary, 50% chance for secondary
-  let available = [...pool];
   let hasBag = false;
 
-  // Pick primary (always)
   let primary = null;
-  if (available.length > 0) {
-    const idx = Math.floor(Math.random() * available.length);
-    primary = available.splice(idx, 1)[0];
+  if (pool.length > 0) {
+    const idx = Math.floor(Math.random() * pool.length);
+    primary = pool.splice(idx, 1)[0];
     if (primary.match(/bag|backpack|tote/i)) hasBag = true;
   }
 
-  // Pick secondary (50% chance)
   let secondary = null;
-  if (Math.random() < 0.5 && available.length > 0) {
-    if (hasBag) available = available.filter(a => !a.match(/bag|backpack|tote/i));
-    if (available.length > 0) {
-      const idx = Math.floor(Math.random() * available.length);
-      secondary = available.splice(idx, 1)[0];
+  if (Math.random() < 0.5 && pool.length > 0) {
+    if (hasBag) pool = pool.filter(a => !a.match(/bag|backpack|tote/i));
+    if (pool.length > 0) {
+      const idx = Math.floor(Math.random() * pool.length);
+      secondary = pool.splice(idx, 1)[0];
     }
   }
 
   return { primary, secondary };
 }
 
-// New: Context-aware noise (room vs urban, time of day)
 function getContextualNoise(sceneType, time, loc = "") {
   const isRoom = sceneType === "room";
   const isNight = /night|midnight|3am|2am/.test(time);
@@ -576,7 +565,6 @@ function getContextualNoise(sceneType, time, loc = "") {
   let pool = [...RARE_TOKYO];
 
   if (isRoom) {
-    // Room scenes: reduce outdoor/street specific noise
     pool = pool.filter(n => 
       !n.includes("vending machine") && 
       !n.includes("pachinko") && 
@@ -586,14 +574,12 @@ function getContextualNoise(sceneType, time, loc = "") {
     );
   }
 
-  // Vending machine location filter: only appear in konbini, vending machine corner, or back alley
   const hasVendingLocation = /vending|konbini|back alley/.test(loc);
   if (!hasVendingLocation) {
     pool = pool.filter(n => !n.includes("vending machine"));
   }
 
   if (isNight || isEvening) {
-    // Night/evening: boost neon/vending/machine glow items
     const nightNoise = pool.filter(n => 
       n.includes("vending machine") || 
       n.includes("neon") || 
@@ -608,7 +594,6 @@ function getContextualNoise(sceneType, time, loc = "") {
   return pool.length > 0 ? pick(pool) : null;
 }
 
-// New: Seasonal & TPO-aware bottom correction
 function getContextualBottom(season, styleType, sceneType = "urban") {
   let pool = [...(styleType === 'sexy' ? BOTTOMS_SEXY : 
                  styleType === 'yami' ? BOTTOMS_YAMI : 
@@ -619,7 +604,6 @@ function getContextualBottom(season, styleType, sceneType = "urban") {
   const isSummer = season === "summer";
   const isRoom = sceneType === "room";
 
-  // Winter: reduce extremely revealing bottoms
   if (isWinter) {
     const revealing = pool.filter(b => 
       b.includes("micro") || b.includes("ultra-short") || b.includes("hot pants") ||
@@ -630,7 +614,6 @@ function getContextualBottom(season, styleType, sceneType = "urban") {
     }
   }
 
-  // Summer: reduce heavy winter-style bottoms (less strict than American version)
   if (isSummer) {
     const heavy = pool.filter(b => 
       b.includes("wool") || b.includes("corduroy") || b.includes("velvet")
@@ -640,7 +623,6 @@ function getContextualBottom(season, styleType, sceneType = "urban") {
     }
   }
 
-  // Room scenes: slightly prefer more comfortable bottoms
   if (isRoom) {
     const comfy = pool.filter(b => 
       b.includes("wide") || b.includes("pleated") || b.includes("A-line") ||
@@ -664,7 +646,6 @@ const SHOES = [
 
 // ==================== SCENE ====================
 const LOC_URBAN = [
-  // 昼・屋外
   "narrow backstreet, tangled power lines, midday sun casting hard shadows",
   "multistory bicycle parking, thousands of silver spokes, bright afternoon",
   "narrow asphalt road, yellow Stop characters, clear daytime",
@@ -682,7 +663,6 @@ const LOC_URBAN = [
   "city block corner, convenience store awning, lunch hour",
   "underneath railway bridge, graffiti and pigeons",
   "narrow stone-paved slope in old Tokyo neighbourhood",
-  // 夕方
   "elevated highway overpass, concrete pillars, golden hour shadows",
   "minimalist cafe interior, concrete walls, warm afternoon light through glass",
   "train station platform edge, yellow tactile paving, late afternoon",
@@ -693,7 +673,6 @@ const LOC_URBAN = [
   "open rooftop, empty chairs, golden city backdrop",
   "school athletic field fence, dust in the late sun",
   "canal side walk with iron railings, golden reflections",
-  // 夜
   "konbini parking lot, cold fluorescent rectangle in the dark",
   "pachinko parlor exterior, aggressive neon signage, cracked asphalt",
   "underground walkway, white tiles, flickering fluorescent",
@@ -702,9 +681,21 @@ const LOC_URBAN = [
   "subterranean shopping mall corridor, closed shutters after hours",
   "interior of empty subway car, green velour seats, night run",
   "stairwell of a 1990s apartment complex, dim ceiling light",
-  "back alley, wet asphalt, vending machine glow, midnight"
+  "back alley, wet asphalt, vending machine glow, midnight",
+  // Industrial waterfront / Bay Area inspired scenes (user requested)
+  "industrial waterfront, cranes and containers, rusty metal",
+  "bay area factory district, smoke stacks, heavy machinery",
+  "shipping port, massive cargo ships, industrial cranes",
+  "abandoned warehouse district, broken windows, graffiti",
+  "oil refinery at dusk, flames and smoke, industrial glow",
+  "harbor promenade, seagulls, salt air",
+  "ferry terminal, concrete pier, ocean breeze",
+  "waterfront park, benches facing the bay",
+  "industrial canal, rusted bridges, industrial reflection",
+  "bay bridge view, distant city skyline, water reflections"
 ];
 
+// FIX: LOC_ROOMを室内・屋内に限定。都市・飲食店などは除去し重複も削除
 const LOC_ROOM = [
   "small one-room apartment, futon folded, clothes rack overflowing",
   "bedroom with unmade bed, morning light through cheap curtains",
@@ -722,61 +713,7 @@ const LOC_ROOM = [
   "piles of fashion magazines on floor",
   "sun-drenched window with dust motes",
   "small home studio with synth and cables",
-  "cozy nook with beanbag and bookshelves",
-  // Bay area industrial / waterfront
-  "industrial waterfront, cranes and containers, rusty metal",
-  "bay area factory district, smoke stacks, heavy machinery",
-  "shipping port, massive cargo ships, industrial cranes",
-  "abandoned warehouse district, broken windows, graffiti",
-  "oil refinery at dusk, flames and smoke, industrial glow",
-  "harbor promenade, seagulls, salt air",
-  "ferry terminal, concrete pier, ocean breeze",
-  "waterfront park, benches facing the bay",
-  "industrial canal, rusted bridges, industrial reflection",
-  "bay bridge view, distant city skyline, water reflections",
-  // Drama-friendly locations (duplicated for higher probability)
-  "tree-lined street with sunlight filtering through leaves",
-  "ginkgo tree-lined street in autumn, golden carpet",
-  "zelkova tree-lined avenue, dappled light",
-  "fashion boutique interior with clothing racks",
-  "small cafe interior with wooden tables",
-  "vintage clothing store interior, racks of clothes",
-  "bookstore interior with tall bookshelves",
-  "convenience store interior at night, fluorescent glow",
-  "movie theater lobby with movie posters",
-  "cinema entrance with neon signs",
-  "movie theater interior, dark with screen glow",
-  "ticket counter at movie theater, red carpet",
-  "shopping arcade with glass roof, daylight filtering",
-  "department store interior, escalators and displays",
-  "cafe terrace with outdoor seating, city view",
-  // Duplicates for higher appearance rate
-  "tree-lined street with sunlight filtering through leaves",
-  "ginkgo tree-lined street in autumn, golden carpet",
-  "zelkova tree-lined avenue, dappled light",
-  "fashion boutique interior with clothing racks",
-  "small cafe interior with wooden tables",
-  "vintage clothing store interior, racks of clothes",
-  "bookstore interior with tall bookshelves",
-  "convenience store interior at night, fluorescent glow",
-  "movie theater lobby with movie posters",
-  "cinema entrance with neon signs",
-  "movie theater interior, dark with screen glow",
-  "ticket counter at movie theater, red carpet",
-  "shopping arcade with glass roof, daylight filtering",
-  "department store interior, escalators and displays",
-  "cafe terrace with outdoor seating, city view",
-  // Eating locations
-  "ramen shop counter, steaming bowls, wooden stools",
-  "izakaya interior, wooden tables, lanterns",
-  "sushi counter, chef preparing, fresh fish",
-  "cafe table with coffee and cake, cozy lighting",
-  "food stall at night market, steam rising, warm glow",
-  "bakery interior, bread shelves, warm lighting",
-  "dessert cafe, colorful sweets, pastel decor",
-  "bar counter with snacks, dim lighting, cocktails",
-  "convenience store eating area, small tables, late night",
-  "food court, multiple stalls, busy atmosphere"
+  "cozy nook with beanbag and bookshelves"
 ];
 
 const SEASONS_SCENE = {
@@ -810,17 +747,11 @@ const SEASONS_SCENE = {
   ]
 };
 
-// New: Spring scene picker with reduced cherry blossom probability
 function pickSeasonScene(season) {
   let pool = SEASONS_SCENE[season] || SEASONS_SCENE.spring;
-
-  if (season === "spring") {
-    // 30% chance to filter out cherry blossom items
-    if (Math.random() < 0.30) {
-      pool = pool.filter(s => !s.includes("cherry blossom"));
-    }
+  if (season === "spring" && Math.random() < 0.30) {
+    pool = pool.filter(s => !s.includes("cherry blossom"));
   }
-
   return pick(pool);
 }
 
@@ -831,14 +762,12 @@ const WEATHER = {
   winter: ["clear and freezing, high contrast shadows","light snow barely sticking to asphalt","thick grey overcast, flat shadowless city","dry cold, sharp edges on everything"]
 };
 
-// 時間帯を昼40%/夕方30%/夜30%で制御
 const SCENE_TIMES = {
   day:     ["10 AM, crisp morning light, long soft shadows","midday, harsh overhead sun, deep geometric shadows","early afternoon, flat bright light","lunch hour, city in motion","weekend afternoon, quiet streets, sharp sunlight"],
   evening: ["late afternoon, golden hour, amber reflecting off windows","5 PM, rush hour beginning, warm slanted light","golden hour, last sunlight cutting between buildings","dusk, sky turning indigo, shop lights flickering on","twilight, boundary between natural and artificial light"],
   night:   ["early evening, 8 PM, city fully lit","midnight, deserted streets, solitary vending machine glow","3 AM, eerie stillness, orange sodium streetlights","2 AM, post-closing-time emptiness","blue hour transitioning to dark night"]
 };
 
-// Glutton mode time pool (day + evening only, no late night)
 const GLUTTON_TIMES = [
   "10 AM, crisp morning light, long soft shadows",
   "midday, harsh overhead sun, deep geometric shadows",
@@ -875,14 +804,12 @@ const RARE_TOKYO = [
   "faint steam rising from a ramen shop vent in the background",
   "reflection of a blue emergency exit sign on a wet railing",
   "single discarded yellow train ticket on grey asphalt",
-  // 食いしん坊キャラ強化（食の事故）
   "sauce stain on sleeve unnoticed",
   "crumbs scattered on table edge",
   "half-melted ice cream dripping",
   "steam fogging up glasses while eating"
 ];
 
-// New: Temporal Lighting Sync (time-based lighting filter)
 function getTemporalLighting(time) {
   const isNight = /night|midnight|3am|2am/.test(time);
   const isEvening = /evening|dusk|twilight|5 PM|8 PM/.test(time);
@@ -907,14 +834,12 @@ function getTemporalLighting(time) {
   return pick(pool);
 }
 
-// New: Environment Boundary (indoor/outdoor weather logic)
 function isIndoorLocation(loc) {
   return /room|apartment|bedroom|kitchen|bathroom|living|desk|closet|balcony|studio|vanity/.test(loc);
 }
 
 function getEnvironmentalWeather(loc, weather) {
   const isIndoor = isIndoorLocation(loc);
-  
   if (isIndoor) {
     if (weather.includes("rain")) return "soft rain visible through window";
     if (weather.includes("snow")) return "snow falling outside, cozy indoor light";
@@ -922,13 +847,10 @@ function getEnvironmentalWeather(loc, weather) {
     if (weather.includes("sun")) return "bright sunlight streaming through window";
     return "soft indoor ambient light with window view";
   }
-  
   return weather;
 }
 
-// New: Foreground Blur Gimmick (rare photographic effect)
 const FOREGROUND_BLUR = [
-  // Urban
   "blurred coffee cup in foreground",
   "out of focus leaves framing the shot",
   "bokeh streetlight in foreground",
@@ -936,20 +858,17 @@ const FOREGROUND_BLUR = [
   "blurred railing or fence in foreground",
   "bokeh neon sign reflection in foreground",
   "out of focus bicycle handle in foreground",
-  // Room
   "blurred book or magazine in foreground",
   "out of focus mug on desk",
   "soft focus curtain edge in foreground",
   "blurred plant leaves in foreground",
   "bokeh window light in foreground",
-  // Close-up specific
   "out of focus hair strands in extreme close-up",
   "blurred shoulder or collar in foreground",
   "soft focus fabric texture in foreground"
 ];
 
 function getForegroundBlur(sceneType, framing, loc = "") {
-  // Only 12% chance to appear (very rare)
   if (Math.random() > 0.12) return null;
 
   const isRoom = sceneType === "room";
@@ -959,18 +878,15 @@ function getForegroundBlur(sceneType, framing, loc = "") {
   let pool = [...FOREGROUND_BLUR];
 
   if (isMinimal) {
-    // Minimal/white studio: only very subtle or clean foregrounds
     pool = pool.filter(b => 
       b.includes("fabric") || b.includes("window light") || b.includes("curtain") || b.includes("hair")
     );
   } else if (isRoom) {
-    // Room: prefer indoor items
     pool = pool.filter(b => 
       b.includes("book") || b.includes("mug") || b.includes("curtain") || 
       b.includes("plant") || b.includes("window light") || b.includes("fabric")
     );
   } else {
-    // Urban: prefer street items
     pool = pool.filter(b => 
       b.includes("coffee") || b.includes("leaves") || b.includes("streetlight") || 
       b.includes("window frame") || b.includes("railing") || b.includes("neon") || 
@@ -979,7 +895,6 @@ function getForegroundBlur(sceneType, framing, loc = "") {
   }
 
   if (isClose && Math.random() < 0.5) {
-    // Close-up: boost close-up specific items
     const closeItems = pool.filter(b => b.includes("hair") || b.includes("shoulder") || b.includes("fabric"));
     if (closeItems.length > 0) pool = [...pool, ...closeItems];
   }
@@ -987,80 +902,7 @@ function getForegroundBlur(sceneType, framing, loc = "") {
   return pool.length > 0 ? pick(pool) : null;
 }
 
-// New: Glutton Mode helpers
-const GLUTTON_LOCATIONS = [
-  "ramen shop counter, steaming bowls, wooden stools",
-  "izakaya interior, wooden tables, lanterns",
-  "sushi counter, chef preparing, fresh fish",
-  "cafe table with coffee and cake, cozy lighting",
-  "food stall at night market, steam rising, warm glow",
-  "bakery interior, bread shelves, warm lighting",
-  "dessert cafe, colorful sweets, pastel decor",
-  "bar counter with snacks, dim lighting, cocktails",
-  "convenience store eating area, small tables, late night",
-  "food court, multiple stalls, busy atmosphere",
-  "small cafe interior with wooden tables",
-  "cafe terrace with outdoor seating, city view",
-  // Expanded locations
-  "italian restaurant, pasta and pizza, warm lighting",
-  "chinese restaurant, fried rice and dumplings, red lanterns",
-  "korean restaurant, korean bbq grill, smoky atmosphere",
-  "family restaurant, hamburger steak and pasta, bright lighting",
-  "fast food restaurant, burger and fries, plastic tables",
-  "donburi shop, rice bowl counter, quick service",
-  "udon soba shop, hot noodle bowls, wooden counter",
-  "curry restaurant, curry rice and katsu, spicy aroma",
-  "steakhouse, grilled steak, dim lighting",
-  "seafood restaurant, grilled fish and sashimi, fresh display"
-];
-
-const GLUTTON_POSES = [
-  "eating ramen with chopsticks, slurping noodles, satisfied expression",
-  "eating sushi with chopsticks, single piece, focused",
-  "eating pizza slice, folded, mid-bite",
-  "eating burger with both hands, big bite, messy",
-  "eating cake with fork, small piece, delicate",
-  "eating onigiri with both hands, rice on cheek",
-  "eating takoyaki with toothpick, sauce on lips",
-  "eating crepe while walking, holding with both hands",
-  "eating ice cream cone, licking, happy face",
-  "eating skewer food, holding in one hand, casual",
-  "eating french fries, dipping in ketchup, casual",
-  "eating noodles with spoon and chopsticks, focused",
-  "eating sandwich, holding with both hands, big bite",
-  "eating dumplings with chopsticks, sauce on side",
-  "eating fried chicken, holding in hand, crispy",
-  "eating parfait with long spoon, layers of cream and fruit, delicate",
-  "eating parfait, scooping from top, whipped cream on lips",
-  "eating pancakes with fork and knife, syrup dripping, stack of pancakes",
-  "eating pancakes, cutting with fork, butter melting",
-  "eating pasta with fork, twirling noodles, sauce on lips",
-  "eating carbonara, creamy sauce, parmesan on top",
-  "eating spaghetti, slurping long noodles, tomato sauce",
-  "eating penne arrabbiata, spicy sauce, focused expression",
-  "eating too quickly, slight mess on lips",
-  "holding half-eaten snack, distracted",
-  "chewing while looking elsewhere",
-  "food in hand, forgot to finish talking",
-  "taking a bite mid-laugh, slightly clumsy",
-  "ramen noodles slipping from chopsticks"
-];
-
-const GLUTTON_GESTURES = [
-  "wiping mouth with sleeve absentmindedly",
-  "holding food awkwardly while checking phone",
-  "trying to balance drink and snack",
-  "fumbling slightly with chopsticks"
-];
-
-const GLUTTON_EXPRESSIONS = [
-  "absent-minded while eating",
-  "slightly embarrassed after messy bite",
-  "happy but unfocused while chewing",
-  "lost in thought, still holding food"
-];
-
-// Location to food mapping for coherent glutton mode
+// ==================== GLUTTON MODE (detailed version from old) ====================
 const GLUTTON_LOCATION_FOOD_MAP = {
   "ramen shop": ["eating ramen with chopsticks, slurping noodles, satisfied expression", "ramen noodles slipping from chopsticks"],
   "izakaya": ["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy", "eating takoyaki with toothpick, sauce on lips"],
@@ -1145,121 +987,32 @@ function getGluttonScene() {
   return pick(GLUTTON_SCENES);
 }
 
+// ==================== ARTIST MODE ====================
 const ARTIST_SCENES = [
-  // 自室作曲
   { location: "small one-room apartment, futon folded, clothes rack overflowing, guitar leaning on wall, laptop open on low table with DAW software, headphones around neck, songwriting notebook open, half-eaten onigiri on plate", pose: "sitting cross-legged on floor, acoustic guitar on lap, humming melody while writing lyrics, focused and creative expression", time: "late night, 2 AM, only desk lamp on", weather: "cozy indoor light, city lights visible through window" },
   { location: "bedroom with unmade bed, morning light through cheap curtains, acoustic guitar case open, laptop with music production software, coffee cup and snack wrappers scattered", pose: "lying on bed propped on elbows, playing soft chords on acoustic guitar, eyes closed, composing new song", time: "morning, 10 AM, soft sunlight", weather: "gentle morning light, peaceful creative atmosphere" },
-  // ライブ
   { location: "street corner busking, guitar case open with coins and bills, small crowd gathering, city background", pose: "busking on street corner, playing acoustic guitar and singing passionately, guitar case open for tips, happy and energetic expression", time: "afternoon, 4 PM, golden hour", weather: "warm golden light, lively street atmosphere" },
   { location: "small live house stage, dim lights, audience silhouettes, microphone stand", pose: "performing on small stage, singing with eyes closed, acoustic guitar strapped, emotional and powerful delivery", time: "evening, 8 PM, live house peak time", weather: "dim stage lighting with warm spotlight on performer" },
-  { location: "indie live venue, red brick wall, string lights, intimate crowd", pose: "on stage with acoustic guitar, singing original song, slight smile, connecting with audience", time: "night, 9 PM, sold-out show vibe", weather: "intimate venue lighting, enthusiastic crowd energy" },
-  // レコーディング
   { location: "professional recording studio, soundproof booth, large condenser mic, headphones, mixing console visible through glass", pose: "in recording booth, wearing studio headphones, singing into microphone with focused expression, acoustic guitar nearby", time: "afternoon, 3 PM, studio session", weather: "clean studio lighting, professional focused atmosphere" },
   { location: "home studio corner, synth keyboard, audio interface, computer monitor showing waveform, acoustic guitar on stand", pose: "sitting at desk, wearing headphones, producing track on laptop, tapping foot to beat, creative flow", time: "late night, 1 AM, home studio", weather: "blue screen glow mixed with warm desk lamp" },
-  // その他アーティストシーン
   { location: "rooftop at sunset, city skyline, acoustic guitar, wind in hair", pose: "standing on rooftop, playing acoustic guitar and singing, hair blowing, dreamy and free expression", time: "sunset, 6 PM, golden hour", weather: "beautiful sunset light, inspiring open air" },
-  { location: "indie bookstore event space, small stage, bookshelves background, intimate audience", pose: "performing acoustic set in bookstore, singing softly, guitar in hand, warm connection with listeners", time: "evening, 7 PM, literary event", weather: "soft indoor lighting, intellectual cozy vibe" },
-  { location: "park bench under cherry blossom tree (spring), guitar case, notebook", pose: "sitting on park bench, acoustic guitar, writing lyrics inspired by the scenery, peaceful creative moment", time: "afternoon, 2 PM, spring day", weather: "gentle spring breeze, cherry blossom petals falling" }
+  { location: "park bench under cherry blossom tree, guitar case, notebook", pose: "sitting on park bench, acoustic guitar, writing lyrics inspired by the scenery, peaceful creative moment", time: "afternoon, 2 PM, spring day", weather: "gentle spring breeze, cherry blossom petals falling" }
 ];
 
+// ==================== ALBUM / VISUAL MODE ====================
 const ALBUM_SCENES = [
-  // Moody cinematic portraits
   { location: "neon-lit back alley at night, rain on asphalt, reflections, guitar case", pose: "standing in rain, acoustic guitar slung over shoulder, looking up at neon signs, melancholic and cool expression, low angle dramatic lighting", time: "late night, 11 PM, rainy Tokyo", weather: "wet neon reflections, cinematic noir atmosphere" },
   { location: "rooftop at blue hour, city lights below, wind, guitar", pose: "silhouette against city skyline, holding acoustic guitar, hair flowing, powerful and free pose, worm's eye view", time: "twilight, 7 PM, blue hour", weather: "cool blue tones, inspiring open sky" },
   { location: "empty subway car at night, green seats, fluorescent light, guitar", pose: "sitting alone in empty train, acoustic guitar on lap, looking out window, introspective and lonely expression, high angle", time: "late night, 2 AM, last train", weather: "harsh fluorescent + cool night outside" },
-  // Symbolic / artistic
   { location: "cherry blossom petals falling in dark room, single window light, guitar", pose: "sitting on floor surrounded by falling petals, playing guitar softly, dreamy and nostalgic expression, dutch tilt", time: "evening, 6 PM, spring", weather: "soft window light, symbolic cherry blossom rain" },
   { location: "abandoned warehouse, broken windows, dramatic light beams, guitar", pose: "standing in light beam, guitar raised like a weapon, powerful and rebellious pose, low angle heroic", time: "afternoon, golden hour through windows", weather: "volumetric god rays, gritty industrial romance" },
-  { location: "mirror selfie in messy room, guitar, laptop, snacks, neon sign reflection", pose: "taking mirror selfie with guitar, cool and slightly messy aesthetic, confident expression, over shoulder angle", time: "late night, 1 AM, home", weather: "mixed neon + warm lamp light, authentic artist life" },
-  // Close-up artistic
-  { location: "extreme close-up on face and guitar headstock, shallow depth of field", pose: "face half in shadow, fingers on guitar frets, intense emotional expression, eye level intimate", time: "studio lighting", weather: "dramatic side lighting, film noir portrait" },
-  { location: "black background, single spotlight, guitar silhouette, smoke", pose: "silhouette with guitar, smoke curling, mysterious and iconic pose, low angle from below", time: "dark studio", weather: "single dramatic spotlight, high contrast" },
-  // Urban symbolic
-  { location: "Shibuya crossing at night, blurred crowd, guitar case, rain", pose: "standing still in moving crowd, guitar case at feet, looking straight at camera, powerful and isolated pose, high angle", time: "night, 10 PM, Shibuya", weather: "rainy neon chaos, cinematic urban loneliness" },
-  { location: "under elevated train tracks, graffiti, golden hour light, guitar", pose: "leaning against concrete pillar, guitar in hand, looking into distance, cool and contemplative, dutch tilt", time: "evening, 5 PM, golden hour", weather: "warm light through tracks, gritty romantic" },
-
-  // White / Minimal studio (new)
   { location: "pure white seamless background, studio lighting, minimal shadow, guitar", pose: "standing against white bg, acoustic guitar held naturally, clean and powerful pose, eye level", time: "studio lighting", weather: "clean white background, high-key lighting, minimalist" },
   { location: "pure white seamless background, soft shadow, guitar leaning", pose: "sitting on white floor, guitar beside, looking at camera with gentle expression, high angle soft", time: "studio lighting", weather: "soft white seamless, high-key minimal portrait" },
   { location: "gradient white to light gray background, clean studio, guitar", pose: "standing in profile with guitar, elegant and artistic pose, low angle dramatic", time: "studio lighting", weather: "soft gradient background, high-end studio portrait" },
-
-  // More varied locations for Visual
   { location: "quiet park at dusk, ginkgo trees, autumn leaves, guitar", pose: "sitting on bench with guitar, looking at falling leaves, peaceful and nostalgic expression, eye level", time: "dusk, 5 PM, autumn", weather: "soft golden dusk light, serene park atmosphere" },
   { location: "train station platform at night, empty, fluorescent light, guitar case", pose: "standing on empty platform with guitar case, looking at arriving train, cool and urban expression, low angle", time: "late night, 12 AM", weather: "harsh station fluorescent + dark night" },
-  { location: "rooftop parking lot at sunset, city view, guitar", pose: "leaning on car with guitar, wind in hair, powerful and free pose, worm's eye view", time: "sunset, 6 PM", weather: "dramatic sunset light, urban rooftop vibe" },
   { location: "minimal concrete room, single window, dramatic light, guitar", pose: "standing in light beam from window, guitar in hand, intense emotional expression, dutch tilt", time: "afternoon, golden hour", weather: "volumetric window light, minimalist dramatic space" }
 ];
-
-function getGluttonLocationAndPose() {
-  // Pick a location first
-  const location = pick(GLUTTON_LOCATIONS);
-  
-  // Determine the food based on location keywords (strict matching)
-  let pose;
-  
-  if (location.includes("ramen shop")) {
-    pose = pick(["eating ramen with chopsticks, slurping noodles, satisfied expression", "ramen noodles slipping from chopsticks"]);
-  } else if (location.includes("sushi counter")) {
-    pose = "eating sushi with chopsticks, single piece, focused";
-  } else if (location.includes("donburi shop")) {
-    pose = pick(["eating gyudon with chopsticks, rice bowl, satisfied", "eating katsudon, pork cutlet on rice, focused"]);
-  } else if (location.includes("curry restaurant")) {
-    pose = pick(["eating curry rice with spoon, spicy aroma, satisfied", "eating katsu curry, cutlet on curry rice, focused"]);
-  } else if (location.includes("italian restaurant")) {
-    pose = pick(["eating pasta with fork, twirling noodles, sauce on lips", "eating carbonara, creamy sauce, parmesan on top", "eating spaghetti, slurping long noodles, tomato sauce", "eating penne arrabbiata, spicy sauce, focused expression", "eating pizza slice, folded, mid-bite"]);
-  } else if (location.includes("udon soba shop")) {
-    pose = pick(["eating udon with chopsticks, hot broth, satisfied", "eating soba, cold noodles, refreshing"]);
-  } else if (location.includes("chinese restaurant")) {
-    pose = pick(["eating fried chicken, holding in hand, crispy", "eating dumplings with chopsticks, sauce on side"]);
-  } else if (location.includes("korean restaurant")) {
-    pose = pick(["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy"]);
-  } else if (location.includes("steakhouse")) {
-    pose = pick(["eating steak, knife and fork, satisfied expression", "eating hamburger steak, knife and fork, satisfied"]);
-  } else if (location.includes("seafood restaurant")) {
-    pose = pick(["eating grilled fish, chopsticks, fresh aroma", "eating sashimi, soy sauce dip, focused", "eating seafood pasta, creamy sauce, satisfied"]);
-  } else if (location.includes("izakaya")) {
-    pose = pick(["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy", "eating takoyaki with toothpick, sauce on lips"]);
-  } else if (location.includes("dessert cafe")) {
-    pose = pick(["eating parfait with long spoon, layers of cream and fruit, delicate", "eating pancakes with fork and knife, syrup dripping, stack of pancakes", "eating cake with fork, small piece, delicate"]);
-  } else if (location.includes("cafe")) {
-    pose = pick(["eating cake with fork, small piece, delicate", "eating pancakes with fork and knife, syrup dripping, stack of pancakes", "eating parfait with long spoon, layers of cream and fruit, delicate", "eating pasta with fork, twirling noodles, sauce on lips"]);
-  } else if (location.includes("bakery")) {
-    pose = "eating sandwich, holding with both hands, big bite";
-  } else if (location.includes("food stall")) {
-    pose = pick(["eating takoyaki with toothpick, sauce on lips", "eating crepe while walking, holding with both hands", "eating skewer food, holding in one hand, casual"]);
-  } else if (location.includes("bar")) {
-    pose = pick(["eating fried chicken, holding in hand, crispy", "eating french fries, dipping in ketchup, casual"]);
-  } else if (location.includes("convenience store")) {
-    pose = pick(["eating onigiri with both hands, rice on cheek", "eating sandwich, holding with both hands, big bite"]);
-  } else if (location.includes("food court")) {
-    pose = pick(["eating ramen with chopsticks, slurping noodles, satisfied expression", "eating pizza slice, folded, mid-bite", "eating burger with both hands, big bite, messy"]);
-  } else if (location.includes("family restaurant")) {
-    pose = pick(["eating hamburger steak, knife and fork, satisfied", "eating pasta with fork, twirling noodles, sauce on lips", "eating omurice, ketchup on top, focused"]);
-  } else if (location.includes("fast food")) {
-    pose = pick(["eating burger with both hands, big bite, messy", "eating french fries, dipping in ketchup, casual", "eating fried chicken, holding in hand, crispy"]);
-  } else {
-    // Fallback: pick any glutton pose
-    pose = pick(GLUTTON_POSES);
-  }
-  
-  return { location, pose };
-}
-
-function getGluttonLocation() {
-  return pick(GLUTTON_LOCATIONS);
-}
-
-function getGluttonPose() {
-  return pick(GLUTTON_POSES);
-}
-
-function getGluttonGesture() {
-  return Math.random() < 0.7 ? pick(GLUTTON_GESTURES) : null;
-}
-
-function getGluttonExpression() {
-  return Math.random() < 0.7 ? pick(GLUTTON_EXPRESSIONS) : null;
-}
 
 // ==================== COLOR ====================
 const COLORS_BASE = {
@@ -1305,50 +1058,7 @@ const BODY_POSES = [
   "standing tall, chin up","looking away, distracted",
   "caught off-balance, natural","standing with one leg bent, foot against wall",
   "sitting cross-legged on floor (indoor)","leaning in doorway, one shoulder",
-  "lying on bed, propped on elbows (indoor)","perched on desk edge (indoor)",
-  // Street performance / busking
-  "busking on street corner, playing guitar, guitar case open with coins",
-  "performing on sidewalk, singing passionately, small crowd watching",
-  "street musician, playing guitar, hat on ground for tips",
-  "outdoor performance, guitar in hand, singing with eyes closed",
-  // Eating while walking (食べ歩き)
-  "eating takoyaki while walking, paper tray in hand",
-  "walking with crepe, taking a bite, street food",
-  "eating ice cream cone while strolling, casual pose",
-  "holding street food skewer, mid-bite, urban background",
-  "walking with convenience store onigiri, casual eating",
-  "eating ramen from paper cup while walking, slurping",
-  // Additional eating poses
-  "eating ramen with chopsticks, slurping noodles, satisfied expression",
-  "eating sushi with chopsticks, single piece, focused",
-  "eating pizza slice, folded, mid-bite",
-  "eating burger with both hands, big bite, messy",
-  "eating cake with fork, small piece, delicate",
-  "eating onigiri with both hands, rice on cheek",
-  "eating takoyaki with toothpick, sauce on lips",
-  "eating crepe while walking, holding with both hands",
-  "eating ice cream cone, licking, happy face",
-  "eating skewer food, holding in one hand, casual",
-  "eating french fries, dipping in ketchup, casual",
-  "eating noodles with spoon and chopsticks, focused",
-  "eating sandwich, holding with both hands, big bite",
-  "eating dumplings with chopsticks, sauce on side",
-  "eating fried chicken, holding in hand, crispy",
-  "eating parfait with long spoon, layers of cream and fruit, delicate",
-  "eating parfait, scooping from top, whipped cream on lips",
-  "eating pancakes with fork and knife, syrup dripping, stack of pancakes",
-  "eating pancakes, cutting with fork, butter melting",
-  "eating pasta with fork, twirling noodles, sauce on lips",
-  "eating carbonara, creamy sauce, parmesan on top",
-  "eating spaghetti, slurping long noodles, tomato sauce",
-  "eating penne arrabbiata, spicy sauce, focused expression",
-  // 食いしん坊キャラ強化
-  "eating too quickly, slight mess on lips",
-  "holding half-eaten snack, distracted",
-  "chewing while looking elsewhere",
-  "food in hand, forgot to finish talking",
-  "taking a bite mid-laugh, slightly clumsy",
-  "ramen noodles slipping from chopsticks"
+  "lying on bed, propped on elbows (indoor)","perched on desk edge (indoor)"
 ];
 
 const HAND_GESTURES = [
@@ -1366,12 +1076,7 @@ const HAND_GESTURES = [
   "rolling up sleeve","pulling down hem of top","hands behind back",
   "covering mouth while laughing","giving peace sign low near waist",
   "biting thumbnail lightly","fidgeting with ring","tapping fingers on thigh",
-  "holding wrist with other hand","hugging arms in cold","shielding eyes from light",
-  // 食いしん坊キャラ強化
-  "wiping mouth with sleeve absentmindedly",
-  "holding food awkwardly while checking phone",
-  "trying to balance drink and snack",
-  "fumbling slightly with chopsticks"
+  "holding wrist with other hand","hugging arms in cold","shielding eyes from light"
 ];
 
 const FACIAL_EXPRESSIONS = [
@@ -1390,12 +1095,7 @@ const FACIAL_EXPRESSIONS = [
   "caught off-guard, authentic moment","mid-blink, candid feel",
   "looking away, uninterested in camera","slight squint from bright light",
   "lonely, vulnerable expression","defiant, chin slightly raised",
-  "dreamy, soft gaze","nostalgic, distant smile","determined, jaw set lightly",
-  // 食いしん坊キャラ強化
-  "absent-minded while eating",
-  "slightly embarrassed after messy bite",
-  "happy but unfocused while chewing",
-  "lost in thought, still holding food"
+  "dreamy, soft gaze","nostalgic, distant smile","determined, jaw set lightly"
 ];
 
 const LIGHTING = [
@@ -1433,51 +1133,41 @@ const CAMERA_FIXED = "cinematic color grade, Fujifilm X-T4, 23mm f2, natural ski
 
 // ==================== HAIR ====================
 const HAIRSTYLES = [
-  // ショート
   "short cropped pixie cut","textured short wolf cut","blunt bob chin-length",
   "asymmetric short bob","shaggy short cut with curtain bangs","buzz cut with soft fade",
   "short undercut with longer top","ear-length bob with natural texture",
-  // ミディアム
   "medium length wolf cut, messy layers","collarbone-length straight cut, center part",
   "wavy lob with loose texture","medium shag with heavy curtain bangs",
   "blunt collarbone bob","half-up half-down messy bun",
   "medium length with visible bleach damage and regrowth",
-  // ロング
   "long straight hair, blunt cut","long wavy hair loosely falling",
   "long layered hair with face-framing pieces","high ponytail, sleek and tight",
   "low messy bun, loose strands falling","long hair pulled to one side",
   "braided sections mixed into loose long hair",
-  // ツインテール・お団子系
   "twin tails, low and loose","twin tails, high and tight",
   "two space buns on top","one side bun, asymmetric","low pigtails, slightly messy",
-  // カラー・加工系
   "bleached platinum blonde, slightly grown-out roots",
   "black hair with faded blue-grey ends","vivid dyed hair, two-tone split dye",
   "pastel pink dyed ends on dark base","silver-white dyed hair",
   "natural black with subtle dark brown highlights",
-  // 特徴的なスタイル
   "hime cut, straight bangs and side curtains","retro 70s feathered layers",
   "wet-look slicked back hair","extremely voluminous teased hair"
 ];
 
 // ==================== MAKEUP ====================
 const MAKEUPS = [
-  // ナチュラル・素肌感
   "no-makeup makeup, dewy skin, barely-there tint",
   "clean skin, glossy lip, brushed-up brows",
   "natural base, soft pink cheek flush, clear gloss",
   "minimal makeup, moisturized skin glow, light mascara",
-  // 白・マット・整肌系
   "porcelain-white foundation, matte finish, high coverage",
   "ultra pale base, powdered matte skin, whitened complexion",
   "full coverage matte base, flawless finish, no-shimmer",
-  // チーク強め系
   "flushed cheeks high on cheekbones, gradient blush effect",
   "heavy coral blush placed high, gyaru-inspired",
   "deep rose blush, heavily swept across nose bridge",
   "gradient cheek blush blending into light contour",
   "soft pink blush dusted over entire face, doll-like",
-  // 目元・アイシャドー系
   "heavy smoky eye, deep charcoal and black",
   "bold cut-crease eye, sharp liner wing, dramatic",
   "warm brown smoky eye, sun-kissed effect",
@@ -1485,17 +1175,14 @@ const MAKEUPS = [
   "thick black eyeliner all around, goth-adjacent",
   "double eyelid tape visible, dramatic eye enlargement",
   "vivid colored eyeshadow, electric blue or violet lid",
-  // 涙袋・デカ目系
   "pronounced aegyo-sal (lower eye bag highlight), enlarged eye effect",
   "aegyo-sal shimmer under eye, puppy eye makeup",
   "circle lens effect, irises appear enlarged, glossy",
   "heavy lash extensions, visible flutter",
-  // 病み系・個性派
   "dark undereye circles emphasized, intentional tired look",
   "sfumato bruise-toned undereye, menhera aesthetic",
   "graphic liner in colour, geometric under-eye art",
   "black lip, matte dark finish","deep plum lip, full coverage",
-  // ギャル系
   "gyaru makeup, heavy white inner corner, bronzed skin",
   "agejo makeup, thick lashes, bright highlight, glossy lip",
   "dark tan foundation, neon pink gloss, false lashes"
@@ -1514,7 +1201,6 @@ function setFraming(f) {
   document.querySelectorAll(".frame-btn").forEach(b => b.classList.remove("active"));
   document.getElementById("frame-" + f).classList.add("active");
 }
-
 function setCameraAngle(a) {
   currentCameraAngle = a;
   document.querySelectorAll(".angle-btn").forEach(b => b.classList.remove("active"));
@@ -1555,7 +1241,6 @@ function toggleArtistMode() {
     btn.style.borderColor = "#60a5fa";
     btn.style.color = "#60a5fa";
     btn.style.background = "#0f172a";
-    // optional: turn off glutton if both conflict too much
     if (gluttonMode) {
       gluttonMode = false;
       const gbtn = document.getElementById("glutton-btn");
@@ -1582,31 +1267,9 @@ function toggleAlbumMode() {
     btn.style.color = "#c084fc";
     btn.style.background = "#1a0f1a";
     if (inputs) inputs.style.display = "block";
-    // turn off other special modes
-    if (gluttonMode) {
-      gluttonMode = false;
-      const gbtn = document.getElementById("glutton-btn");
-      gbtn.classList.remove("active");
-      gbtn.style.borderColor = "";
-      gbtn.style.color = "";
-      gbtn.style.background = "";
-    }
-    if (artistMode) {
-      artistMode = false;
-      const abtn = document.getElementById("artist-btn");
-      abtn.classList.remove("active");
-      abtn.style.borderColor = "";
-      abtn.style.color = "";
-      abtn.style.background = "";
-    }
-    if (whiteStudioMode) {
-      whiteStudioMode = false;
-      const wbtn = document.getElementById("white-btn");
-      wbtn.classList.remove("active");
-      wbtn.style.borderColor = "";
-      wbtn.style.color = "";
-      wbtn.style.background = "";
-    }
+    if (gluttonMode) { gluttonMode = false; const gbtn = document.getElementById("glutton-btn"); gbtn.classList.remove("active"); gbtn.style.borderColor = ""; gbtn.style.color = ""; gbtn.style.background = ""; }
+    if (artistMode) { artistMode = false; const abtn = document.getElementById("artist-btn"); abtn.classList.remove("active"); abtn.style.borderColor = ""; abtn.style.color = ""; abtn.style.background = ""; }
+    if (whiteStudioMode) { whiteStudioMode = false; const wbtn = document.getElementById("white-btn"); wbtn.classList.remove("active"); wbtn.style.borderColor = ""; wbtn.style.color = ""; wbtn.style.background = ""; }
   } else {
     btn.classList.remove("active");
     btn.style.borderColor = "";
@@ -1624,33 +1287,9 @@ function toggleWhiteStudioMode() {
     btn.style.borderColor = "#ffffff";
     btn.style.color = "#000000";
     btn.style.background = "#f0f0f0";
-    // turn off other special modes
-    if (gluttonMode) {
-      gluttonMode = false;
-      const gbtn = document.getElementById("glutton-btn");
-      gbtn.classList.remove("active");
-      gbtn.style.borderColor = "";
-      gbtn.style.color = "";
-      gbtn.style.background = "";
-    }
-    if (artistMode) {
-      artistMode = false;
-      const abtn = document.getElementById("artist-btn");
-      abtn.classList.remove("active");
-      abtn.style.borderColor = "";
-      abtn.style.color = "";
-      abtn.style.background = "";
-    }
-    if (albumMode) {
-      albumMode = false;
-      const vbtn = document.getElementById("album-btn");
-      vbtn.classList.remove("active");
-      vbtn.style.borderColor = "";
-      vbtn.style.color = "";
-      vbtn.style.background = "";
-      const inputs = document.getElementById("albumInputs");
-      if (inputs) inputs.style.display = "none";
-    }
+    if (gluttonMode) { gluttonMode = false; const gbtn = document.getElementById("glutton-btn"); gbtn.classList.remove("active"); gbtn.style.borderColor = ""; gbtn.style.color = ""; gbtn.style.background = ""; }
+    if (artistMode) { artistMode = false; const abtn = document.getElementById("artist-btn"); abtn.classList.remove("active"); abtn.style.borderColor = ""; abtn.style.color = ""; abtn.style.background = ""; }
+    if (albumMode) { albumMode = false; const vbtn = document.getElementById("album-btn"); vbtn.classList.remove("active"); vbtn.style.borderColor = ""; vbtn.style.color = ""; vbtn.style.background = ""; const inputs = document.getElementById("albumInputs"); if (inputs) inputs.style.display = "none"; }
   } else {
     btn.classList.remove("active");
     btn.style.borderColor = "";
@@ -1664,14 +1303,13 @@ function toggleLock(key) {
   lockedFields[key] = !lockedFields[key];
   renderFields();
 }
-
 function isLocked(key) {
   return !!lockedFields[key];
 }
 
 // ==================== GENERATE ====================
 function reroll(key) {
-  if (isLocked(key)) return; // locked → do nothing
+  if (isLocked(key)) return;
 
   if (key === 'style') {
     const s = pickStyle();
@@ -1689,7 +1327,7 @@ function reroll(key) {
   else if (key === 'accessory2')    { const a = pickAccessories(lastVals.styleType, currentSceneType); lastVals.accessory2 = a.secondary; }
   else if (key === 'outer')         { lastVals.outer = pickOuterwear(currentSeason, lastVals.weather || ""); }
   else if (key === 'rare')          { lastVals.rare = Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
-  else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming, preserved.loc || ""); }
+  else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming, lastVals.loc || ""); }
   else if (key === 'camera')        { lastVals.camera = pick(CAMERA); }
   else if (key === 'styleScene')    { lastVals.styleScene = pick(STYLE_SCENE); }
   else if (key === 'pose')          { lastVals.pose = pick(BODY_POSES); }
@@ -1701,9 +1339,11 @@ function reroll(key) {
   rebuildPromptAndDisplay();
 }
 
+// FIX: clearField でロックも解除する（ロックしたまま null になることを防ぐ）
 function clearField(key) {
   if (isLocked(key)) return;
   lastVals[key] = null;
+  lockedFields[key] = false; // ← 追加：ロックも同時に解除
   rebuildPromptAndDisplay();
 }
 
@@ -1726,11 +1366,9 @@ function rebuildPromptAndDisplay() {
   if (currentFilter === 'toycam') filterTags = "toy camera aesthetic, plastic lens, vignetting, color shift, light leak, soft focus, slightly overexposed";
   if (currentFilter === 'softfocus') filterTags = "strong soft focus, diffusion filter, dreamy blur, reduced contrast, cinematic portrait";
 
-  const sceneNote = currentSceneType === 'room'? "intimate private room, personal space" : "anonymous urban environment";
-
+  const sceneNote = currentSceneType === 'room' ? "intimate private room, personal space" : "anonymous urban environment";
   const albumTags = albumMode ? "visual art, cinematic composition, negative space for text, cinematic color grade, symbolic and artistic, high detail, moody atmospheric lighting" : "";
 
-  // アルバムジャケット用テキスト入力（サイズ・配置対応・プロ仕様）
   let textOverlay = "";
   if (albumMode) {
     const artistInput = document.getElementById("artistNameInput");
@@ -1784,11 +1422,11 @@ function rebuildPromptAndDisplay() {
     "young Japanese woman",
     framingText,
     "standing naturally, clean fashion pose",
-    v.hair? `hairstyle: ${v.hair}` : null,
-    v.makeup? `makeup: ${v.makeup}` : null,
+    v.hair ? `hairstyle: ${v.hair}` : null,
+    v.makeup ? `makeup: ${v.makeup}` : null,
     `wearing ${v.style} outfit`,
     v.top, v.bottom,
-   ...(v.outer? [v.outer] : []),
+    ...(v.outer ? [v.outer] : []),
     `${v.fabric} fabric`,
     "color palette: clean neutral tones",
     `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
@@ -1797,18 +1435,21 @@ function rebuildPromptAndDisplay() {
     `location: ${v.loc}`,
     v.season_scene, v.time, v.weather,
     "young Japanese woman",
-    framingText, angleText, v.pose, ...(v.gesture ? [v.gesture] : []), ...(v.expression ? [v.expression] : []), v.light,
-    v.hair? `hairstyle: ${v.hair}` : null,
-    v.makeup? `makeup: ${v.makeup}` : null,
+    framingText, angleText, v.pose,
+    ...(v.gesture ? [v.gesture] : []),
+    ...(v.expression ? [v.expression] : []),
+    v.light,
+    v.hair ? `hairstyle: ${v.hair}` : null,
+    v.makeup ? `makeup: ${v.makeup}` : null,
     `wearing ${v.style} outfit`,
     v.top, v.bottom,
-   ...(v.outer? [v.outer] : []),
+    ...(v.outer ? [v.outer] : []),
     `${v.fabric} fabric`,
     `color palette: ${v.mood_color}`,
     `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
     v.shoe,
     v.camera, v.styleScene, CAMERA_FIXED,
-   ...(v.rare? [v.rare] : []),
+    ...(v.rare ? [v.rare] : []),
     ...(v.foregroundBlur ? [v.foregroundBlur] : []),
     filterTags,
     sceneNote,
@@ -1835,15 +1476,15 @@ function renderFields() {
     { label: "Accessory 2", value: v.accessory2 || "— none —", color: v.accessory2 ? "#86efac" : "#2a2535", key: "accessory2" },
     { label: "Shoes",      value: v.shoe,          color: "#67e8f9", key: "shoe" },
     { label: "Scene",      value: v.loc,           color: "#fda4af", key: "loc" },
-    { label: "Season",     value: v.season_scene,  color: "#fcd34d", key: "season_scene" },
+    ...(v.season_scene ? [{ label: "Season",     value: v.season_scene,  color: "#fcd34d", key: "season_scene" }] : []),
     { label: "Time",       value: v.time,          color: "#fcd34d", key: "time" },
     { label: "Weather",    value: v.weather,       color: "#a5f3fc", key: "weather" },
     { label: "Camera",     value: v.camera,        color: "#fed7aa", key: "camera" },
     { label: "Film Style", value: v.styleScene,    color: "#fda4af", key: "styleScene" },
     { label: "Figure",     value: v.pose,          color: "#c084fc", key: "pose" },
-    { label: "Gesture",    value: v.gesture,       color: "#f9a8d4", key: "gesture" },
-    { label: "Expression", value: v.expression,    color: "#86efac", key: "expression" },
-    { label: "Lighting",   value: v.light,         color: "#fcd34d", key: "light" },
+    ...(v.gesture ? [{ label: "Gesture",    value: v.gesture,       color: "#f9a8d4", key: "gesture" }] : []),
+    ...(v.expression ? [{ label: "Expression", value: v.expression,    color: "#86efac", key: "expression" }] : []),
+    ...(v.light ? [{ label: "Lighting",   value: v.light,         color: "#fcd34d", key: "light" }] : []),
     { label: "Hair",       value: v.hair,          color: "#f9a8d4", key: "hair" },
     { label: "Makeup",     value: v.makeup,        color: "#fda4af", key: "makeup" },
     ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
@@ -1890,57 +1531,99 @@ function generateAll() {
     if (lockedFields[k] && lastVals[k] !== undefined) preserved[k] = lastVals[k];
   });
 
-  // Pick glutton scene ONCE for full coherence
-  let gluttonScene = null;
-  if (gluttonMode) {
-    gluttonScene = getGluttonScene();
-  }
-
-  // Pick artist scene ONCE for music-themed coherence (シンガーソングライター)
-  let artistScene = null;
-  if (artistMode) {
-    artistScene = pick(ARTIST_SCENES);
-  }
-
-  // Pick album jacket scene (special dramatic angles + cool artistic poses)
-  let albumScene = null;
-  if (albumMode) {
-    albumScene = pick(ALBUM_SCENES);
-  }
-
-  // White Studio Mode: force clean white background for pure fashion focus
+  // Special mode scenes
+  let gluttonScene = gluttonMode ? getGluttonScene() : null;
+  let artistScene  = artistMode  ? pick(ARTIST_SCENES) : null;
+  let albumScene   = albumMode   ? pick(ALBUM_SCENES)  : null;
   let whiteStudioScene = null;
   if (whiteStudioMode) {
-    // Pick from the white/minimal scenes in ALBUM_SCENES (first 3)
     const whiteScenes = ALBUM_SCENES.filter(s => s.location.includes("white") || s.location.includes("gradient") || s.location.includes("studio"));
     whiteStudioScene = whiteScenes.length > 0 ? pick(whiteScenes) : pick(ALBUM_SCENES);
   }
 
+  // FIX: time/weather/loc を先に確定してから rare を計算する
+  const resolvedLoc = preserved.loc ||
+    (whiteStudioMode ? whiteStudioScene.location :
+    (albumMode ? albumScene.location :
+    (artistMode ? artistScene.location :
+    (gluttonMode ? gluttonScene.location : pick(locPool)))));
+
+  const resolvedTimePhase = preserved.timePhase || timePhase;
+
+  const resolvedTime = preserved.time ||
+    (whiteStudioMode ? whiteStudioScene.time :
+    (albumMode ? albumScene.time :
+    (artistMode ? artistScene.time :
+    (gluttonMode ? gluttonScene.time : pick(SCENE_TIMES[resolvedTimePhase])))));
+
+  // FIX: weather を1回だけ決定し、outer にも同じ値を渡す
+  const resolvedWeather = preserved.weather ||
+    (whiteStudioMode ? whiteStudioScene.weather :
+    (albumMode ? albumScene.weather :
+    (artistMode ? artistScene.weather :
+    (gluttonMode ? gluttonScene.weather :
+    getEnvironmentalWeather(resolvedLoc, pick(WEATHER[currentSeason]))))));
+
+  // FIX: アクセサリーを1回だけ生成して使い回す（3重生成を廃止）
+  const resolvedAcc = {
+    primary:   preserved.accessory1 !== undefined ? preserved.accessory1 : null,
+    secondary: preserved.accessory2 !== undefined ? preserved.accessory2 : null
+  };
+  if (resolvedAcc.primary === null && resolvedAcc.secondary === null) {
+    const acc = pickAccessories(styleType, currentSceneType);
+    resolvedAcc.primary   = acc.primary;
+    resolvedAcc.secondary = acc.secondary;
+  }
+
+  // FIX: outer に確定済み weather を渡す
+  const resolvedOuter = preserved.outer !== undefined
+    ? preserved.outer
+    : pickOuterwear(currentSeason, resolvedWeather);
+
+  // FIX: rare は time/loc が確定した後に計算
+  const resolvedRare = preserved.rare !== undefined
+    ? preserved.rare
+    : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, resolvedTime, resolvedLoc) : null);
+
   lastVals = {
-    style, styleType, timePhase,
-    top:          preserved.top || pickTop(styleType),
+    style, styleType,
+    timePhase: resolvedTimePhase,
+    top:          preserved.top    || pickTop(styleType),
     bottom:       preserved.bottom || getContextualBottom(currentSeason, styleType, currentSceneType),
-    outer:        preserved.outer !== undefined ? preserved.outer : pickOuterwear(currentSeason, preserved.weather || pick(WEATHER[currentSeason])),
+    outer:        resolvedOuter,
     fabric:       preserved.fabric || pick(FABRICS),
     mood_color:   preserved.mood_color || buildColorDescription(currentSeason),
-    acc:          preserved.acc || pickAccessories(styleType, currentSceneType), // legacy, will be replaced
-    accessory1:   preserved.accessory1 || (pickAccessories(styleType, currentSceneType).primary || null),
-    accessory2:   preserved.accessory2 || (pickAccessories(styleType, currentSceneType).secondary || null),
+    accessory1:   resolvedAcc.primary,
+    accessory2:   resolvedAcc.secondary,
     shoe:         preserved.shoe || pick(SHOES),
-    loc:          whiteStudioMode ? whiteStudioScene.location : (albumMode ? albumScene.location : (artistMode ? artistScene.location : (gluttonMode ? gluttonScene.location : (preserved.loc || pick(locPool))))),
-    time:         whiteStudioMode ? whiteStudioScene.time : (albumMode ? albumScene.time : (artistMode ? artistScene.time : (gluttonMode ? gluttonScene.time : (preserved.time || pick(SCENE_TIMES[timePhase]))))),
-    weather:      whiteStudioMode ? whiteStudioScene.weather : (albumMode ? albumScene.weather : (artistMode ? artistScene.weather : (gluttonMode ? gluttonScene.weather : (preserved.weather || getEnvironmentalWeather(preserved.loc || pick(locPool), pick(WEATHER[currentSeason])))))),
+    loc:          resolvedLoc,
+    time:         resolvedTime,
+    weather:      resolvedWeather,
     season_scene: (whiteStudioMode || albumMode || artistMode || gluttonMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
-    rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
-    foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming, preserved.loc || ""),
-    pose:         whiteStudioMode ? whiteStudioScene.pose : (albumMode ? albumScene.pose : (artistMode ? artistScene.pose : (gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES))))),
-    gesture:      artistMode ? (pick(["playing acoustic guitar softly", "humming melody while strumming", "tuning guitar with focused expression", "singing quietly while playing chords"]) ) : ((gluttonMode && !('gesture' in preserved)) ? getGluttonGesture() : ('gesture' in preserved ? preserved.gesture : pick(HAND_GESTURES))),
-    expression:   artistMode ? (pick(["dreamy and creative", "passionate and emotional while singing", "focused and inspired", "gentle smile while playing"]) ) : ((gluttonMode && !('expression' in preserved)) ? getGluttonExpression() : ('expression' in preserved ? preserved.expression : pick(FACIAL_EXPRESSIONS))),
-    light:        whiteStudioMode ? null : (preserved.light || getTemporalLighting(preserved.time || pick(SCENE_TIMES[timePhase]))),
-    hair:         'hair' in preserved ? preserved.hair : pick(HAIRSTYLES),
-    makeup:       'makeup' in preserved ? preserved.makeup : pick(MAKEUPS)
+    rare:         resolvedRare,
+    foregroundBlur: preserved.foregroundBlur !== undefined
+      ? preserved.foregroundBlur
+      : getForegroundBlur(currentSceneType, currentFraming, resolvedLoc),
+    pose:         preserved.pose ||
+      (whiteStudioMode ? whiteStudioScene.pose :
+      (albumMode ? albumScene.pose :
+      (artistMode ? artistScene.pose :
+      (gluttonMode ? gluttonScene.pose : pick(BODY_POSES))))),
+    gesture:      preserved.gesture !== undefined ? preserved.gesture :
+      (whiteStudioMode ? null :
+      (artistMode
+        ? pick(["playing acoustic guitar softly", "humming melody while strumming", "tuning guitar with focused expression", "singing quietly while playing chords"])
+        : (gluttonMode ? null : pick(HAND_GESTURES)))),
+    expression:   preserved.expression !== undefined ? preserved.expression :
+      (whiteStudioMode ? null :
+      (artistMode
+        ? pick(["dreamy and creative", "passionate and emotional while singing", "focused and inspired", "gentle smile while playing"])
+        : (gluttonMode ? null : pick(FACIAL_EXPRESSIONS)))),
+    light:        whiteStudioMode ? null : (preserved.light || getTemporalLighting(resolvedTime)),
+    hair:         preserved.hair   !== undefined ? preserved.hair   : pick(HAIRSTYLES),
+    makeup:       preserved.makeup !== undefined ? preserved.makeup : pick(MAKEUPS)
   };
 
   rebuildPromptAndDisplay();
