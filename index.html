@@ -946,16 +946,22 @@ const FOREGROUND_BLUR = [
   "soft focus fabric texture in foreground"
 ];
 
-function getForegroundBlur(sceneType, framing) {
+function getForegroundBlur(sceneType, framing, loc = "") {
   // Only 12% chance to appear (very rare)
   if (Math.random() > 0.12) return null;
 
   const isRoom = sceneType === "room";
   const isClose = framing === "close" || framing === "bust";
+  const isMinimal = /white|studio|seamless|minimal|gradient|clean/i.test(loc);
 
   let pool = [...FOREGROUND_BLUR];
 
-  if (isRoom) {
+  if (isMinimal) {
+    // Minimal/white studio: only very subtle or clean foregrounds
+    pool = pool.filter(b => 
+      b.includes("fabric") || b.includes("window light") || b.includes("curtain") || b.includes("hair")
+    );
+  } else if (isRoom) {
     // Room: prefer indoor items
     pool = pool.filter(b => 
       b.includes("book") || b.includes("mug") || b.includes("curtain") || 
@@ -1630,7 +1636,7 @@ function reroll(key) {
   else if (key === 'accessory2')    { const a = pickAccessories(lastVals.styleType, currentSceneType); lastVals.accessory2 = a.secondary; }
   else if (key === 'outer')         { lastVals.outer = pickOuterwear(currentSeason, lastVals.weather || ""); }
   else if (key === 'rare')          { lastVals.rare = Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
-  else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming); }
+  else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming, preserved.loc || ""); }
   else if (key === 'camera')        { lastVals.camera = pick(CAMERA); }
   else if (key === 'styleScene')    { lastVals.styleScene = pick(STYLE_SCENE); }
   else if (key === 'pose')          { lastVals.pose = pick(BODY_POSES); }
@@ -1853,7 +1859,7 @@ function generateAll() {
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         preserved.rare !== undefined ? preserved.rare : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", preserved.loc || "") : null),
-    foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming),
+    foregroundBlur: preserved.foregroundBlur !== undefined ? preserved.foregroundBlur : getForegroundBlur(currentSceneType, currentFraming, preserved.loc || ""),
     pose:         albumMode ? albumScene.pose : (artistMode ? artistScene.pose : (gluttonMode ? gluttonScene.pose : (preserved.pose || pick(BODY_POSES)))),
     gesture:      artistMode ? (pick(["playing acoustic guitar softly", "humming melody while strumming", "tuning guitar with focused expression", "singing quietly while playing chords"]) ) : ((gluttonMode && !('gesture' in preserved)) ? getGluttonGesture() : ('gesture' in preserved ? preserved.gesture : pick(HAND_GESTURES))),
     expression:   artistMode ? (pick(["dreamy and creative", "passionate and emotional while singing", "focused and inspired", "gentle smile while playing"]) ) : ((gluttonMode && !('expression' in preserved)) ? getGluttonExpression() : ('expression' in preserved ? preserved.expression : pick(FACIAL_EXPRESSIONS))),
