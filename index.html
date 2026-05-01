@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Urban Japan Architect v5</title>
+<title>Urban Japan Architect v6</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap');
   :root{
@@ -74,7 +74,7 @@
 <body>
 
 <header>
-  <div class="eyebrow">AI Prompt Suite · Female Edition · v5</div>
+  <div class="eyebrow">AI Prompt Suite · Female Edition · v6</div>
   <h1>Urban Japan <span>Architect</span></h1>
   <div class="subtitle">Anonymous Cityscape · Techwear to Night-Out · Modern Tokyo</div>
   <div class="counter" id="counter">— generated</div>
@@ -138,6 +138,16 @@
       <button class="selector-btn" onclick="toggleArtistMode()" id="artist-btn">🎸 アーティストモード</button>
       <button class="selector-btn" onclick="toggleAlbumMode()" id="album-btn">🎵 Visual Mode</button>
       <button class="selector-btn" onclick="toggleWhiteStudioMode()" id="white-btn">👕 白背景スタジオ</button>
+    </div>
+    
+    <!-- Kawaii Background (White Studio only) -->
+    <div id="kawaiiBgSection" style="display:none; margin-top:8px; padding:8px; background:#1a1625; border:1px solid #3a2f4a; border-radius:4px;">
+      <div style="font-size:8px; color:#6a5e80; margin-bottom:4px;">KAWAII BACKGROUND (White Studio)</div>
+      <button onclick="generateKawaiiBackground()" 
+              style="width:100%; background:#ff8ad4; color:#000; border:none; padding:8px; font-size:9px; letter-spacing:0.1em; cursor:pointer; border-radius:2px;">
+        🎀 GENERATE KAWAII PATTERN
+      </button>
+      <div id="kawaiiBgStatus" style="font-size:7px; color:#ff8ad4; margin-top:4px; min-height:12px;"></div>
     </div>
   </div>
 </div>
@@ -224,6 +234,7 @@ let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
 let lockedFields = {};
+let currentBackground = ""; // For White Studio Kawaii Background
 
 // ==================== HELPERS ====================
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -290,6 +301,80 @@ const STYLES_SUBCULTURE = [
   "visual kei androgynous makeup","punk with safety pins and chains","underground idol with big ribbon and platform"
 ];
 
+// Kawaii Deep (from Surface Architect - for White Studio background only)
+const KAWAII_DEEP_DATA = {
+  motif: [
+    "melting ice cream with glitter flakes","layered frill cake with ribbons","frilly ribbon bows with pearls",
+    "pastel syringe with heart liquid","band-aid patches with lace edges","pixelated tamagotchi icons",
+    "90s flip phone silhouettes","frilly lace umbrellas","strawberry milk splashes","crinkled holographic PVC",
+    "star-shaped candy drops","shimmering perfume bottles","glass slippers with ribbons","moon macarons",
+    "dreamy carousel horses","checkered heart patches","lace-up corset lacing","velvet rosettes with silver charms",
+    "heavy bijoux and gems","quilted leather texture","tweed fabric patterns","monogram heart logos",
+    "satin ribbon streamers","pearl necklaces strings","broken heart glass shards","blood-dripping teddy bears",
+    "medical cross charms","barbed wire with lace","dark-eyed doll faces","bandage textures","metallic pill capsules",
+    "eyeball-shaped cherries","razor blade charms","90s flip phones","translucent iMac plastic",
+    "neon jelly heart stickers","inflatable chair shapes","rainbow butterfly clips","star sunglasses",
+    "groovy flower icons","tribal heart tattoos","clunky platform boots","graffiti star tags",
+    "progress bar UI","abstract window frames","heavy chain links","tulle lace layers","faux fur texture",
+    "heart-shaped stitches","butterfly wing patterns","industrial metal studs","iridescent sea shells",
+    "soda bubbles","soft swan silhouettes","crystal prism shards","origami cranes","folded love notes",
+    "tiny golden bells","frilly apron lace","tiara silhouettes","magical wands","glittering crowns",
+    "swan boats","soft-serve swirls","lollipop swirls","gummy rings","starry sky fragments",
+    "candy necklaces","beaded bracelets","ribbon chokers","fluffy slippers","lace headbands",
+    "cherry blossom petals","shining diamond dust","cat ear silhouettes","bunny tail puffs",
+    "bow-tie pasta","pastel macarons","magic circles","cyber wings","circuit hearts","neon tubes",
+    "fuzzy pom-poms","silk rosettes","liquid mercury drops","chrome hearts","glass marbles",
+    "holographic butterflies","candy wrappers","marshmallows","checkered ribbons","starry constellations",
+    "lace fans","sparkle emojis","floating balloons","jelly beans","wrapped candies","layered ruffles",
+    "scalloped lace","beaded curtains","pearl strands","sequin textures","glitter stars",
+    "shimmering scales","velvet bows","satin ribbons","fluffy kittens","small bunnies",
+    "cupcake swirls","fruit slices","lemon drops","mint leaves","lavender buds","pink roses",
+    "daisy chains","sunflower petals","firefly glow","dreamcatchers","stuffed animals",
+    "milk bottles","teddy bear heads","strawberry slices","whipped cream peaks","glittering raindrops",
+    "pastel feathers","chibi angel wings","corset bows","sheer mesh panels","glitter jelly shoes",
+    "pom-pom earrings","starry hair clips","lace doilies","heart lollipops","puffy stickers",
+    "pixel stars","glossy hearts","holographic circles"
+  ],
+  structure: [
+    "dense seamless tile", "scattered floating", "diagonal candy stripes", "bubble wrap grid",
+    "radial heart symmetry", "uniform isometric grid", "layered overlapping elements",
+    "scalloped border repeat", "honeycomb icon layout", "spiral motif arrangement",
+    "staggered offset pattern", "rhythmic heart pulse", "chaotic decora explosion",
+    "concentric circle ripples", "checkerboard icon grid", "linear element flow",
+    "woven ribbon texture", "dense sticker-bombing"
+  ],
+  palette: [
+    "yumekawaii lavender", "strawberry milk pink", "cyber kawaii neon pink", "pastel goth black/pink",
+    "angel core white/gold", "y2k metallic pink/blue", "healing sage/blush", "acid green/purple pop",
+    "marshmallow peach/blue", "menhera dark red/black", "creamy vanilla", "90s anime bright palette",
+    "dreamy sunset gradient", "icy winter pastel blue", "vintage toy bright", "soft lilac",
+    "pudding yellow", "magical girl transformation glow", "soft velvet teal/rose", "neon gummy candy colors"
+  ],
+  vibe: [
+    "soft and dreamy", "chaotic but cute", "extremely healing", "nostalgic 90s-2000s",
+    "sentimental", "street fashion kawaii", "elegant princess", "slightly surreal",
+    "energetic and playful", "darkly sweet", "pure and innocent", "hyper-active decora",
+    "modernist minimal cute", "fairy-tale magical", "sweet and airy", "bittersweet memory",
+    "playful and mischievous", "luxurious and fancy", "underground harajuku style", "ethereal and heavenly"
+  ],
+  details: [
+    "sparkling glitter dust", "pastel airbrushing", "pearl sheen", "delicate lace embroidery",
+    "puffy 3D sticker finish", "halftone heart screen tones", "iridescent holographic film",
+    "manga-style empty frames", "glossy jelly finish", "soft-focus bokeh hearts",
+    "pastel chromatic aberration", "heart-shaped light leaks", "glitter gel pen strokes",
+    "watercolor bleed edges", "3D clay-like volume", "soft airbrushed grain",
+    "reflective plastic sheen", "embroidered patch edges", "fine ink pen sparkles", "layered transparency effect"
+  ],
+  medium: [
+    "vector kawaii illustration", "90s anime cel-shading", "soft pastel gouache",
+    "3D cute matte render", "digital sticker sheet style", "risograph print texture",
+    "glitter gel art", "watercolor wash", "claymation aesthetic", "pixel art cute style",
+    "airbrushed street art", "screen print vintage", "3D glossy plastic render",
+    "felt and fabric collage", "pencil sketch and pastel", "chalk-like soft texture",
+    "iridescent digital painting", "high-gloss vinyl render", "embroidery art style", "mixed media cute collage"
+  ]
+};
+
 function pickStyle() {
   const r = Math.random();
   if (r < 0.25) return { name: pick(STYLES_MODE_MINIMAL), type: 'mode_minimal' };
@@ -298,6 +383,25 @@ function pickStyle() {
   if (r < 0.78) return { name: pick(STYLES_YAMI),         type: 'yami' };
   if (r < 0.88) return { name: pick(STYLES_MOE),          type: 'moe' };
   return           { name: pick(STYLES_SUBCULTURE),       type: 'subculture' };
+}
+
+// Generate Kawaii Deep background for White Studio
+function generateKawaiiBackground() {
+  const d = KAWAII_DEEP_DATA;
+  const bg = `${pick(d.motif)}, ${pick(d.structure)}, color palette: ${pick(d.palette)}, ${pick(d.details)}, vibe: ${pick(d.vibe)}, ${pick(d.medium)}`;
+  currentBackground = bg;
+  
+  // Update status
+  const statusEl = document.getElementById("kawaiiBgStatus");
+  if (statusEl) {
+    statusEl.textContent = "✓ Generated: " + bg.substring(0, 60) + "...";
+    statusEl.style.color = "#4ade80";
+  }
+  
+  // Auto-rebuild prompt if fields are already shown
+  if (document.getElementById("promptBox").style.display !== "none") {
+    rebuildPromptAndDisplay();
+  }
 }
 
 // ==================== TOPS ====================
@@ -1300,11 +1404,18 @@ function toggleWhiteStudioMode() {
     if (gluttonMode) { gluttonMode = false; const gbtn = document.getElementById("glutton-btn"); gbtn.classList.remove("active"); gbtn.style.borderColor = ""; gbtn.style.color = ""; gbtn.style.background = ""; }
     if (artistMode) { artistMode = false; const abtn = document.getElementById("artist-btn"); abtn.classList.remove("active"); abtn.style.borderColor = ""; abtn.style.color = ""; abtn.style.background = ""; }
     if (albumMode) { albumMode = false; const vbtn = document.getElementById("album-btn"); vbtn.classList.remove("active"); vbtn.style.borderColor = ""; vbtn.style.color = ""; vbtn.style.background = ""; const inputs = document.getElementById("albumInputs"); if (inputs) inputs.style.display = "none"; }
+    // Show Kawaii Background section
+    const bgSection = document.getElementById("kawaiiBgSection");
+    if (bgSection) bgSection.style.display = "block";
   } else {
     btn.classList.remove("active");
     btn.style.borderColor = "";
     btn.style.color = "";
     btn.style.background = "";
+    // Hide Kawaii Background section
+    const bgSection = document.getElementById("kawaiiBgSection");
+    if (bgSection) bgSection.style.display = "none";
+    currentBackground = "";
   }
 }
 
@@ -1428,19 +1539,23 @@ function rebuildPromptAndDisplay() {
   }
 
   const parts = whiteStudioMode ? [
-    "studio white seamless background",
-    "young Japanese woman",
+    currentBackground 
+      ? `studio background: ${currentBackground}, kawaii pattern wallpaper` 
+      : "pure white seamless studio background",
+    "young Japanese woman, fashion magazine editorial shot",
     framingText,
-    "standing naturally, clean fashion pose",
+    "confident fashion pose, slightly turned, hands on hips or one hand in hair",
     v.hair ? `hairstyle: ${v.hair}` : null,
     v.makeup ? `makeup: ${v.makeup}` : null,
     `wearing ${v.style} outfit`,
     v.top, v.bottom,
     ...(v.outer ? [v.outer] : []),
     `${v.fabric} fabric`,
-    "color palette: clean neutral tones",
     `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
-    v.shoe
+    v.shoe,
+    "high-key studio lighting, soft shadow, professional fashion photography",
+    "clean crisp image, hyper-detailed, 85mm lens",
+    "kawaii fashion editorial, playful and stylish, full color"
   ].filter(Boolean) : [
     `location: ${v.loc}`,
     v.season_scene, v.time, v.weather,
@@ -1653,17 +1768,17 @@ function copyPrompt() {
 
 function savePrompt() {
   if (!currentPrompt) return;
-  let saved = JSON.parse(localStorage.getItem("uja_v5") || "[]");
+  let saved = JSON.parse(localStorage.getItem("uja_v6") || "[]");
   if (saved.includes(currentPrompt)) return;
   saved.unshift(currentPrompt);
-  localStorage.setItem("uja_v5", JSON.stringify(saved.slice(0, 30)));
+  localStorage.setItem("uja_v6", JSON.stringify(saved.slice(0, 30)));
   renderSaved();
 }
 
 function deleteSavedPrompt(index) {
-  let saved = JSON.parse(localStorage.getItem("uja_v5") || "[]");
+  let saved = JSON.parse(localStorage.getItem("uja_v6") || "[]");
   saved.splice(index, 1);
-  localStorage.setItem("uja_v5", JSON.stringify(saved));
+  localStorage.setItem("uja_v6", JSON.stringify(saved));
   renderSaved();
 }
 
