@@ -281,13 +281,23 @@ const STYLES_MOE = [
   "heavily frilled dreamy pastel aesthetic","kawaii character fan meetup look"
 ];
 
+// サブカル系（12%）
+const STYLES_SUBCULTURE = [
+  "visual kei dramatic makeup and hair","punk rock Tokyo street","hip-hop b-boy Tokyo style",
+  "gothic lolita proper black lace","extreme decora with many accessories","underground idol chika idol frilly",
+  "cyber techwear futuristic","band vocalist rock stage look","indie musician vintage band tee",
+  "fairy kei extreme pastel overload","proper sweet lolita with big bow","dark gothic street Japan",
+  "visual kei androgynous makeup","punk with safety pins and chains","underground idol with big ribbon and platform"
+];
+
 function pickStyle() {
   const r = Math.random();
-  if (r < 0.30) return { name: pick(STYLES_MODE_MINIMAL), type: 'mode_minimal' };
-  if (r < 0.55) return { name: pick(STYLES_MODE_DECO),    type: 'mode_deco' };
-  if (r < 0.75) return { name: pick(STYLES_SEXY),         type: 'sexy' };
-  if (r < 0.90) return { name: pick(STYLES_YAMI),         type: 'yami' };
-  return           { name: pick(STYLES_MOE),              type: 'moe' };
+  if (r < 0.25) return { name: pick(STYLES_MODE_MINIMAL), type: 'mode_minimal' };
+  if (r < 0.45) return { name: pick(STYLES_MODE_DECO),    type: 'mode_deco' };
+  if (r < 0.63) return { name: pick(STYLES_SEXY),         type: 'sexy' };
+  if (r < 0.78) return { name: pick(STYLES_YAMI),         type: 'yami' };
+  if (r < 0.88) return { name: pick(STYLES_MOE),          type: 'moe' };
+  return           { name: pick(STYLES_SUBCULTURE),       type: 'subculture' };
 }
 
 // ==================== TOPS ====================
