@@ -1214,25 +1214,7 @@ const KAWAII_POSES = [
   "sitting pose with knees together, hands on knees, smiling",
   "standing on tiptoes, hands making small waves",
   "head resting on one hand, other hand making peace sign",
-  "gentle twirl with skirt flare, looking at camera",
-  "both hands making bunny ears behind head, smiling",
-  "one hand making OK sign near eye, other hand on waist",
-  "sitting with legs crossed, hands making small hearts",
-  "leaning head on shoulder, hands clasped in front",
-  "peace sign with both hands above head, happy face",
-  "finger heart with one hand, other hand waving",
-  "head tilt with both hands making cat ears",
-  "twirling with hands in peace signs, big smile",
-  "sitting on floor pose, knees up, arms around legs, smiling",
-  "one hand on cheek, other hand making heart",
-  "jumping with arms raised, excited expression",
-  "head resting on hands, elbows on invisible table, smiling",
-  "peace sign near face, other hand holding hair",
-  "gentle bow with hands on knees, cute smile",
-  "both hands making finger guns, playful expression",
-  "sitting with one leg extended, hand on knee, smiling",
-  "head tilt with finger heart, other hand on hip",
-  "twirling with one hand raised, other hand on skirt"
+  "gentle twirl with skirt flare, looking at camera"
 ];
 
 const FACIAL_EXPRESSIONS = [
@@ -1826,7 +1808,7 @@ function deleteSavedPrompt(index) {
 }
 
 function renderSaved() {
-  const saved = JSON.parse(localStorage.getItem("uja_v6") || "[]");
+  const saved = JSON.parse(localStorage.getItem("uja_v5") || "[]");
   const section = document.getElementById("savedSection");
   const list = document.getElementById("savedList");
   if (saved.length === 0) { section.style.display = "none"; return; }
