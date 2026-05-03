@@ -69,6 +69,12 @@
   .field-row.is-locked{background:#0e0c14}
   @keyframes rarePulse{0%,100%{box-shadow:0 0 4px #c084fc55,0 0 12px #c084fc33}50%{box-shadow:0 0 12px #c084fc,0 0 28px #c084fc66}}
   .rare-row{animation:rarePulse 1.8s ease-in-out infinite;border-color:#332f40}
+  /* Best Friends person panels */
+  .person-panel{margin-bottom:16px;padding:12px;background:#1a1625;border:1px solid #3a2f4a;border-radius:4px}
+  .person-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .person-panel-title{font-size:10px;letter-spacing:0.15em;text-transform:uppercase}
+  .person-generate-btn{background:transparent;border:1px solid currentColor;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;padding:4px 10px;transition:all .2s;opacity:.8}
+  .person-generate-btn:hover{opacity:1}
 </style>
 </head>
 <body>
@@ -138,17 +144,21 @@
       <button class="selector-btn" onclick="toggleArtistMode()" id="artist-btn">🎸 アーティストモード</button>
       <button class="selector-btn" onclick="toggleAlbumMode()" id="album-btn">🎵 Visual Mode</button>
       <button class="selector-btn" onclick="toggleWhiteStudioMode()" id="white-btn">👕 白背景スタジオ</button>
+      <button class="selector-btn" onclick="toggleBestFriendsMode()" id="bestfriends-btn">👭 仲良しモード</button>
     </div>
-    
-    <!-- Kawaii Background (White Studio only) -->
-    <div id="kawaiiBgSection" style="display:none; margin-top:8px; padding:8px; background:#1a1625; border:1px solid #3a2f4a; border-radius:4px;">
-      <div style="font-size:8px; color:#6a5e80; margin-bottom:4px;">KAWAII BACKGROUND (White Studio)</div>
-      <button onclick="generateKawaiiBackground()" 
-              style="width:100%; background:#ff8ad4; color:#000; border:none; padding:8px; font-size:9px; letter-spacing:0.1em; cursor:pointer; border-radius:2px;">
-        🎀 GENERATE KAWAII PATTERN
-      </button>
-      <div id="kawaiiBgStatus" style="font-size:7px; color:#ff8ad4; margin-top:4px; min-height:12px;"></div>
-    </div>
+
+```
+<!-- Kawaii Background (White Studio only) -->
+<div id="kawaiiBgSection" style="display:none; margin-top:8px; padding:8px; background:#1a1625; border:1px solid #3a2f4a; border-radius:4px;">
+  <div style="font-size:8px; color:#6a5e80; margin-bottom:4px;">KAWAII BACKGROUND (White Studio)</div>
+  <button onclick="generateKawaiiBackground()"
+          style="width:100%; background:#ff8ad4; color:#000; border:none; padding:8px; font-size:9px; letter-spacing:0.1em; cursor:pointer; border-radius:2px;">
+    🎀 GENERATE KAWAII PATTERN
+  </button>
+  <div id="kawaiiBgStatus" style="font-size:7px; color:#ff8ad4; margin-top:4px; min-height:12px;"></div>
+</div>
+```
+
   </div>
 </div>
 
@@ -167,15 +177,15 @@
   </div>
 
   <!-- Visual Mode専用入力欄 -->
+
   <div id="albumInputs" style="display:none; margin-top:16px; padding:12px; background:#0f0e12; border:1px solid #332f40; border-radius:6px;">
     <div style="font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#6a6278; margin-bottom:8px;">Visual Mode Info</div>
-    <input id="artistNameInput" type="text" placeholder="アーティスト名（例: 夜の果て）" 
+    <input id="artistNameInput" type="text" placeholder="アーティスト名（例: 夜の果て）"
            style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:11px; padding:8px; margin-bottom:8px; border-radius:4px;"
            oninput="if (albumMode) rebuildPromptAndDisplay()">
-    <input id="albumTitleInput" type="text" placeholder="アルバムタイトル（例: 食いしん坊の夜）" 
+    <input id="albumTitleInput" type="text" placeholder="アルバムタイトル（例: 食いしん坊の夜）"
            style="width:100%; background:#0a080c; border:1px solid #22202a; color:#d4cee0; font-family:var(--mono); font-size:11px; padding:8px; border-radius:4px;"
            oninput="if (albumMode) rebuildPromptAndDisplay()">
-    
     <div style="display:flex; gap:8px; margin-top:8px;">
       <div style="flex:1">
         <div style="font-size:8px; color:#6a6278; margin-bottom:4px;">文字サイズ</div>
@@ -202,7 +212,6 @@
         </select>
       </div>
     </div>
-    
     <div style="font-size:8px; color:#6a6278; margin-top:6px; line-height:1.4;">
       ※ 入力するとプロンプトにテキスト配置が自動追加されます
     </div>
@@ -230,11 +239,16 @@ let gluttonMode = false;
 let artistMode = false;
 let albumMode = false;
 let whiteStudioMode = false;
+let bestFriendsMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
 let lockedFields = {};
-let currentBackground = ""; // For White Studio Kawaii Background
+let lockedFieldsA = {};
+let lockedFieldsB = {};
+let currentBackground = "";
+let personA = {};
+let personB = {};
 
 // ==================== HELPERS ====================
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -257,7 +271,6 @@ const STYLES_MODE_MINIMAL = [
   "underground rapper Tokyo style","lo-fi producer oversized hoodie look",
   "sound engineer chic all-black technical","Shimokitazawa live house regular"
 ];
-
 const STYLES_MODE_DECO = [
   "Harajuku mix-print maximalist","Shimokitazawa thrift layered mix","vintage floral tapestry look",
   "Tokyo bohemian Harajuku","heavy layered patterned streetwear","avant-garde frill street fashion",
@@ -266,7 +279,6 @@ const STYLES_MODE_DECO = [
   "Harajuku rainbow coordination","fruits magazine era revival","neon Harajuku street",
   "fairy kei pastel Tokyo","Lolita adjacent street casual","Laforet window display look"
 ];
-
 const STYLES_SEXY = [
   "Shibuya night-out glam","Y2K gyaru revival","jirai-kei dark cute",
   "Roppongi club-ready","Harajuku sexy kawaii","Kabukicho after-midnight",
@@ -275,7 +287,6 @@ const STYLES_SEXY = [
   "agejo gyaru evening","sexy Y2K shimmer","glam rock Tokyo night",
   "party girl Azabu aesthetic","velvet club Roppongi","Shibuya109 going-out look"
 ];
-
 const STYLES_YAMI = [
   "yami kawaii dark pastel","menhera-kei street look","dark jirai aesthetic",
   "hospital kei lite street","bandage accessory dark cute","pastel goth Tokyo",
@@ -283,7 +294,6 @@ const STYLES_YAMI = [
   "dark decora with medical motif","dark academia Tokyo version","witchcore street Japan",
   "gloomy bear aesthetic","sad girl Tokyo aesthetic","dark fairy wing street"
 ];
-
 const STYLES_MOE = [
   "moe casual schoolgirl off-duty","soft moe aesthetic pastel",
   "maid cafe aesthetic street version","magical girl civilian mode",
@@ -291,8 +301,6 @@ const STYLES_MOE = [
   "soft girl Tokyo edition","Akihabara idol fan fashion",
   "heavily frilled dreamy pastel aesthetic","kawaii character fan meetup look"
 ];
-
-// サブカル系（12%）
 const STYLES_SUBCULTURE = [
   "visual kei dramatic makeup and hair","punk rock Tokyo street","hip-hop b-boy Tokyo style",
   "gothic lolita proper black lace","extreme decora with many accessories","underground idol chika idol frilly",
@@ -301,7 +309,6 @@ const STYLES_SUBCULTURE = [
   "visual kei androgynous makeup","punk with safety pins and chains","underground idol with big ribbon and platform"
 ];
 
-// Kawaii Deep (from Surface Architect - for White Studio background only)
 const KAWAII_DEEP_DATA = {
   motif: [
     "melting ice cream with glitter flakes","layered frill cake with ribbons","frilly ribbon bows with pearls",
@@ -316,62 +323,47 @@ const KAWAII_DEEP_DATA = {
     "neon jelly heart stickers","inflatable chair shapes","rainbow butterfly clips","star sunglasses",
     "groovy flower icons","tribal heart tattoos","clunky platform boots","graffiti star tags",
     "progress bar UI","abstract window frames","heavy chain links","tulle lace layers","faux fur texture",
-    "heart-shaped stitches","butterfly wing patterns","industrial metal studs","iridescent sea shells",
-    "soda bubbles","soft swan silhouettes","crystal prism shards","origami cranes","folded love notes",
-    "tiny golden bells","frilly apron lace","tiara silhouettes","magical wands","glittering crowns",
-    "swan boats","soft-serve swirls","lollipop swirls","gummy rings","starry sky fragments",
-    "candy necklaces","beaded bracelets","ribbon chokers","fluffy slippers","lace headbands",
-    "cherry blossom petals","shining diamond dust","cat ear silhouettes","bunny tail puffs",
-    "bow-tie pasta","pastel macarons","magic circles","cyber wings","circuit hearts","neon tubes",
-    "fuzzy pom-poms","silk rosettes","liquid mercury drops","chrome hearts","glass marbles",
-    "holographic butterflies","candy wrappers","marshmallows","checkered ribbons","starry constellations",
-    "lace fans","sparkle emojis","floating balloons","jelly beans","wrapped candies","layered ruffles",
-    "scalloped lace","beaded curtains","pearl strands","sequin textures","glitter stars",
-    "shimmering scales","velvet bows","satin ribbons","fluffy kittens","small bunnies",
-    "cupcake swirls","fruit slices","lemon drops","mint leaves","lavender buds","pink roses",
-    "daisy chains","sunflower petals","firefly glow","dreamcatchers","stuffed animals",
-    "milk bottles","teddy bear heads","strawberry slices","whipped cream peaks","glittering raindrops",
-    "pastel feathers","chibi angel wings","corset bows","sheer mesh panels","glitter jelly shoes",
-    "pom-pom earrings","starry hair clips","lace doilies","heart lollipops","puffy stickers",
-    "pixel stars","glossy hearts","holographic circles"
+    "heart-shaped stitches","butterfly wing patterns","industrial metal studs","iridescent sea shells"
   ],
   structure: [
-    "dense seamless tile", "scattered floating", "diagonal candy stripes", "bubble wrap grid",
-    "radial heart symmetry", "uniform isometric grid", "layered overlapping elements",
-    "scalloped border repeat", "honeycomb icon layout", "spiral motif arrangement",
-    "staggered offset pattern", "rhythmic heart pulse", "chaotic decora explosion",
-    "concentric circle ripples", "checkerboard icon grid", "linear element flow",
-    "woven ribbon texture", "dense sticker-bombing"
+    "dense seamless tile","scattered floating","diagonal candy stripes","bubble wrap grid",
+    "radial heart symmetry","uniform isometric grid","layered overlapping elements",
+    "scalloped border repeat","honeycomb icon layout","spiral motif arrangement",
+    "staggered offset pattern","rhythmic heart pulse","chaotic decora explosion",
+    "concentric circle ripples","checkerboard icon grid","linear element flow",
+    "woven ribbon texture","dense sticker-bombing"
   ],
   palette: [
-    "yumekawaii lavender", "strawberry milk pink", "cyber kawaii neon pink", "pastel goth black/pink",
-    "angel core white/gold", "y2k metallic pink/blue", "healing sage/blush", "acid green/purple pop",
-    "marshmallow peach/blue", "menhera dark red/black", "creamy vanilla", "90s anime bright palette",
-    "dreamy sunset gradient", "icy winter pastel blue", "vintage toy bright", "soft lilac",
-    "pudding yellow", "magical girl transformation glow", "soft velvet teal/rose", "neon gummy candy colors"
+    "yumekawaii lavender","strawberry milk pink","cyber kawaii neon pink","pastel goth black/pink",
+    "angel core white/gold","y2k metallic pink/blue","healing sage/blush","acid green/purple pop",
+    "marshmallow peach/blue","menhera dark red/black","creamy vanilla","90s anime bright palette",
+    "dreamy sunset gradient","icy winter pastel blue","vintage toy bright","soft lilac",
+    "pudding yellow","magical girl transformation glow","soft velvet teal/rose","neon gummy candy colors"
   ],
   vibe: [
-    "soft and dreamy", "chaotic but cute", "extremely healing", "nostalgic 90s-2000s",
-    "sentimental", "street fashion kawaii", "elegant princess", "slightly surreal",
-    "energetic and playful", "darkly sweet", "pure and innocent", "hyper-active decora",
-    "modernist minimal cute", "fairy-tale magical", "sweet and airy", "bittersweet memory",
-    "playful and mischievous", "luxurious and fancy", "underground harajuku style", "ethereal and heavenly"
+    "soft and dreamy","chaotic but cute","extremely healing","nostalgic 90s-2000s",
+    "sentimental","street fashion kawaii","elegant princess","slightly surreal",
+    "energetic and playful","darkly sweet","pure and innocent","hyper-active decora",
+    "modernist minimal cute","fairy-tale magical","sweet and airy","bittersweet memory"
   ],
   details: [
-    "sparkling glitter dust", "pastel airbrushing", "pearl sheen", "delicate lace embroidery",
-    "puffy 3D sticker finish", "halftone heart screen tones", "iridescent holographic film",
-    "manga-style empty frames", "glossy jelly finish", "soft-focus bokeh hearts",
-    "pastel chromatic aberration", "heart-shaped light leaks", "glitter gel pen strokes",
-    "watercolor bleed edges", "3D clay-like volume", "soft airbrushed grain",
-    "reflective plastic sheen", "embroidered patch edges", "fine ink pen sparkles", "layered transparency effect"
+    "sparkling glitter dust","pastel airbrushing","pearl sheen","delicate lace embroidery",
+    "puffy 3D sticker finish","halftone heart screen tones","iridescent holographic film",
+    "manga-style empty frames","glossy jelly finish","soft-focus bokeh hearts",
+    "pastel chromatic aberration","heart-shaped light leaks","glitter gel pen strokes",
+    "watercolor bleed edges","3D clay-like volume","soft airbrushed grain",
+    "reflective plastic sheen","embroidered patch edges","fine ink pen sparkles","layered transparency effect",
+    "completely original character design, not based on any existing character",
+    "generic cute mascot, avoid all copyrighted characters",
+    "original kawaii style, no specific mascot references"
   ],
   medium: [
-    "vector kawaii illustration", "90s anime cel-shading", "soft pastel gouache",
-    "3D cute matte render", "digital sticker sheet style", "risograph print texture",
-    "glitter gel art", "watercolor wash", "claymation aesthetic", "pixel art cute style",
-    "airbrushed street art", "screen print vintage", "3D glossy plastic render",
-    "felt and fabric collage", "pencil sketch and pastel", "chalk-like soft texture",
-    "iridescent digital painting", "high-gloss vinyl render", "embroidery art style", "mixed media cute collage"
+    "vector kawaii illustration","90s anime cel-shading","soft pastel gouache",
+    "3D cute matte render","digital sticker sheet style","risograph print texture",
+    "glitter gel art","watercolor wash","claymation aesthetic","pixel art cute style",
+    "airbrushed street art","screen print vintage","3D glossy plastic render",
+    "felt and fabric collage","pencil sketch and pastel","chalk-like soft texture",
+    "iridescent digital painting","high-gloss vinyl render","embroidery art style","mixed media cute collage"
   ]
 };
 
@@ -385,20 +377,15 @@ function pickStyle() {
   return           { name: pick(STYLES_SUBCULTURE),       type: 'subculture' };
 }
 
-// Generate Kawaii Deep background for White Studio
 function generateKawaiiBackground() {
   const d = KAWAII_DEEP_DATA;
   const bg = `${pick(d.motif)}, ${pick(d.structure)}, color palette: ${pick(d.palette)}, ${pick(d.details)}, vibe: ${pick(d.vibe)}, ${pick(d.medium)}`;
   currentBackground = bg;
-  
-  // Update status
   const statusEl = document.getElementById("kawaiiBgStatus");
   if (statusEl) {
     statusEl.textContent = "✓ Generated: " + bg.substring(0, 60) + "...";
     statusEl.style.color = "#4ade80";
   }
-  
-  // Auto-rebuild prompt if fields are already shown
   if (document.getElementById("promptBox").style.display !== "none") {
     rebuildPromptAndDisplay();
   }
@@ -417,7 +404,6 @@ const TOPS_MINIMAL = [
   "structured shoulder pad top","recycled nylon track top","quiet luxury cashmere blend top",
   "vintage band tee faded and worn","tour merch oversized hoodie","retro logo ringer tee","oversized jazz club tee"
 ];
-
 const TOPS_DECO = [
   "bold abstract print oversized shirt","voluminous layered pastel ruffle blouse",
   "large floral print open button-down","complex tie-dye washed hoodie",
@@ -434,7 +420,6 @@ const TOPS_DECO = [
   "harajuku mix print layered top","vintage bandana patchwork blouse","candy color block ruffle blouse",
   "detailed sakura pattern haori style","bold kanji graphic oversized tee","metallic thread woven top"
 ];
-
 const TOPS_SEXY = [
   "sequined tube top","satin bustier barely-there straps","plunge satin camisole",
   "cropped lace-up corset top","black lace-up top with puffy sleeves",
@@ -449,7 +434,6 @@ const TOPS_SEXY = [
   "satin corset with garter straps","crystal studded off-shoulder top","liquid metal effect camisole",
   "butterfly backless satin top","faux fur trimmed bustier","high shine metallic mesh top"
 ];
-
 const TOPS_YAMI = [
   "black lace high-neck top","oversized black hoodie with heavy text graphic",
   "distressed fishnet top over bralette","bandage wrap crop top black",
@@ -467,7 +451,6 @@ const TOPS_YAMI = [
   "menhera bear print oversized tee","gothic lolita inspired blouse",
   "dark pastel striped knit with holes","black tiered ruffle with cross charm"
 ];
-
 const TOPS_MOE = [
   "pastel pink sailor uniform blouse","soft lavender knit sweater",
   "oversized cat-print hoodie","strawberry embroidered crop knit",
@@ -504,7 +487,6 @@ const BOTTOMS_MINIMAL = [
   "technical nylon joggers","A-line midi tech skirt","utilitarian carpenter pants",
   "matte black performance leggings","sculptural asymmetric skirt"
 ];
-
 const BOTTOMS_DECO = [
   "layered skirt over patterned trousers","pleated midi skirt asymmetrical mix-print",
   "paperbag waist trousers with bold stripes","asymmetric wrap trousers with geometric pattern",
@@ -516,7 +498,6 @@ const BOTTOMS_DECO = [
   "baroque floral jacquard trousers","candy color block wide pants","detailed sakura print midi skirt",
   "heavy embroidery wide skirt"
 ];
-
 const BOTTOMS_SEXY = [
   "leather-look micro mini skirt","low-rise denim micro mini","lace-trim shorts",
   "bodycon ribbed mini","thigh-slit satin midi","metallic micro skirt",
@@ -528,7 +509,6 @@ const BOTTOMS_SEXY = [
   "strappy high waist mini","glitter vinyl pencil skirt","cutout side bodycon mini",
   "thigh high slit satin pencil","high shine satin mini with bow"
 ];
-
 const BOTTOMS_YAMI = [
   "black asymmetric layered skirt","ripped black denim","black tutu skirt over tights",
   "bandage skirt black","black pleated midi with chains","distressed black cargo pants",
@@ -539,7 +519,6 @@ const BOTTOMS_YAMI = [
   "dark rose print pleated skirt","black tutu with cross charms",
   "dark academia pleated midi","gothic lolita inspired skirt","ripped fishnet overlay skirt"
 ];
-
 const BOTTOMS_MOE = [
   "pastel pleated mini skirt","cream A-line midi skirt","pink gingham mini",
   "lavender tiered voluminous ruffle skirt","white lace trim shorts",
@@ -568,13 +547,10 @@ const OUTERWEAR = {
   winter: ["long sleek wool overcoat","voluminous puffer jacket","GORE-TEX technical parka","shearling collar aviator jacket","heavy wool duffle coat","velvet blazer"]
 };
 
-// FIX: weather引数を正しく受け取って使う
 function pickOuterwear(season, weather) {
   let pool = OUTERWEAR[season] || OUTERWEAR.spring;
   const isRaining = weather && weather.includes("rain");
-  if (!isRaining) {
-    pool = pool.filter(o => !o.includes("rain"));
-  }
+  if (!isRaining) pool = pool.filter(o => !o.includes("rain"));
   return Math.random() < 0.7 ? pick(pool) : null;
 }
 
@@ -596,21 +572,18 @@ const ACCESSORIES_MODE = [
   "cap with subtle logo","silver ear cuffs","smartwatch with technical band",
   "acoustic guitar case on back","guitar strap over shoulder","sheet music sticking out of bag","drumsticks in back pocket"
 ];
-
 const ACCESSORIES_SEXY = [
   "heart choker","micro metallic bag on chain","thigh-high sheer tights",
   "rhinestone barrette","fishnet gloves","satin bow in hair","pearl layered necklace",
   "strappy heeled sandals","crystal ear cuffs","mini shoulder bag with logo",
   "leg garter with chain","over-knee socks with bows","platform boots with buckles"
 ];
-
 const ACCESSORIES_YAMI = [
   "bandage wrapped wrist accessory","black cross pendant necklace","syringe hair clip",
   "dark lace gloves","black ribbon choker","menhera pin badge collection",
   "hospital wristband accessory","dark star hair clips","chain anklet",
   "stuffed animal keychain","plush bear charm","dark teddy bear keychain"
 ];
-
 const ACCESSORIES_MOE = [
   "large pastel bow hair clip","strawberry hair pins","heart-shaped sunglasses",
   "pastel phone case with charms","lace gloves","bunny ear headband",
@@ -619,46 +592,34 @@ const ACCESSORIES_MOE = [
   "stuffed animal charm","pastel teddy bear keychain"
 ];
 
-// FIX: 1回だけ呼び出して primary/secondary を返す（以前は3回独立呼び出しでバラバラだった）
 function pickAccessories(styleType, sceneType = "urban") {
   let pool;
   if (styleType === 'sexy')      pool = [...ACCESSORIES_SEXY];
   else if (styleType === 'yami') pool = [...ACCESSORIES_YAMI];
   else if (styleType === 'moe')  pool = [...ACCESSORIES_MOE];
   else                           pool = [...ACCESSORIES_MODE];
-
   const isRoom = sceneType === "room";
-
   if (isRoom) {
-    pool = pool.filter(a => 
-      !a.includes("thigh-high") && 
-      !a.includes("platform heels") && 
-      !a.includes("strappy heeled") && 
-      !a.includes("chunky platform") &&
-      !a.includes("leg garter") &&
-      !a.includes("over-knee")
+    pool = pool.filter(a =>
+      !a.includes("thigh-high") && !a.includes("platform heels") &&
+      !a.includes("strappy heeled") && !a.includes("chunky platform") &&
+      !a.includes("leg garter") && !a.includes("over-knee")
     );
   } else {
     if (styleType !== 'moe' && styleType !== 'yami') {
-      pool = pool.filter(a => 
-        !a.includes("strawberry") && 
-        !a.includes("bunny ear") && 
-        !a.includes("pastel bow") &&
-        !a.includes("heart-shaped") &&
-        !a.includes("rainbow layered")
+      pool = pool.filter(a =>
+        !a.includes("strawberry") && !a.includes("bunny ear") &&
+        !a.includes("pastel bow") && !a.includes("heart-shaped") && !a.includes("rainbow layered")
       );
     }
   }
-
   let hasBag = false;
-
   let primary = null;
   if (pool.length > 0) {
     const idx = Math.floor(Math.random() * pool.length);
     primary = pool.splice(idx, 1)[0];
     if (primary.match(/bag|backpack|tote/i)) hasBag = true;
   }
-
   let secondary = null;
   if (Math.random() < 0.5 && pool.length > 0) {
     if (hasBag) pool = pool.filter(a => !a.match(/bag|backpack|tote/i));
@@ -667,7 +628,6 @@ function pickAccessories(styleType, sceneType = "urban") {
       secondary = pool.splice(idx, 1)[0];
     }
   }
-
   return { primary, secondary };
 }
 
@@ -675,78 +635,51 @@ function getContextualNoise(sceneType, time, loc = "") {
   const isRoom = sceneType === "room";
   const isNight = /night|midnight|3am|2am/.test(time);
   const isEvening = /evening|dusk|twilight|5 PM|8 PM/.test(time);
-
   let pool = [...RARE_TOKYO];
-
   if (isRoom) {
-    pool = pool.filter(n => 
-      !n.includes("vending machine") && 
-      !n.includes("pachinko") && 
-      !n.includes("construction LED") &&
-      !n.includes("train ticket") &&
-      !n.includes("bicycle")
+    pool = pool.filter(n =>
+      !n.includes("vending machine") && !n.includes("pachinko") &&
+      !n.includes("construction LED") && !n.includes("train ticket") && !n.includes("bicycle")
     );
   }
-
   const hasVendingLocation = /vending|konbini|back alley/.test(loc);
-  if (!hasVendingLocation) {
-    pool = pool.filter(n => !n.includes("vending machine"));
-  }
-
+  if (!hasVendingLocation) pool = pool.filter(n => !n.includes("vending machine"));
   if (isNight || isEvening) {
-    const nightNoise = pool.filter(n => 
-      n.includes("vending machine") || 
-      n.includes("neon") || 
-      n.includes("fluorescent") ||
-      n.includes("pachinko")
+    const nightNoise = pool.filter(n =>
+      n.includes("vending machine") || n.includes("neon") ||
+      n.includes("fluorescent") || n.includes("pachinko")
     );
-    if (nightNoise.length > 0 && Math.random() < 0.6) {
-      pool = [...pool, ...nightNoise];
-    }
+    if (nightNoise.length > 0 && Math.random() < 0.6) pool = [...pool, ...nightNoise];
   }
-
   return pool.length > 0 ? pick(pool) : null;
 }
 
 function getContextualBottom(season, styleType, sceneType = "urban") {
-  let pool = [...(styleType === 'sexy' ? BOTTOMS_SEXY : 
-                 styleType === 'yami' ? BOTTOMS_YAMI : 
-                 styleType === 'moe'  ? BOTTOMS_MOE : 
+  let pool = [...(styleType === 'sexy' ? BOTTOMS_SEXY :
+                 styleType === 'yami' ? BOTTOMS_YAMI :
+                 styleType === 'moe'  ? BOTTOMS_MOE :
                  styleType === 'mode_deco' ? BOTTOMS_DECO : BOTTOMS_MINIMAL)];
-
   const isWinter = season === "winter";
   const isSummer = season === "summer";
   const isRoom = sceneType === "room";
-
   if (isWinter) {
-    const revealing = pool.filter(b => 
+    const revealing = pool.filter(b =>
       b.includes("micro") || b.includes("ultra-short") || b.includes("hot pants") ||
       b.includes("thigh-slit") || b.includes("bodycon mini") || b.includes("high waist hot")
     );
-    if (revealing.length > 0 && Math.random() < 0.75) {
-      pool = pool.filter(b => !revealing.includes(b));
-    }
+    if (revealing.length > 0 && Math.random() < 0.75) pool = pool.filter(b => !revealing.includes(b));
   }
-
   if (isSummer) {
-    const heavy = pool.filter(b => 
-      b.includes("wool") || b.includes("corduroy") || b.includes("velvet")
-    );
-    if (heavy.length > 0 && Math.random() < 0.6) {
-      pool = pool.filter(b => !heavy.includes(b));
-    }
+    const heavy = pool.filter(b => b.includes("wool") || b.includes("corduroy") || b.includes("velvet"));
+    if (heavy.length > 0 && Math.random() < 0.6) pool = pool.filter(b => !heavy.includes(b));
   }
-
   if (isRoom) {
-    const comfy = pool.filter(b => 
+    const comfy = pool.filter(b =>
       b.includes("wide") || b.includes("pleated") || b.includes("A-line") ||
       b.includes("culottes") || b.includes("track")
     );
-    if (comfy.length > 0 && Math.random() < 0.4) {
-      pool = [...pool, ...comfy];
-    }
+    if (comfy.length > 0 && Math.random() < 0.4) pool = [...pool, ...comfy];
   }
-
   return pick(pool);
 }
 
@@ -796,7 +729,6 @@ const LOC_URBAN = [
   "interior of empty subway car, green velour seats, night run",
   "stairwell of a 1990s apartment complex, dim ceiling light",
   "back alley, wet asphalt, vending machine glow, midnight",
-  // Industrial waterfront / Bay Area inspired scenes (user requested)
   "industrial waterfront, cranes and containers, rusty metal",
   "bay area factory district, smoke stacks, heavy machinery",
   "shipping port, massive cargo ships, industrial cranes",
@@ -808,8 +740,6 @@ const LOC_URBAN = [
   "industrial canal, rusted bridges, industrial reflection",
   "bay bridge view, distant city skyline, water reflections"
 ];
-
-// FIX: LOC_ROOMを室内・屋内に限定。都市・飲食店などは除去し重複も削除
 const LOC_ROOM = [
   "small one-room apartment, futon folded, clothes rack overflowing",
   "bedroom with unmade bed, morning light through cheap curtains",
@@ -863,9 +793,7 @@ const SEASONS_SCENE = {
 
 function pickSeasonScene(season) {
   let pool = SEASONS_SCENE[season] || SEASONS_SCENE.spring;
-  if (season === "spring" && Math.random() < 0.30) {
-    pool = pool.filter(s => !s.includes("cherry blossom"));
-  }
+  if (season === "spring" && Math.random() < 0.30) pool = pool.filter(s => !s.includes("cherry blossom"));
   return pick(pool);
 }
 
@@ -883,14 +811,10 @@ const SCENE_TIMES = {
 };
 
 const GLUTTON_TIMES = [
-  "10 AM, crisp morning light, long soft shadows",
-  "midday, harsh overhead sun, deep geometric shadows",
-  "early afternoon, flat bright light",
-  "lunch hour, city in motion",
-  "late afternoon, golden hour, amber reflecting off windows",
-  "5 PM, rush hour beginning, warm slanted light",
-  "golden hour, last sunlight cutting between buildings",
-  "dusk, sky turning indigo, shop lights flickering on"
+  "10 AM, crisp morning light, long soft shadows","midday, harsh overhead sun, deep geometric shadows",
+  "early afternoon, flat bright light","lunch hour, city in motion",
+  "late afternoon, golden hour, amber reflecting off windows","5 PM, rush hour beginning, warm slanted light",
+  "golden hour, last sunlight cutting between buildings","dusk, sky turning indigo, shop lights flickering on"
 ];
 
 function pickTimePhase() {
@@ -898,10 +822,6 @@ function pickTimePhase() {
   if (r < 0.55) return 'day';
   if (r < 0.80) return 'evening';
   return 'night';
-}
-
-function getGluttonTime() {
-  return pick(GLUTTON_TIMES);
 }
 
 // ==================== RARE TOKYO ====================
@@ -928,23 +848,20 @@ function getTemporalLighting(time) {
   const isNight = /night|midnight|3am|2am/.test(time);
   const isEvening = /evening|dusk|twilight|5 PM|8 PM/.test(time);
   const isGolden = /golden hour|late afternoon/.test(time);
-
   let pool = [...LIGHTING];
-
   if (isNight) {
-    const nightPool = pool.filter(l => 
-      l.includes("neon") || l.includes("fluorescent") || l.includes("vending") || 
+    const nightPool = pool.filter(l =>
+      l.includes("neon") || l.includes("fluorescent") || l.includes("vending") ||
       l.includes("streetlamp") || l.includes("sodium") || l.includes("LED")
     );
     if (nightPool.length > 0) pool = nightPool;
   } else if (isEvening || isGolden) {
-    const goldenPool = pool.filter(l => 
-      l.includes("golden") || l.includes("warm") || l.includes("amber") || 
+    const goldenPool = pool.filter(l =>
+      l.includes("golden") || l.includes("warm") || l.includes("amber") ||
       l.includes("slant") || l.includes("sunset")
     );
     if (goldenPool.length > 0) pool = goldenPool;
   }
-
   return pick(pool);
 }
 
@@ -965,141 +882,59 @@ function getEnvironmentalWeather(loc, weather) {
 }
 
 const FOREGROUND_BLUR = [
-  "blurred coffee cup in foreground",
-  "out of focus leaves framing the shot",
-  "bokeh streetlight in foreground",
-  "soft focus window frame in foreground",
-  "blurred railing or fence in foreground",
-  "bokeh neon sign reflection in foreground",
-  "out of focus bicycle handle in foreground",
-  "blurred book or magazine in foreground",
-  "out of focus mug on desk",
-  "soft focus curtain edge in foreground",
-  "blurred plant leaves in foreground",
-  "bokeh window light in foreground",
-  "out of focus hair strands in extreme close-up",
-  "blurred shoulder or collar in foreground",
+  "blurred coffee cup in foreground","out of focus leaves framing the shot",
+  "bokeh streetlight in foreground","soft focus window frame in foreground",
+  "blurred railing or fence in foreground","bokeh neon sign reflection in foreground",
+  "out of focus bicycle handle in foreground","blurred book or magazine in foreground",
+  "out of focus mug on desk","soft focus curtain edge in foreground",
+  "blurred plant leaves in foreground","bokeh window light in foreground",
+  "out of focus hair strands in extreme close-up","blurred shoulder or collar in foreground",
   "soft focus fabric texture in foreground"
 ];
 
 function getForegroundBlur(sceneType, framing, loc = "") {
   if (Math.random() > 0.12) return null;
-
   const isRoom = sceneType === "room";
   const isClose = framing === "close" || framing === "bust";
   const isMinimal = /white|studio|seamless|minimal|gradient|clean/i.test(loc);
-
   let pool = [...FOREGROUND_BLUR];
-
   if (isMinimal) {
-    pool = pool.filter(b => 
-      b.includes("fabric") || b.includes("window light") || b.includes("curtain") || b.includes("hair")
-    );
+    pool = pool.filter(b => b.includes("fabric") || b.includes("window light") || b.includes("curtain") || b.includes("hair"));
   } else if (isRoom) {
-    pool = pool.filter(b => 
-      b.includes("book") || b.includes("mug") || b.includes("curtain") || 
-      b.includes("plant") || b.includes("window light") || b.includes("fabric")
-    );
+    pool = pool.filter(b => b.includes("book") || b.includes("mug") || b.includes("curtain") || b.includes("plant") || b.includes("window light") || b.includes("fabric"));
   } else {
-    pool = pool.filter(b => 
-      b.includes("coffee") || b.includes("leaves") || b.includes("streetlight") || 
-      b.includes("window frame") || b.includes("railing") || b.includes("neon") || 
-      b.includes("bicycle")
-    );
+    pool = pool.filter(b => b.includes("coffee") || b.includes("leaves") || b.includes("streetlight") || b.includes("window frame") || b.includes("railing") || b.includes("neon") || b.includes("bicycle"));
   }
-
   if (isClose && Math.random() < 0.5) {
     const closeItems = pool.filter(b => b.includes("hair") || b.includes("shoulder") || b.includes("fabric"));
     if (closeItems.length > 0) pool = [...pool, ...closeItems];
   }
-
   return pool.length > 0 ? pick(pool) : null;
 }
 
-// ==================== GLUTTON MODE (detailed version from old) ====================
-const GLUTTON_LOCATION_FOOD_MAP = {
-  "ramen shop": ["eating ramen with chopsticks, slurping noodles, satisfied expression", "ramen noodles slipping from chopsticks"],
-  "izakaya": ["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy", "eating takoyaki with toothpick, sauce on lips"],
-  "sushi counter": ["eating sushi with chopsticks, single piece, focused"],
-  "cafe": ["eating cake with fork, small piece, delicate", "eating pancakes with fork and knife, syrup dripping, stack of pancakes", "eating parfait with long spoon, layers of cream and fruit, delicate", "eating pasta with fork, twirling noodles, sauce on lips"],
-  "food stall": ["eating takoyaki with toothpick, sauce on lips", "eating crepe while walking, holding with both hands", "eating skewer food, holding in one hand, casual"],
-  "bakery": ["eating sandwich, holding with both hands, big bite"],
-  "dessert cafe": ["eating parfait with long spoon, layers of cream and fruit, delicate", "eating pancakes with fork and knife, syrup dripping, stack of pancakes", "eating cake with fork, small piece, delicate"],
-  "bar": ["eating fried chicken, holding in hand, crispy", "eating french fries, dipping in ketchup, casual"],
-  "convenience store": ["eating onigiri with both hands, rice on cheek", "eating sandwich, holding with both hands, big bite"],
-  "food court": ["eating ramen with chopsticks, slurping noodles, satisfied expression", "eating pizza slice, folded, mid-bite", "eating burger with both hands, big bite, messy"],
-  "italian restaurant": ["eating pasta with fork, twirling noodles, sauce on lips", "eating carbonara, creamy sauce, parmesan on top", "eating spaghetti, slurping long noodles, tomato sauce", "eating penne arrabbiata, spicy sauce, focused expression", "eating pizza slice, folded, mid-bite"],
-  "chinese restaurant": ["eating fried chicken, holding in hand, crispy", "eating dumplings with chopsticks, sauce on side"],
-  "korean restaurant": ["eating dumplings with chopsticks, sauce on side", "eating fried chicken, holding in hand, crispy"],
-  "family restaurant": ["eating hamburger steak, knife and fork, satisfied", "eating pasta with fork, twirling noodles, sauce on lips", "eating omurice, ketchup on top, focused"],
-  "fast food": ["eating burger with both hands, big bite, messy", "eating french fries, dipping in ketchup, casual", "eating fried chicken, holding in hand, crispy"],
-  "donburi shop": ["eating gyudon with chopsticks, rice bowl, satisfied", "eating katsudon, pork cutlet on rice, focused"],
-  "udon soba shop": ["eating udon with chopsticks, hot broth, satisfied", "eating soba, cold noodles, refreshing"],
-  "curry restaurant": ["eating curry rice with spoon, spicy aroma, satisfied", "eating katsu curry, cutlet on curry rice, focused"],
-  "steakhouse": ["eating steak, knife and fork, satisfied expression", "eating hamburger steak, knife and fork, satisfied"],
-  "seafood restaurant": ["eating grilled fish, chopsticks, fresh aroma", "eating sashimi, soy sauce dip, focused", "eating seafood pasta, creamy sauce, satisfied"]
-};
-
-// Pre-made coherent glutton scenes (location + pose + time + weather)
+// ==================== GLUTTON MODE ====================
 const GLUTTON_SCENES = [
-  // Ramen variations
   { location: "ramen shop counter, steaming bowls, wooden stools", pose: "eating ramen with chopsticks, slurping noodles, satisfied expression", time: "lunch hour, city in motion", weather: "clear and bright, lunch rush atmosphere" },
   { location: "ramen shop counter, steaming bowls, wooden stools", pose: "eating tsukemen, dipping noodles, focused", time: "evening, 7 PM, dinner time", weather: "warm ramen shop lighting, steamy atmosphere" },
   { location: "late night ramen shop, bright lights, empty seats", pose: "eating miso ramen, slurping, tired but happy", time: "late night, 11 PM, quiet ramen shop", weather: "bright fluorescent lighting, calm night" },
-
-  // Sushi & Seafood
   { location: "sushi counter, chef preparing, fresh fish", pose: "eating sushi with chopsticks, single piece, focused", time: "early evening, 6 PM, dinner rush beginning", weather: "clear evening, soft restaurant lighting" },
   { location: "kaisen don shop, fresh sashimi bowl, bright counter", pose: "eating kaisen don with chopsticks, fresh and colorful", time: "lunch hour, busy kaisen don shop", weather: "bright shop lighting, fresh seafood vibe" },
-  { location: "seafood izakaya, grilled fish and sashimi, fresh display", pose: "eating grilled fish, chopsticks, fresh aroma", time: "early evening, 6 PM, dinner beginning", weather: "soft evening lighting, lively izakaya" },
-
-  // Donburi & Curry
   { location: "donburi shop, rice bowl counter, quick service", pose: "eating gyudon with chopsticks, rice bowl, satisfied", time: "lunch hour, busy donburi shop", weather: "bright shop lighting, quick lunch atmosphere" },
-  { location: "donburi shop, rice bowl counter, quick service", pose: "eating katsudon, pork cutlet on rice, focused", time: "evening, 7 PM, dinner time", weather: "warm donburi shop lighting, satisfying meal" },
   { location: "curry restaurant, curry rice and katsu, spicy aroma", pose: "eating curry rice with spoon, spicy aroma, satisfied", time: "lunch hour, city in motion", weather: "clear and bright, lunch rush atmosphere" },
-  { location: "curry restaurant, curry rice and katsu, spicy aroma", pose: "eating katsu curry, cutlet on curry rice, focused", time: "late evening, 8 PM, after-work crowd", weather: "warm curry restaurant lighting, spicy air" },
-
-  // Udon / Soba
   { location: "udon soba shop, hot noodle bowls, wooden counter", pose: "eating udon with chopsticks, hot broth, satisfied", time: "lunch hour, city in motion", weather: "clear and bright, lunch rush atmosphere" },
-  { location: "udon soba shop, hot noodle bowls, wooden counter", pose: "eating cold soba, refreshing, summer vibe", time: "afternoon, 3 PM, hot summer day", weather: "cool shop interior, refreshing atmosphere" },
-
-  // Izakaya & Yakitori
   { location: "izakaya interior, wooden tables, lanterns", pose: "eating dumplings with chopsticks, sauce on side", time: "late evening, 8 PM, after-work crowd", weather: "clear evening, warm izakaya lighting" },
   { location: "izakaya interior, wooden tables, lanterns", pose: "eating yakitori skewers, satisfied, beer in hand", time: "evening, 9 PM, izakaya peak time", weather: "warm lantern lighting, lively after-work vibe" },
-  { location: "izakaya interior, wooden tables, lanterns", pose: "eating karaage, crispy and juicy, happy expression", time: "late night, 10 PM, drinking crowd", weather: "dim izakaya lighting, relaxed night" },
-
-  // Cafe & Dessert
   { location: "cafe table with coffee and cake, cozy lighting", pose: "eating cake with fork, small piece, delicate", time: "afternoon, 3 PM, relaxed cafe time", weather: "soft afternoon light, cozy cafe ambiance" },
-  { location: "cafe table with coffee and cake, cozy lighting", pose: "eating pancakes with fork and knife, syrup dripping, stack of pancakes", time: "morning, 10 AM, brunch time", weather: "bright morning cafe light, sweet aroma" },
   { location: "dessert cafe, colorful sweets, pastel decor", pose: "eating parfait with long spoon, layers of cream and fruit, delicate", time: "afternoon, 4 PM, dessert time", weather: "soft afternoon light, sweet cafe atmosphere" },
   { location: "crepe stand, colorful crepes, sweet smell", pose: "eating crepe while walking, holding with both hands", time: "afternoon, 4 PM, dessert time", weather: "soft afternoon light, sweet street atmosphere" },
-
-  // Italian / Pizza / Pasta
   { location: "italian restaurant, pasta and pizza, warm lighting", pose: "eating pasta with fork, twirling noodles, sauce on lips", time: "early evening, 7 PM, dinner time", weather: "clear evening, warm restaurant ambiance" },
-  { location: "italian restaurant, pasta and pizza, warm lighting", pose: "eating pizza slice, folded, mid-bite", time: "late evening, 9 PM, casual dinner", weather: "dim italian restaurant lighting, cozy night" },
-
-  // Asian (Korean / Chinese)
   { location: "korean restaurant, korean bbq grill, smoky atmosphere", pose: "eating korean bbq with chopsticks and scissors, satisfied expression", time: "evening, 7 PM, dinner time", weather: "warm restaurant lighting, lively atmosphere" },
-  { location: "korean restaurant, korean bbq grill, smoky atmosphere", pose: "eating bibimbap, mixing with spoon, focused", time: "lunch hour, busy korean restaurant", weather: "bright korean restaurant lighting, appetizing" },
-  { location: "chinese restaurant, fried rice and dumplings, red lanterns", pose: "eating fried rice with spoon, focused", time: "late evening, 8 PM, after-work crowd", weather: "clear evening, warm chinese restaurant lighting" },
-  { location: "chinese restaurant, fried rice and dumplings, red lanterns", pose: "eating gyoza with chopsticks, sauce on side", time: "evening, 6 PM, early dinner", weather: "warm chinese restaurant lighting, dumpling steam" },
-
-  // Family / Fast food / Steak
-  { location: "family restaurant, hamburger steak and pasta, bright lighting", pose: "eating hamburger steak, knife and fork, satisfied", time: "afternoon, 5 PM, early dinner", weather: "bright family restaurant lighting, casual vibe" },
-  { location: "steakhouse, grilled steak, dim lighting", pose: "eating steak, knife and fork, satisfied expression", time: "evening, 7 PM, dinner time", weather: "dim restaurant lighting, intimate atmosphere" },
   { location: "fast food restaurant, burger and fries, plastic tables", pose: "eating burger with both hands, big bite, messy", time: "late night, 10 PM, quick bite", weather: "bright fast food lighting, casual night" },
-  { location: "fast food restaurant, burger and fries, plastic tables", pose: "eating french fries, dipping in ketchup, casual", time: "afternoon, 2 PM, snack time", weather: "bright fast food lighting, relaxed" },
-
-  // Street food & Others
   { location: "takoyaki food stall, steam rising, warm glow", pose: "eating takoyaki with toothpick, sauce on lips", time: "evening, 7 PM, street food time", weather: "warm streetlight glow, bustling night market" },
-  { location: "okonomiyaki shop, hot teppan, savory smell", pose: "eating okonomiyaki with spatula, satisfied", time: "evening, 8 PM, casual dinner", weather: "warm teppan lighting, savory aroma" },
-  { location: "bakery interior, bread shelves, warm lighting", pose: "eating sandwich, holding with both hands, big bite", time: "lunch hour, busy bakery", weather: "warm bakery lighting, fresh bread aroma" },
-  { location: "convenience store eating area, small tables, late night", pose: "eating onigiri with both hands, rice on cheek", time: "late night, 11 PM, quiet convenience store", weather: "bright convenience store lighting, quiet night" },
-  { location: "food court, multiple stalls, busy atmosphere", pose: "eating ramen with chopsticks, slurping noodles, satisfied expression", time: "lunch hour, busy food court", weather: "bright food court lighting, bustling atmosphere" }
+  { location: "convenience store eating area, small tables, late night", pose: "eating onigiri with both hands, rice on cheek", time: "late night, 11 PM, quiet convenience store", weather: "bright convenience store lighting, quiet night" }
 ];
 
-function getGluttonScene() {
-  return pick(GLUTTON_SCENES);
-}
+function getGluttonScene() { return pick(GLUTTON_SCENES); }
 
 // ==================== ARTIST MODE ====================
 const ARTIST_SCENES = [
@@ -1175,6 +1010,47 @@ const BODY_POSES = [
   "lying on bed, propped on elbows (indoor)","perched on desk edge (indoor)"
 ];
 
+const KAWAII_POSES = [
+  "making double peace signs near face, smiling brightly",
+  "tilting head cutely, one hand on cheek",
+  "both hands making finger hearts, head slightly tilted",
+  "twirling gently with arms out, happy expression",
+  "jumping slightly with excitement, hands in small fists",
+  "looking back over shoulder with cute smile",
+  "one hand making heart shape, other hand on hip",
+  "both hands framing face like a picture, big smile",
+  "head tilt with finger on lips, shy cute expression",
+  "peace sign with one hand, other hand holding skirt",
+  "making cat paw hands near face, playful expression",
+  "hands on cheeks, mouth open in cute surprise",
+  "leaning forward slightly with hands behind back, smiling",
+  "standing on tiptoes, hands making small waves",
+  "both hands making bunny ears behind head, smiling",
+  "gentle twirl with skirt flare, looking at camera"
+];
+
+// Best Friends poses
+const BEST_FRIENDS_POSES = [
+  "standing close together, shoulders touching, smiling at each other",
+  "arm around each other's shoulders, laughing together",
+  "linking arms, walking side by side, happy conversation",
+  "high-fiving each other, excited expressions",
+  "taking a selfie together, phone in one hand, peace signs",
+  "hugging side by side, cheeks touching, big smiles",
+  "standing back to back, arms crossed, cool pose",
+  "one leaning head on the other's shoulder, gentle smiles",
+  "facing each other, hands making heart shape together",
+  "sitting side by side on invisible bench, shoulders touching",
+  "one making peace sign, the other making finger heart, looking at camera",
+  "whispering to each other, hands covering mouth, giggling",
+  "jumping together in sync, hands raised, excited",
+  "standing in mirror pose, copying each other's gestures",
+  "holding hands, swinging arms, walking together",
+  "one resting head on the other's shoulder, soft smiles",
+  "facing forward, arms around each other's waists",
+  "group hug pose, warm and friendly"
+];
+
 const HAND_GESTURES = [
   "holding smartphone loosely","both hands holding phone, thumbs typing",
   "checking phone screen, slight frown","scrolling with one thumb",
@@ -1191,30 +1067,6 @@ const HAND_GESTURES = [
   "covering mouth while laughing","giving peace sign low near waist",
   "biting thumbnail lightly","fidgeting with ring","tapping fingers on thigh",
   "holding wrist with other hand","hugging arms in cold","shielding eyes from light"
-];
-
-// Kawaii cute poses (used when Kawaii Background is active in White Studio)
-const KAWAII_POSES = [
-  "making double peace signs near face, smiling brightly",
-  "tilting head cutely, one hand on cheek",
-  "both hands making finger hearts, head slightly tilted",
-  "twirling gently with arms out, happy expression",
-  "jumping slightly with excitement, hands in small fists",
-  "looking back over shoulder with cute smile",
-  "sitting on invisible chair pose, legs together, smiling",
-  "one hand making heart shape, other hand on hip",
-  "both hands framing face like a picture, big smile",
-  "head tilt with finger on lips, shy cute expression",
-  "peace sign with one hand, other hand holding skirt",
-  "twirling with one leg lifted, arms spread",
-  "making cat paw hands near face, playful expression",
-  "hands on cheeks, mouth open in cute surprise",
-  "leaning forward slightly with hands behind back, smiling",
-  "one leg bent, finger heart with both hands",
-  "sitting pose with knees together, hands on knees, smiling",
-  "standing on tiptoes, hands making small waves",
-  "head resting on one hand, other hand making peace sign",
-  "gentle twirl with skirt flare, looking at camera"
 ];
 
 const FACIAL_EXPRESSIONS = [
@@ -1355,6 +1207,15 @@ function setFilter(f) {
   document.getElementById("filter-" + f).classList.add("active");
 }
 
+function deactivateBtn(id) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.classList.remove("active");
+  btn.style.borderColor = "";
+  btn.style.color = "";
+  btn.style.background = "";
+}
+
 function toggleGluttonMode() {
   gluttonMode = !gluttonMode;
   const btn = document.getElementById("glutton-btn");
@@ -1363,12 +1224,7 @@ function toggleGluttonMode() {
     btn.style.borderColor = "#f97316";
     btn.style.color = "#f97316";
     btn.style.background = "#1a120f";
-  } else {
-    btn.classList.remove("active");
-    btn.style.borderColor = "";
-    btn.style.color = "";
-    btn.style.background = "";
-  }
+  } else { deactivateBtn("glutton-btn"); }
 }
 
 function toggleArtistMode() {
@@ -1379,20 +1235,8 @@ function toggleArtistMode() {
     btn.style.borderColor = "#60a5fa";
     btn.style.color = "#60a5fa";
     btn.style.background = "#0f172a";
-    if (gluttonMode) {
-      gluttonMode = false;
-      const gbtn = document.getElementById("glutton-btn");
-      gbtn.classList.remove("active");
-      gbtn.style.borderColor = "";
-      gbtn.style.color = "";
-      gbtn.style.background = "";
-    }
-  } else {
-    btn.classList.remove("active");
-    btn.style.borderColor = "";
-    btn.style.color = "";
-    btn.style.background = "";
-  }
+    if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
+  } else { deactivateBtn("artist-btn"); }
 }
 
 function toggleAlbumMode() {
@@ -1405,14 +1249,12 @@ function toggleAlbumMode() {
     btn.style.color = "#c084fc";
     btn.style.background = "#1a0f1a";
     if (inputs) inputs.style.display = "block";
-    if (gluttonMode) { gluttonMode = false; const gbtn = document.getElementById("glutton-btn"); gbtn.classList.remove("active"); gbtn.style.borderColor = ""; gbtn.style.color = ""; gbtn.style.background = ""; }
-    if (artistMode) { artistMode = false; const abtn = document.getElementById("artist-btn"); abtn.classList.remove("active"); abtn.style.borderColor = ""; abtn.style.color = ""; abtn.style.background = ""; }
-    if (whiteStudioMode) { whiteStudioMode = false; const wbtn = document.getElementById("white-btn"); wbtn.classList.remove("active"); wbtn.style.borderColor = ""; wbtn.style.color = ""; wbtn.style.background = ""; }
+    if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
+    if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
+    if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); document.getElementById("kawaiiBgSection").style.display = "none"; }
+    if (bestFriendsMode) { bestFriendsMode = false; deactivateBtn("bestfriends-btn"); personA = {}; personB = {}; }
   } else {
-    btn.classList.remove("active");
-    btn.style.borderColor = "";
-    btn.style.color = "";
-    btn.style.background = "";
+    deactivateBtn("album-btn");
     if (inputs) inputs.style.display = "none";
   }
 }
@@ -1425,21 +1267,37 @@ function toggleWhiteStudioMode() {
     btn.style.borderColor = "#ffffff";
     btn.style.color = "#000000";
     btn.style.background = "#f0f0f0";
-    if (gluttonMode) { gluttonMode = false; const gbtn = document.getElementById("glutton-btn"); gbtn.classList.remove("active"); gbtn.style.borderColor = ""; gbtn.style.color = ""; gbtn.style.background = ""; }
-    if (artistMode) { artistMode = false; const abtn = document.getElementById("artist-btn"); abtn.classList.remove("active"); abtn.style.borderColor = ""; abtn.style.color = ""; abtn.style.background = ""; }
-    if (albumMode) { albumMode = false; const vbtn = document.getElementById("album-btn"); vbtn.classList.remove("active"); vbtn.style.borderColor = ""; vbtn.style.color = ""; vbtn.style.background = ""; const inputs = document.getElementById("albumInputs"); if (inputs) inputs.style.display = "none"; }
-    // Show Kawaii Background section
-    const bgSection = document.getElementById("kawaiiBgSection");
-    if (bgSection) bgSection.style.display = "block";
+    if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
+    if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
+    if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
+    if (bestFriendsMode) { bestFriendsMode = false; deactivateBtn("bestfriends-btn"); personA = {}; personB = {}; }
+    document.getElementById("kawaiiBgSection").style.display = "block";
   } else {
-    btn.classList.remove("active");
-    btn.style.borderColor = "";
-    btn.style.color = "";
-    btn.style.background = "";
-    // Hide Kawaii Background section
-    const bgSection = document.getElementById("kawaiiBgSection");
-    if (bgSection) bgSection.style.display = "none";
+    deactivateBtn("white-btn");
+    document.getElementById("kawaiiBgSection").style.display = "none";
     currentBackground = "";
+  }
+}
+
+function toggleBestFriendsMode() {
+  bestFriendsMode = !bestFriendsMode;
+  const btn = document.getElementById("bestfriends-btn");
+  if (bestFriendsMode) {
+    btn.classList.add("active");
+    btn.style.borderColor = "#f9a8d4";
+    btn.style.color = "#f9a8d4";
+    btn.style.background = "#1a0f14";
+    if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
+    if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
+    if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
+    if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); document.getElementById("kawaiiBgSection").style.display = "none"; currentBackground = ""; }
+  } else {
+    deactivateBtn("bestfriends-btn");
+    personA = {};
+    personB = {};
+  }
+  if (document.getElementById("displayFields").style.display !== "none") {
+    rebuildPromptAndDisplay();
   }
 }
 
@@ -1448,48 +1306,142 @@ function toggleLock(key) {
   lockedFields[key] = !lockedFields[key];
   renderFields();
 }
-function isLocked(key) {
-  return !!lockedFields[key];
+function isLocked(key) { return !!lockedFields[key]; }
+
+function toggleLockA(key) {
+  lockedFieldsA[key] = !lockedFieldsA[key];
+  renderFields();
 }
+function isLockedA(key) { return !!lockedFieldsA[key]; }
+
+function toggleLockB(key) {
+  lockedFieldsB[key] = !lockedFieldsB[key];
+  renderFields();
+}
+function isLockedB(key) { return !!lockedFieldsB[key]; }
 
 // ==================== GENERATE ====================
 function reroll(key) {
   if (isLocked(key)) return;
-
   if (key === 'style') {
     const s = pickStyle();
     lastVals.style = s.name; lastVals.styleType = s.type;
-  } else if (key === 'top')         { lastVals.top = pickTop(lastVals.styleType); }
-  else if (key === 'bottom')        { lastVals.bottom = pickBottom(lastVals.styleType); }
-  else if (key === 'fabric')        { lastVals.fabric = pick(FABRICS); }
-  else if (key === 'shoe')          { lastVals.shoe = pick(SHOES); }
-  else if (key === 'loc')           { lastVals.loc = pick(currentSceneType === 'urban' ? LOC_URBAN : LOC_ROOM); }
-  else if (key === 'time')          { lastVals.time = pick(SCENE_TIMES[lastVals.timePhase]); }
-  else if (key === 'mood_color')    { lastVals.mood_color = buildColorDescription(currentSeason); }
-  else if (key === 'weather')       { lastVals.weather = pick(WEATHER[currentSeason]); }
-  else if (key === 'season_scene')  { lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]); }
-  else if (key === 'accessory1')    { const a = pickAccessories(lastVals.styleType, currentSceneType); lastVals.accessory1 = a.primary; }
-  else if (key === 'accessory2')    { const a = pickAccessories(lastVals.styleType, currentSceneType); lastVals.accessory2 = a.secondary; }
-  else if (key === 'outer')         { lastVals.outer = pickOuterwear(currentSeason, lastVals.weather || ""); }
-  else if (key === 'rare')          { lastVals.rare = Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
+  } else if (key === 'top')          { lastVals.top = pickTop(lastVals.styleType); }
+  else if (key === 'bottom')         { lastVals.bottom = pickBottom(lastVals.styleType); }
+  else if (key === 'fabric')         { lastVals.fabric = pick(FABRICS); }
+  else if (key === 'shoe')           { lastVals.shoe = pick(SHOES); }
+  else if (key === 'loc')            { lastVals.loc = pick(currentSceneType === 'urban' ? LOC_URBAN : LOC_ROOM); }
+  else if (key === 'time')           { lastVals.time = pick(SCENE_TIMES[lastVals.timePhase]); }
+  else if (key === 'mood_color')     { lastVals.mood_color = buildColorDescription(currentSeason); }
+  else if (key === 'weather')        { lastVals.weather = pick(WEATHER[currentSeason]); }
+  else if (key === 'season_scene')   { lastVals.season_scene = pick(SEASONS_SCENE[currentSeason]); }
+  else if (key === 'accessory1')     { const a = pickAccessories(lastVals.styleType, currentSceneType); lastVals.accessory1 = a.primary; }
+  else if (key === 'accessory2')     { const a = pickAccessories(lastVals.styleType, currentSceneType); lastVals.accessory2 = a.secondary; }
+  else if (key === 'outer')          { lastVals.outer = pickOuterwear(currentSeason, lastVals.weather || ""); }
+  else if (key === 'rare')           { lastVals.rare = Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
   else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming, lastVals.loc || ""); }
-  else if (key === 'camera')        { lastVals.camera = pick(CAMERA); }
-  else if (key === 'styleScene')    { lastVals.styleScene = pick(STYLE_SCENE); }
-  else if (key === 'pose')          { lastVals.pose = pick(BODY_POSES); }
-  else if (key === 'gesture')       { lastVals.gesture = pick(HAND_GESTURES); }
-  else if (key === 'expression')    { lastVals.expression = pick(FACIAL_EXPRESSIONS); }
-  else if (key === 'light')         { lastVals.light = getTemporalLighting(lastVals.time || ""); }
-  else if (key === 'hair')          { lastVals.hair = pick(HAIRSTYLES); }
-  else if (key === 'makeup')        { lastVals.makeup = pick(MAKEUPS); }
+  else if (key === 'camera')         { lastVals.camera = pick(CAMERA); }
+  else if (key === 'styleScene')     { lastVals.styleScene = pick(STYLE_SCENE); }
+  else if (key === 'pose')           { lastVals.pose = pick(BODY_POSES); }
+  else if (key === 'gesture')        { lastVals.gesture = pick(HAND_GESTURES); }
+  else if (key === 'expression')     { lastVals.expression = pick(FACIAL_EXPRESSIONS); }
+  else if (key === 'light')          { lastVals.light = getTemporalLighting(lastVals.time || ""); }
+  else if (key === 'hair')           { lastVals.hair = pick(HAIRSTYLES); }
+  else if (key === 'makeup')         { lastVals.makeup = pick(MAKEUPS); }
   rebuildPromptAndDisplay();
 }
 
-// FIX: clearField でロックも解除する（ロックしたまま null になることを防ぐ）
 function clearField(key) {
   if (isLocked(key)) return;
   lastVals[key] = null;
-  lockedFields[key] = false; // ← 追加：ロックも同時に解除
+  lockedFields[key] = false;
   rebuildPromptAndDisplay();
+}
+
+// ---- Person A/B reroll/clear ----
+function rerollA(key) {
+  if (isLockedA(key)) return;
+  if (key === 'style') { const s = pickStyle(); personA.style = s.name; personA.styleType = s.type; }
+  else if (key === 'top')    { personA.top = pickTop(personA.styleType || 'mode_minimal'); }
+  else if (key === 'bottom') { personA.bottom = getContextualBottom(currentSeason, personA.styleType || 'mode_minimal', currentSceneType); }
+  else if (key === 'shoe')   { personA.shoe = pick(SHOES); }
+  else if (key === 'hair')   { personA.hair = pick(HAIRSTYLES); }
+  else if (key === 'makeup') { personA.makeup = pick(MAKEUPS); }
+  else if (key === 'pose')   { personA.pose = pick(BEST_FRIENDS_POSES); }
+  else if (key === 'outer')  { personA.outer = pickOuterwear(currentSeason, ""); }
+  else if (key === 'fabric') { personA.fabric = pick(FABRICS); }
+  rebuildPromptAndDisplay();
+}
+
+function clearFieldA(key) {
+  if (isLockedA(key)) return;
+  personA[key] = null;
+  lockedFieldsA[key] = false;
+  rebuildPromptAndDisplay();
+}
+
+function rerollB(key) {
+  if (isLockedB(key)) return;
+  if (key === 'style') { const s = pickStyle(); personB.style = s.name; personB.styleType = s.type; }
+  else if (key === 'top')    { personB.top = pickTop(personB.styleType || 'mode_minimal'); }
+  else if (key === 'bottom') { personB.bottom = getContextualBottom(currentSeason, personB.styleType || 'mode_minimal', currentSceneType); }
+  else if (key === 'shoe')   { personB.shoe = pick(SHOES); }
+  else if (key === 'hair')   { personB.hair = pick(HAIRSTYLES); }
+  else if (key === 'makeup') { personB.makeup = pick(MAKEUPS); }
+  else if (key === 'pose')   { personB.pose = pick(BEST_FRIENDS_POSES); }
+  else if (key === 'outer')  { personB.outer = pickOuterwear(currentSeason, ""); }
+  else if (key === 'fabric') { personB.fabric = pick(FABRICS); }
+  rebuildPromptAndDisplay();
+}
+
+function clearFieldB(key) {
+  if (isLockedB(key)) return;
+  personB[key] = null;
+  lockedFieldsB[key] = false;
+  rebuildPromptAndDisplay();
+}
+
+// Shared scene reroll (best friends mode)
+function rerollShared(key) {
+  reroll(key);
+}
+
+function buildPersonPanel(person, prefix, title, titleColor, lockFn, isLockedFn, rerollFn, clearFn, generateFn) {
+  const fields = [
+    { label: "Style",   value: person.style  || "—", key: "style",  color: "#f9a8d4" },
+    { label: "Top",     value: person.top    || "—", key: "top",    color: "#c084fc" },
+    { label: "Bottom",  value: person.bottom || "—", key: "bottom", color: "#c084fc" },
+    { label: "Outer",   value: person.outer  || "— none —", key: "outer", color: person.outer ? "#93c5fd" : "#2a2535" },
+    { label: "Fabric",  value: person.fabric || "—", key: "fabric", color: "#fcd34d" },
+    { label: "Shoes",   value: person.shoe   || "—", key: "shoe",   color: "#67e8f9" },
+    { label: "Hair",    value: person.hair   || "—", key: "hair",   color: "#f9a8d4" },
+    { label: "Makeup",  value: person.makeup || "—", key: "makeup", color: "#fda4af" },
+    { label: "Pose",    value: person.pose   || "—", key: "pose",   color: "#86efac" },
+  ];
+  const rows = fields.map(f => {
+    const locked = isLockedFn(f.key);
+    const canClear = (f.key === 'hair' || f.key === 'makeup') && f.value && f.value !== '—' && f.value !== '— none —';
+    return `
+      <div class="field-row ${locked ? 'is-locked' : ''}">
+        <div class="field-label">${f.label}</div>
+        <div class="field-value" style="color:${f.color}">${f.value}</div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="lock-btn ${locked ? 'locked' : ''}" onclick="${lockFn}('${f.key}')" title="${locked ? 'Unlock' : 'Lock'}">${locked ? '🔒' : '🔓'}</button>
+          <button class="reroll-btn" onclick="${rerollFn}('${f.key}')" title="Re-roll">🔄</button>
+          ${canClear ? `<button class="reroll-btn" onclick="${clearFn}('${f.key}')" title="Clear" style="color:#ef4444">✖</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join("");
+  return `
+    <div class="person-panel">
+      <div class="person-panel-header">
+        <div class="person-panel-title" style="color:${titleColor}">${title}</div>
+        <button class="person-generate-btn" style="color:${titleColor}" onclick="${generateFn}()">↺ REGENERATE</button>
+      </div>
+      ${rows}
+    </div>
+  `;
 }
 
 function rebuildPromptAndDisplay() {
@@ -1516,16 +1468,10 @@ function rebuildPromptAndDisplay() {
 
   let textOverlay = "";
   if (albumMode) {
-    const artistInput = document.getElementById("artistNameInput");
-    const albumInput = document.getElementById("albumTitleInput");
-    const sizeSelect = document.getElementById("textSizeSelect");
-    const placementSelect = document.getElementById("textPlacementSelect");
-
-    const artistName = artistInput ? artistInput.value.trim() : "";
-    const albumTitle = albumInput ? albumInput.value.trim() : "";
-    const textSize = sizeSelect ? sizeSelect.value : "medium";
-    const placement = placementSelect ? placementSelect.value : "topbottom";
-
+    const artistName = (document.getElementById("artistNameInput") || {}).value?.trim() || "";
+    const albumTitle = (document.getElementById("albumTitleInput") || {}).value?.trim() || "";
+    const textSize = (document.getElementById("textSizeSelect") || {}).value || "medium";
+    const placement = (document.getElementById("textPlacementSelect") || {}).value || "topbottom";
     if (artistName || albumTitle) {
       let sizeDesc = "elegant modern sans-serif font";
       if (textSize === "small") sizeDesc = "subtle small modern font";
@@ -1533,133 +1479,198 @@ function rebuildPromptAndDisplay() {
       else if (textSize === "elegant") sizeDesc = "elegant handwritten script font";
       else if (textSize === "bold") sizeDesc = "bold modern sans-serif font, album title prominent";
       else if (textSize === "minimal") sizeDesc = "minimal thin elegant font";
-
       let placeDesc = "";
       const hasBoth = artistName && albumTitle;
-      const hasOnlyArtist = artistName && !albumTitle;
-      const hasOnlyAlbum = !artistName && albumTitle;
-
       if (placement === "topbottom") {
-        if (hasBoth) placeDesc = `text "${artistName}" at the top in smaller font, "${albumTitle}" at the bottom in larger prominent font`;
-        else if (hasOnlyArtist) placeDesc = `text "${artistName}" elegantly at the top`;
-        else if (hasOnlyAlbum) placeDesc = `text "${albumTitle}" at the bottom in prominent font`;
-      } else if (placement === "top") {
-        placeDesc = `text "${artistName || albumTitle}" elegantly at the top`;
-      } else if (placement === "bottom") {
-        placeDesc = `text "${albumTitle || artistName}" at the bottom in prominent font`;
-      } else if (placement === "center") {
-        if (hasBoth) placeDesc = `large centered text "${albumTitle}" with "${artistName}" below in smaller font`;
-        else placeDesc = `large centered text "${artistName || albumTitle}"`;
-      } else if (placement === "centerSmall") {
-        if (hasBoth) placeDesc = `small centered text "${artistName} ${albumTitle}"`;
-        else placeDesc = `small centered text "${artistName || albumTitle}"`;
-      } else if (placement === "split") {
-        if (hasBoth) placeDesc = `text "${artistName}" at the top in smaller font, "${albumTitle}" at the bottom in larger font`;
-        else placeDesc = `text "${artistName || albumTitle}" elegantly centered`;
-      }
-
+        placeDesc = hasBoth ? `text "${artistName}" at the top in smaller font, "${albumTitle}" at the bottom in larger prominent font` : `text "${artistName || albumTitle}" at the top`;
+      } else if (placement === "top") { placeDesc = `text "${artistName || albumTitle}" elegantly at the top`; }
+      else if (placement === "bottom") { placeDesc = `text "${albumTitle || artistName}" at the bottom in prominent font`; }
+      else if (placement === "center") { placeDesc = hasBoth ? `large centered text "${albumTitle}" with "${artistName}" below in smaller font` : `large centered text "${artistName || albumTitle}"`; }
+      else if (placement === "centerSmall") { placeDesc = `small centered text "${artistName || albumTitle}"`; }
+      else if (placement === "split") { placeDesc = hasBoth ? `text "${artistName}" at the top in smaller font, "${albumTitle}" at the bottom in larger font` : `text "${artistName || albumTitle}" elegantly centered`; }
       textOverlay = `${placeDesc} in ${sizeDesc}, professional album cover typography, clean negative space for text, high-end design`;
     }
   }
 
-  const parts = whiteStudioMode ? [
-    currentBackground 
-      ? `studio background: ${currentBackground}, kawaii pattern wallpaper` 
-      : "pure white seamless studio background",
-    "young Japanese woman, fashion magazine editorial shot",
-    framingText,
-    v.pose,
-    v.hair ? `hairstyle: ${v.hair}` : null,
-    v.makeup ? `makeup: ${v.makeup}` : null,
-    `wearing ${v.style} outfit`,
-    v.top, v.bottom,
-    ...(v.outer ? [v.outer] : []),
-    `${v.fabric} fabric`,
-    `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
-    v.shoe,
-    "high-key studio lighting, soft shadow, professional fashion photography",
-    "clean crisp image, hyper-detailed, 85mm lens",
-    "kawaii fashion editorial, playful and stylish, full color"
-  ].filter(Boolean) : [
-    `location: ${v.loc}`,
-    v.season_scene, v.time, v.weather,
-    "young Japanese woman",
-    framingText, angleText, v.pose,
-    ...(v.gesture ? [v.gesture] : []),
-    ...(v.expression ? [v.expression] : []),
-    v.light,
-    v.hair ? `hairstyle: ${v.hair}` : null,
-    v.makeup ? `makeup: ${v.makeup}` : null,
-    `wearing ${v.style} outfit`,
-    v.top, v.bottom,
-    ...(v.outer ? [v.outer] : []),
-    `${v.fabric} fabric`,
-    `color palette: ${v.mood_color}`,
-    `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
-    v.shoe,
-    v.camera, v.styleScene, CAMERA_FIXED,
-    ...(v.rare ? [v.rare] : []),
-    ...(v.foregroundBlur ? [v.foregroundBlur] : []),
-    filterTags,
-    sceneNote,
-    albumTags,
-    textOverlay,
-    "hyper-realistic, high detail photography"
-  ].filter(Boolean);
+  let parts;
 
-  currentPrompt = parts.join(", ");
+  if (whiteStudioMode) {
+    parts = [
+      currentBackground
+        ? `studio background: ${currentBackground}, kawaii pattern wallpaper, completely original character design, no copyrighted characters, generic cute mascot style`
+        : "pure white seamless studio background",
+      "young Japanese woman, fashion magazine editorial shot",
+      framingText,
+      v.pose,
+      v.hair ? `hairstyle: ${v.hair}` : null,
+      v.makeup ? `makeup: ${v.makeup}` : null,
+      `wearing ${v.style} outfit`,
+      v.top, v.bottom,
+      ...(v.outer ? [v.outer] : []),
+      `${v.fabric} fabric`,
+      `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
+      v.shoe,
+      "high-key studio lighting, soft shadow, professional fashion photography",
+      "clean crisp image, hyper-detailed, 85mm lens",
+      "kawaii fashion editorial, playful and stylish, full color"
+    ];
+  } else if (bestFriendsMode) {
+    const pA = personA;
+    const pB = personB;
+    const sharedPose = pick(BEST_FRIENDS_POSES);
+    parts = [
+      `location: ${v.loc}`,
+      v.season_scene, v.time, v.weather,
+      "two young Japanese women, best friends",
+      framingText, angleText,
+      "standing close together, natural friendly interaction, warm chemistry between them",
+      sharedPose,
+      pA.style ? `Person A: ${pA.style} style, wearing ${pA.top || ""}, ${pA.bottom || ""}, ${pA.shoe || ""}${pA.outer ? ", " + pA.outer : ""}${pA.fabric ? ", " + pA.fabric + " fabric" : ""}${pA.hair ? ", hair: " + pA.hair : ""}${pA.makeup ? ", makeup: " + pA.makeup : ""}` : null,
+      pB.style ? `Person B: ${pB.style} style, wearing ${pB.top || ""}, ${pB.bottom || ""}, ${pB.shoe || ""}${pB.outer ? ", " + pB.outer : ""}${pB.fabric ? ", " + pB.fabric + " fabric" : ""}${pB.hair ? ", hair: " + pB.hair : ""}${pB.makeup ? ", makeup: " + pB.makeup : ""}` : null,
+      v.light,
+      `color palette: ${v.mood_color}`,
+      v.camera, v.styleScene, CAMERA_FIXED,
+      ...(v.rare ? [v.rare] : []),
+      ...(v.foregroundBlur ? [v.foregroundBlur] : []),
+      filterTags,
+      sceneNote,
+      "hyper-realistic, high detail photography, warm friendly atmosphere"
+    ];
+  } else {
+    parts = [
+      `location: ${v.loc}`,
+      v.season_scene, v.time, v.weather,
+      "young Japanese woman",
+      framingText, angleText, v.pose,
+      ...(v.gesture ? [v.gesture] : []),
+      ...(v.expression ? [v.expression] : []),
+      v.light,
+      v.hair ? `hairstyle: ${v.hair}` : null,
+      v.makeup ? `makeup: ${v.makeup}` : null,
+      `wearing ${v.style} outfit`,
+      v.top, v.bottom,
+      ...(v.outer ? [v.outer] : []),
+      `${v.fabric} fabric`,
+      `color palette: ${v.mood_color}`,
+      `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
+      v.shoe,
+      v.camera, v.styleScene, CAMERA_FIXED,
+      ...(v.rare ? [v.rare] : []),
+      ...(v.foregroundBlur ? [v.foregroundBlur] : []),
+      filterTags,
+      sceneNote,
+      albumTags,
+      textOverlay,
+      "hyper-realistic, high detail photography"
+    ];
+  }
+
+  currentPrompt = parts.filter(Boolean).join(", ");
   document.getElementById("finalPrompt").value = currentPrompt;
   renderFields();
 }
 
 function renderFields() {
-  const v = lastVals;
-  const fields = [
-    { label: "Style",      value: v.style,        color: "#f9a8d4", key: "style" },
-    { label: "Top",        value: v.top,           color: "#c084fc", key: "top" },
-    { label: "Bottom",     value: v.bottom,        color: "#c084fc", key: "bottom" },
-    { label: "Outer",      value: v.outer || "— none —", color: v.outer ? "#93c5fd" : "#2a2535", key: "outer" },
-    { label: "Fabric",     value: v.fabric,        color: "#fcd34d", key: "fabric" },
-    { label: "Color",      value: v.mood_color,    color: "#fcd34d", key: "mood_color" },
-    ...(v.accessory1 ? [{ label: "Accessory 1", value: v.accessory1, color: "#86efac", key: "accessory1" }] : []),
-    { label: "Accessory 2", value: v.accessory2 || "— none —", color: v.accessory2 ? "#86efac" : "#2a2535", key: "accessory2" },
-    { label: "Shoes",      value: v.shoe,          color: "#67e8f9", key: "shoe" },
-    { label: "Scene",      value: v.loc,           color: "#fda4af", key: "loc" },
-    ...(v.season_scene ? [{ label: "Season",     value: v.season_scene,  color: "#fcd34d", key: "season_scene" }] : []),
-    { label: "Time",       value: v.time,          color: "#fcd34d", key: "time" },
-    { label: "Weather",    value: v.weather,       color: "#a5f3fc", key: "weather" },
-    { label: "Camera",     value: v.camera,        color: "#fed7aa", key: "camera" },
-    { label: "Film Style", value: v.styleScene,    color: "#fda4af", key: "styleScene" },
-    { label: "Figure",     value: v.pose,          color: "#c084fc", key: "pose" },
-    ...(v.gesture ? [{ label: "Gesture",    value: v.gesture,       color: "#f9a8d4", key: "gesture" }] : []),
-    ...(v.expression ? [{ label: "Expression", value: v.expression,    color: "#86efac", key: "expression" }] : []),
-    ...(v.light ? [{ label: "Lighting",   value: v.light,         color: "#fcd34d", key: "light" }] : []),
-    { label: "Hair",       value: v.hair,          color: "#f9a8d4", key: "hair" },
-    { label: "Makeup",     value: v.makeup,        color: "#fda4af", key: "makeup" },
-    ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
-    ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
-  ];
+  const container = document.getElementById("displayFields");
 
-  document.getElementById("displayFields").innerHTML = fields.map(f => {
-    const locked = isLocked(f.key);
-    const isRare = f.rare;
-    return `
-      <div class="field-row ${locked ? 'is-locked' : ''} ${isRare ? 'rare-row' : ''}">
-        <div class="field-label">${f.label}</div>
-        <div class="field-value" style="color:${f.color}">
-          ${f.value}${isRare ? '<span class="rare-badge" style="color:#c084fc">rare</span>' : ''}
+  if (bestFriendsMode) {
+    // Shared scene fields
+    const v = lastVals;
+    const sharedFields = [
+      { label: "Scene",   value: v.loc || "—",          color: "#fda4af", key: "loc" },
+      { label: "Season",  value: v.season_scene || "—",  color: "#fcd34d", key: "season_scene" },
+      { label: "Time",    value: v.time || "—",          color: "#fcd34d", key: "time" },
+      { label: "Weather", value: v.weather || "—",       color: "#a5f3fc", key: "weather" },
+      { label: "Color",   value: v.mood_color || "—",    color: "#fcd34d", key: "mood_color" },
+      { label: "Camera",  value: v.camera || "—",        color: "#fed7aa", key: "camera" },
+      { label: "Film Style", value: v.styleScene || "—", color: "#fda4af", key: "styleScene" },
+      ...(v.light ? [{ label: "Lighting", value: v.light, color: "#fcd34d", key: "light" }] : []),
+      ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
+      ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
+    ];
+
+    const sharedRows = sharedFields.map(f => {
+      const locked = isLocked(f.key);
+      const isRare = f.rare;
+      return `
+        <div class="field-row ${locked ? 'is-locked' : ''} ${isRare ? 'rare-row' : ''}">
+          <div class="field-label">${f.label}</div>
+          <div class="field-value" style="color:${f.color}">${f.value}${isRare ? '<span class="rare-badge" style="color:#c084fc">rare</span>' : ''}</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="lock-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${f.key}')" title="${locked ? 'Unlock' : 'Lock'}">${locked ? '🔒' : '🔓'}</button>
+            <button class="reroll-btn" onclick="rerollShared('${f.key}')" title="Re-roll">🔄</button>
+          </div>
         </div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="lock-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${f.key}')" title="${locked ? 'Unlock' : 'Lock'}">
-            ${locked ? '🔒' : '🔓'}
-          </button>
-          <button class="reroll-btn" onclick="reroll('${f.key}')" title="Re-roll">🔄</button>
-          ${(f.key === 'gesture' || f.key === 'hair' || f.key === 'makeup') && f.value !== '— none —' ? 
-            `<button class="reroll-btn" onclick="clearField('${f.key}')" title="Clear" style="color:#ef4444">✖</button>` : ''}
+      `;
+    }).join("");
+
+    const sharedPanel = `
+      <div class="person-panel" style="border-color:#332f40">
+        <div class="person-panel-header">
+          <div class="person-panel-title" style="color:#6a6278">SHARED SCENE</div>
         </div>
+        ${sharedRows}
       </div>
     `;
-  }).join("");
+
+    const panelA = personA.style
+      ? buildPersonPanel(personA, 'A', 'PERSON A', '#f9a8d4', 'toggleLockA', isLockedA, 'rerollA', 'clearFieldA', 'generatePersonA')
+      : `<div class="person-panel"><div class="person-panel-header"><div class="person-panel-title" style="color:#f9a8d4">PERSON A</div><button class="person-generate-btn" style="color:#f9a8d4" onclick="generatePersonA()">GENERATE</button></div><div style="color:#2a2535;font-size:11px;padding:8px 0">— not generated yet —</div></div>`;
+
+    const panelB = personB.style
+      ? buildPersonPanel(personB, 'B', 'PERSON B', '#c084fc', 'toggleLockB', isLockedB, 'rerollB', 'clearFieldB', 'generatePersonB')
+      : `<div class="person-panel"><div class="person-panel-header"><div class="person-panel-title" style="color:#c084fc">PERSON B</div><button class="person-generate-btn" style="color:#c084fc" onclick="generatePersonB()">GENERATE</button></div><div style="color:#2a2535;font-size:11px;padding:8px 0">— not generated yet —</div></div>`;
+
+    container.innerHTML = sharedPanel + panelA + panelB;
+
+  } else {
+    // Normal single-person rendering
+    const v = lastVals;
+    const fields = [
+      { label: "Style",      value: v.style,        color: "#f9a8d4", key: "style" },
+      { label: "Top",        value: v.top,           color: "#c084fc", key: "top" },
+      { label: "Bottom",     value: v.bottom,        color: "#c084fc", key: "bottom" },
+      { label: "Outer",      value: v.outer || "— none —", color: v.outer ? "#93c5fd" : "#2a2535", key: "outer" },
+      { label: "Fabric",     value: v.fabric,        color: "#fcd34d", key: "fabric" },
+      { label: "Color",      value: v.mood_color,    color: "#fcd34d", key: "mood_color" },
+      ...(v.accessory1 ? [{ label: "Accessory 1", value: v.accessory1, color: "#86efac", key: "accessory1" }] : []),
+      { label: "Accessory 2", value: v.accessory2 || "— none —", color: v.accessory2 ? "#86efac" : "#2a2535", key: "accessory2" },
+      { label: "Shoes",      value: v.shoe,          color: "#67e8f9", key: "shoe" },
+      { label: "Scene",      value: v.loc,           color: "#fda4af", key: "loc" },
+      ...(v.season_scene ? [{ label: "Season", value: v.season_scene, color: "#fcd34d", key: "season_scene" }] : []),
+      { label: "Time",       value: v.time,          color: "#fcd34d", key: "time" },
+      { label: "Weather",    value: v.weather,       color: "#a5f3fc", key: "weather" },
+      { label: "Camera",     value: v.camera,        color: "#fed7aa", key: "camera" },
+      { label: "Film Style", value: v.styleScene,    color: "#fda4af", key: "styleScene" },
+      { label: "Figure",     value: v.pose,          color: "#c084fc", key: "pose" },
+      ...(v.gesture ? [{ label: "Gesture", value: v.gesture, color: "#f9a8d4", key: "gesture" }] : []),
+      ...(v.expression ? [{ label: "Expression", value: v.expression, color: "#86efac", key: "expression" }] : []),
+      ...(v.light ? [{ label: "Lighting", value: v.light, color: "#fcd34d", key: "light" }] : []),
+      { label: "Hair",       value: v.hair,          color: "#f9a8d4", key: "hair" },
+      { label: "Makeup",     value: v.makeup,        color: "#fda4af", key: "makeup" },
+      ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
+      ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
+    ];
+
+    container.innerHTML = fields.map(f => {
+      const locked = isLocked(f.key);
+      const isRare = f.rare;
+      return `
+        <div class="field-row ${locked ? 'is-locked' : ''} ${isRare ? 'rare-row' : ''}">
+          <div class="field-label">${f.label}</div>
+          <div class="field-value" style="color:${f.color}">
+            ${f.value}${isRare ? '<span class="rare-badge" style="color:#c084fc">rare</span>' : ''}
+          </div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="lock-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${f.key}')" title="${locked ? 'Unlock' : 'Lock'}">${locked ? '🔒' : '🔓'}</button>
+            <button class="reroll-btn" onclick="reroll('${f.key}')" title="Re-roll">🔄</button>
+            ${(f.key === 'gesture' || f.key === 'hair' || f.key === 'makeup') && f.value && f.value !== '— none —' ?
+              `<button class="reroll-btn" onclick="clearField('${f.key}')" title="Clear" style="color:#ef4444">✖</button>` : ''}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
 }
 
 function generateAll() {
@@ -1674,23 +1685,20 @@ function generateAll() {
   const timePhase = pickTimePhase();
   const locPool = currentSceneType === 'urban' ? LOC_URBAN : LOC_ROOM;
 
-  // preserve locked values
   const preserved = {};
   Object.keys(lockedFields).forEach(k => {
     if (lockedFields[k] && lastVals[k] !== undefined) preserved[k] = lastVals[k];
   });
 
-  // Special mode scenes
   let gluttonScene = gluttonMode ? getGluttonScene() : null;
   let artistScene  = artistMode  ? pick(ARTIST_SCENES) : null;
   let albumScene   = albumMode   ? pick(ALBUM_SCENES)  : null;
   let whiteStudioScene = null;
   if (whiteStudioMode) {
-    const whiteScenes = ALBUM_SCENES.filter(s => s.location.includes("white") || s.location.includes("gradient") || s.location.includes("studio"));
-    whiteStudioScene = whiteScenes.length > 0 ? pick(whiteScenes) : pick(ALBUM_SCENES);
+    const ws = ALBUM_SCENES.filter(sc => sc.location.includes("white") || sc.location.includes("gradient") || sc.location.includes("studio"));
+    whiteStudioScene = ws.length > 0 ? pick(ws) : pick(ALBUM_SCENES);
   }
 
-  // FIX: time/weather/loc を先に確定してから rare を計算する
   const resolvedLoc = preserved.loc ||
     (whiteStudioMode ? whiteStudioScene.location :
     (albumMode ? albumScene.location :
@@ -1698,14 +1706,12 @@ function generateAll() {
     (gluttonMode ? gluttonScene.location : pick(locPool)))));
 
   const resolvedTimePhase = preserved.timePhase || timePhase;
-
   const resolvedTime = preserved.time ||
     (whiteStudioMode ? whiteStudioScene.time :
     (albumMode ? albumScene.time :
     (artistMode ? artistScene.time :
     (gluttonMode ? gluttonScene.time : pick(SCENE_TIMES[resolvedTimePhase])))));
 
-  // FIX: weather を1回だけ決定し、outer にも同じ値を渡す
   const resolvedWeather = preserved.weather ||
     (whiteStudioMode ? whiteStudioScene.weather :
     (albumMode ? albumScene.weather :
@@ -1713,7 +1719,6 @@ function generateAll() {
     (gluttonMode ? gluttonScene.weather :
     getEnvironmentalWeather(resolvedLoc, pick(WEATHER[currentSeason]))))));
 
-  // FIX: アクセサリーを1回だけ生成して使い回す（3重生成を廃止）
   const resolvedAcc = {
     primary:   preserved.accessory1 !== undefined ? preserved.accessory1 : null,
     secondary: preserved.accessory2 !== undefined ? preserved.accessory2 : null
@@ -1724,12 +1729,10 @@ function generateAll() {
     resolvedAcc.secondary = acc.secondary;
   }
 
-  // FIX: outer に確定済み weather を渡す
   const resolvedOuter = preserved.outer !== undefined
     ? preserved.outer
     : pickOuterwear(currentSeason, resolvedWeather);
 
-  // FIX: rare は time/loc が確定した後に計算
   const resolvedRare = preserved.rare !== undefined
     ? preserved.rare
     : (Math.random() < 0.18 ? getContextualNoise(currentSceneType, resolvedTime, resolvedLoc) : null);
@@ -1748,7 +1751,7 @@ function generateAll() {
     loc:          resolvedLoc,
     time:         resolvedTime,
     weather:      resolvedWeather,
-    season_scene: (whiteStudioMode || albumMode || artistMode || gluttonMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
+    season_scene: (whiteStudioMode || albumMode || artistMode || gluttonMode || bestFriendsMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
     camera:       preserved.camera || pick(CAMERA),
     styleScene:   preserved.styleScene || pick(STYLE_SCENE),
     rare:         resolvedRare,
@@ -1762,12 +1765,12 @@ function generateAll() {
       (artistMode ? artistScene.pose :
       (gluttonMode ? gluttonScene.pose : pick(BODY_POSES)))))),
     gesture:      preserved.gesture !== undefined ? preserved.gesture :
-      (whiteStudioMode ? null :
+      (whiteStudioMode || bestFriendsMode ? null :
       (artistMode
         ? pick(["playing acoustic guitar softly", "humming melody while strumming", "tuning guitar with focused expression", "singing quietly while playing chords"])
         : (gluttonMode ? null : pick(HAND_GESTURES)))),
     expression:   preserved.expression !== undefined ? preserved.expression :
-      (whiteStudioMode ? null :
+      (whiteStudioMode || bestFriendsMode ? null :
       (artistMode
         ? pick(["dreamy and creative", "passionate and emotional while singing", "focused and inspired", "gentle smile while playing"])
         : (gluttonMode ? null : pick(FACIAL_EXPRESSIONS)))),
@@ -1776,8 +1779,60 @@ function generateAll() {
     makeup:       preserved.makeup !== undefined ? preserved.makeup : pick(MAKEUPS)
   };
 
+  // Best Friends mode: generate both persons
+  if (bestFriendsMode) {
+    generatePersonA();
+    generatePersonB();
+    return; // generatePersonA/B call rebuildPromptAndDisplay internally
+  }
+
   rebuildPromptAndDisplay();
   document.getElementById("saveBtn").style.display = "block";
+}
+
+function generatePersonA() {
+  if (!bestFriendsMode) return;
+  // Preserve locked A fields
+  const sA = pickStyle();
+  personA = {
+    style:     isLockedA('style')  ? personA.style  : sA.name,
+    styleType: isLockedA('style')  ? personA.styleType : sA.type,
+    top:       isLockedA('top')    ? personA.top    : pickTop(isLockedA('style') ? personA.styleType : sA.type),
+    bottom:    isLockedA('bottom') ? personA.bottom : getContextualBottom(currentSeason, isLockedA('style') ? personA.styleType : sA.type, currentSceneType),
+    outer:     isLockedA('outer')  ? personA.outer  : pickOuterwear(currentSeason, lastVals.weather || ""),
+    fabric:    isLockedA('fabric') ? personA.fabric : pick(FABRICS),
+    shoe:      isLockedA('shoe')   ? personA.shoe   : pick(SHOES),
+    hair:      isLockedA('hair')   ? personA.hair   : pick(HAIRSTYLES),
+    makeup:    isLockedA('makeup') ? personA.makeup : pick(MAKEUPS),
+    pose:      isLockedA('pose')   ? personA.pose   : pick(BEST_FRIENDS_POSES),
+  };
+  document.getElementById("emptyState").style.display = "none";
+  document.getElementById("displayFields").style.display = "flex";
+  document.getElementById("promptBox").style.display = "block";
+  document.getElementById("saveBtn").style.display = "block";
+  rebuildPromptAndDisplay();
+}
+
+function generatePersonB() {
+  if (!bestFriendsMode) return;
+  const sB = pickStyle();
+  personB = {
+    style:     isLockedB('style')  ? personB.style  : sB.name,
+    styleType: isLockedB('style')  ? personB.styleType : sB.type,
+    top:       isLockedB('top')    ? personB.top    : pickTop(isLockedB('style') ? personB.styleType : sB.type),
+    bottom:    isLockedB('bottom') ? personB.bottom : getContextualBottom(currentSeason, isLockedB('style') ? personB.styleType : sB.type, currentSceneType),
+    outer:     isLockedB('outer')  ? personB.outer  : pickOuterwear(currentSeason, lastVals.weather || ""),
+    fabric:    isLockedB('fabric') ? personB.fabric : pick(FABRICS),
+    shoe:      isLockedB('shoe')   ? personB.shoe   : pick(SHOES),
+    hair:      isLockedB('hair')   ? personB.hair   : pick(HAIRSTYLES),
+    makeup:    isLockedB('makeup') ? personB.makeup : pick(MAKEUPS),
+    pose:      isLockedB('pose')   ? personB.pose   : pick(BEST_FRIENDS_POSES),
+  };
+  document.getElementById("emptyState").style.display = "none";
+  document.getElementById("displayFields").style.display = "flex";
+  document.getElementById("promptBox").style.display = "block";
+  document.getElementById("saveBtn").style.display = "block";
+  rebuildPromptAndDisplay();
 }
 
 function copyPrompt() {
@@ -1808,7 +1863,7 @@ function deleteSavedPrompt(index) {
 }
 
 function renderSaved() {
-  const saved = JSON.parse(localStorage.getItem("uja_v5") || "[]");
+  const saved = JSON.parse(localStorage.getItem("uja_v6") || "[]");
   const section = document.getElementById("savedSection");
   const list = document.getElementById("savedList");
   if (saved.length === 0) { section.style.display = "none"; return; }
@@ -1816,12 +1871,17 @@ function renderSaved() {
   list.innerHTML = saved.map((p, i) => `
     <div class="saved-item" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
       <div style="flex:1; word-break:break-all;" data-index="${i}">${p}</div>
-      <button onclick="deleteSavedPrompt(${i}); event.stopImmediatePropagation();" 
+      <button onclick="deleteSavedPrompt(${i}); event.stopImmediatePropagation();"
               style="background:transparent; border:none; color:#ef4444; font-size:12px; cursor:pointer; padding:2px 6px; flex-shrink:0;">✖</button>
     </div>
   `).join("");
   document.querySelectorAll(".saved-item > div:first-child").forEach(el => {
-    el.onclick = () => { const ta = document.getElementById("finalPrompt"); ta.value = saved[el.dataset.index]; ta.select(); try { document.execCommand("copy"); } catch(e) {} };
+    el.onclick = () => {
+      const ta = document.getElementById("finalPrompt");
+      ta.value = saved[el.dataset.index];
+      ta.select();
+      try { document.execCommand("copy"); } catch(e) {}
+    };
   });
 }
 
