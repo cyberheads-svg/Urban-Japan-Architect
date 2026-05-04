@@ -140,15 +140,16 @@
   <div class="selector-group" style="margin-top:12px;margin-bottom:0">
     <div class="selector-label">Special Mode</div>
     <div class="selector">
-      <button class="selector-btn" onclick="toggleGluttonMode()" id="glutton-btn">🍜 食いしん坊モード</button>
-      <button class="selector-btn" onclick="toggleArtistMode()" id="artist-btn">🎸 アーティストモード</button>
-      <button class="selector-btn" onclick="toggleAlbumMode()" id="album-btn">🎵 Visual Mode</button>
-      <button class="selector-btn" onclick="toggleWhiteStudioMode()" id="white-btn">👕 白背景スタジオ</button>
-      <button class="selector-btn" onclick="toggleBestFriendsMode()" id="bestfriends-btn">👭 仲良しモード</button>
+      <button class="selector-btn" onclick="toggleGluttonMode()" id="glutton-btn">🍜 GOURMET</button>
+      <button class="selector-btn" onclick="toggleArtistMode()" id="artist-btn">🎸 ARTIST</button>
+      <button class="selector-btn" onclick="toggleAlbumMode()" id="album-btn">🎵 VISUAL</button>
+      <button class="selector-btn" onclick="toggleWhiteStudioMode()" id="white-btn">👕 STUDIO</button>
+      <button class="selector-btn" onclick="toggleBestFriendsMode()" id="bestfriends-btn">👭 FRIENDS</button>
+      <button class="selector-btn" onclick="toggleMotionMode()" id="motion-btn">📷 MOTION</button>
     </div>
 
+<!-- Kawaii Background (White Studio / Friends only) -->
 
-<!-- Kawaii Background (White Studio only) -->
 <div id="kawaiiBgSection" style="display:none; margin-top:8px; padding:8px; background:#1a1625; border:1px solid #3a2f4a; border-radius:4px;">
   <div style="font-size:8px; color:#6a5e80; margin-bottom:4px;">KAWAII BACKGROUND</div>
   <div style="display:flex; gap:6px;">
@@ -162,7 +163,6 @@
   </div>
   <div id="kawaiiBgStatus" style="font-size:7px; color:#ff8ad4; margin-top:4px; min-height:12px;"></div>
 </div>
-
 
   </div>
 </div>
@@ -245,6 +245,7 @@ let artistMode = false;
 let albumMode = false;
 let whiteStudioMode = false;
 let bestFriendsMode = false;
+let motionMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
@@ -759,7 +760,38 @@ const LOC_URBAN = [
   "ferry terminal, concrete pier, ocean breeze",
   "waterfront park, benches facing the bay",
   "industrial canal, rusted bridges, industrial reflection",
-  "bay bridge view, distant city skyline, water reflections"
+  "bay bridge view, distant city skyline, water reflections",
+  // ── NEW LOCATIONS ──
+  "pedestrian scramble crossing at rush hour, crowds blurring past",
+  "overhead expressway on-ramp, green road signs, late afternoon",
+  "monorail station platform, panoramic city glass window behind",
+  "narrow alley between two izakaya, paper lanterns above, evening",
+  "empty public swimming pool off-season, cracked tiles, sharp shadows",
+  "rooftop parking lot, orange safety cones, city horizon at dusk",
+  "defunct shopping street, faded awnings, quiet weekday",
+  "bus terminal waiting bay, shelter and timetables, flat overcast",
+  "wire mesh fence of baseball field, chalk dust, late afternoon",
+  "outdoor concrete staircase of footbridge, geometric shadow lattice",
+  "late-night taxi queue, yellow roof lights in rain",
+  "sunken road between concrete retaining walls, weed-cracked asphalt",
+  "rooftop garden of department store, planters and netting, city below",
+  "koban police box corner, lamp on, quiet intersection",
+  "gravel river embankment, distant high-rise skyline, windy",
+  "car wash tunnel, plastic brushes, neon-lit interior",
+  "multi-storey carpark ramp, concrete spiral, dim ceiling lights",
+  "railway crossing barrier, blinking red, empty road",
+  "public hospital exterior steps, automatic door glow, evening",
+  "suburban grade school gate, yellow warning sign, after-hours silence",
+  "freight dock of convenience store HQ, loading bays, fluorescent",
+  "university campus stone path, ginkgo tunnel, autumn afternoon",
+  "underpass of elevated expressway, concrete columns, puddle reflections",
+  "open plaza in front of city hall, flags and pigeons, midday",
+  "nighttime parking garage rooftop, chain-link edge, city panorama",
+  "lantern-lit shrine approach path, stone steps, early evening",
+  "abandoned amusement park ride structure, overgrown, afternoon light",
+  "concrete water treatment facility, circular tanks, industrial abstraction",
+  "empty bowling alley interior, neon lanes, retro carpet",
+  "underground bicycle storage, amber safety lights, row on row"
 ];
 const LOC_ROOM = [
   "small one-room apartment, futon folded, clothes rack overflowing",
@@ -778,7 +810,28 @@ const LOC_ROOM = [
   "piles of fashion magazines on floor",
   "sun-drenched window with dust motes",
   "small home studio with synth and cables",
-  "cozy nook with beanbag and bookshelves"
+  "cozy nook with beanbag and bookshelves",
+  // ── NEW LOCATIONS ──
+  "shared kitchen, pots drying, someone's groceries on counter",
+  "window seat at night, city lights outside, curtain half-open",
+  "tatami room, low table, open shoji door to corridor",
+  "cramped entrance hallway, shoes scattered, umbrella stand",
+  "laundry room corner, drum washer, fabric softener bottles",
+  "loft bed ladder, storage boxes below, warm overhead light",
+  "bathroom mirror selfie setup, tile wall, soft bulb light",
+  "rooftop of apartment building, futon airing, sky above",
+  "narrow walk-in closet, clothes on both sides, single ceiling light",
+  "kotatsu table in winter, blanket edges visible, warm orange glow",
+  "floor-level mirror against wall, cosmetics scattered around",
+  "reading corner with floor lamp, books stacked, rug",
+  "apartment intercom wall, key hooks, shoes on rack",
+  "galley kitchen, morning sun angle, espresso maker on counter",
+  "futon spread on floor, pillow indent, morning light diagonal",
+  "desk with ring light setup, equipment, night outside window",
+  "small balcony at night, city glow behind, potted herbs",
+  "genkan step, coat hooks above, one sneaker pair neatly placed",
+  "corner of living room with floor plants, late afternoon backlight",
+  "bath stool and shower fittings, steam, white tile wall"
 ];
 
 const SEASONS_SCENE = {
@@ -933,6 +986,137 @@ function getForegroundBlur(sceneType, framing, loc = "") {
   return pool.length > 0 ? pick(pool) : null;
 }
 
+// ==================== MOTION MODE DATA ====================
+// Motion blur type definitions
+const MOTION_TYPES = [
+  {
+    id: "walking",
+    label: "Subject Motion",
+    desc: "被写体が動いてブレる",
+    blurTag: "motion blur on subject, sharp background, subject in motion, directional blur on body and hair",
+    shutterTag: "slow shutter speed 1/30s, intentional subject motion blur",
+    posePool: [
+      "walking briskly past camera, limbs blurred with motion, hair sweeping",
+      "mid-stride, coat swinging, motion streak on edges",
+      "running along street, figure dissolving at edges into blur",
+      "spinning turn, skirt fanning, motion trails on fabric",
+      "stepping off curb, arms swinging, feet blurred",
+      "rushing through crowd, shoulder leading, background still",
+      "quick head turn, hair flying across face in blur arc",
+      "leaning into walk, forward motion blur streaking clothing edges",
+      "jumping from low step, landing blur, hair upward motion",
+      "pushing through heavy door, arm extended in motion streak"
+    ]
+  },
+  {
+    id: "panning",
+    label: "Camera Pan",
+    desc: "カメラを振って背景がブレる",
+    blurTag: "panning shot, subject sharp, background streaked horizontal motion blur, sharp face and torso, background dissolved into horizontal streaks",
+    shutterTag: "panning technique, 1/60s, horizontal background blur",
+    posePool: [
+      "striding forward, face sharp, cityscape behind streaming into lines",
+      "walking with purpose, eye contact with lens, background rushing past",
+      "cycling posture without bike, motion streaked surroundings",
+      "arms mid-swing, caught sharp in pan, horizontal blur behind",
+      "looking straight ahead, determined expression, environment dissolved",
+      "side profile walk, shoulder sharp, buildings streaking behind",
+      "casual stroll but background velocity blur suggests speed",
+      "slow head turn during walk, sharp moment amid motion",
+      "carrying bag, heels lifting, background abstracted into color bands",
+      "turning corner, coat flaring, background compressed into blur stripes"
+    ]
+  },
+  {
+    id: "longexposure",
+    label: "Long Exposure",
+    desc: "長時間露光・光跡・夜景系",
+    blurTag: "long exposure photography, light trails in background, ghostly light streaks, multiple exposure feel, luminous motion trails",
+    shutterTag: "long exposure 2-8 seconds, light trails, slow shutter, tripod blur, luminous streaks",
+    posePool: [
+      "standing still in center, sharp, surrounded by ghostly light trails from passing cars",
+      "face slightly blurred from breathing, neon smeared around figure",
+      "one clear exposure ghosted over long blur, double-ghost effect",
+      "raising hand, arm becoming luminous streak, body anchor point sharp",
+      "holding phone, screen glow smearing into arc as she moves",
+      "walking through frame leaving ghost trail, one sharp moment",
+      "standing beneath light source, halo bloom blooming above head",
+      "twirling, clothing dissolving into circular light blur",
+      "leaning against wall, sharp against river of light behind",
+      "looking up, neon reflections in eyes, street lights trailing down"
+    ]
+  },
+  {
+    id: "handheld",
+    label: "Handheld Shake",
+    desc: "手ブレ・ドキュメンタリー系",
+    blurTag: "handheld camera shake, documentary style, raw and immediate, slight camera motion blur, candid shaky framing, unsteady frame edge",
+    shutterTag: "handheld shake, documentary snap, grain and blur, raw photo aesthetic",
+    posePool: [
+      "caught mid-conversation, unaware of camera, candid blur",
+      "laughing, slightly blurred, authentic unguarded moment",
+      "reaching into bag, not posing, intimate reportage feel",
+      "looking off-frame, slightly motion-blurred, documentary realism",
+      "walking away and glancing back, snapshot aesthetic",
+      "checking phone, head down, ambient city around in motion",
+      "pushing hair from face, movement caught in grainy snap",
+      "leaning in to read a sign, back to camera, handheld realism",
+      "mid-speech, hands moving, blur on hands, face sharper",
+      "reacting to something offscreen, natural spontaneous expression"
+    ]
+  }
+];
+
+// Motion-specific locations (work for both urban and room)
+const LOC_MOTION_URBAN = [
+  "fluorescent-lit underground shopping arcade, blur of shoppers in background",
+  "busy scramble crossing, light trails from phones and signs",
+  "elevated walkway at night, sodium lamp streaks below",
+  "rain-slicked alley, neon reflections multiplied by motion",
+  "train platform, delayed exposure of passing train behind",
+  "tunnel entrance, headlight trails converging",
+  "busy intersection corner, traffic light trails arcing",
+  "riverside promenade at dusk, city reflection smearing in water",
+  "outdoor escalator, motion blur of ascent against still buildings",
+  "night market alley, lantern and stall light trailing",
+  "rooftop at night, city lights below blurring into grid",
+  "empty overpass, single streetlamp casting motion arc",
+  "covered shopping street at closing, shutter grates descending",
+  "subway mezzanine, moving crowd blurred to ghost stream",
+  "parking structure ramp, car light trails curving in dark"
+];
+const LOC_MOTION_ROOM = [
+  "small apartment at night, lamp swinging gently, soft motion",
+  "mirror in dim bedroom, reflection multiplied by movement",
+  "kitchen at night, candle flame motion blurred, warm glow",
+  "cluttered desk, only screen light, head move blur",
+  "bathroom tiles, water droplet trails on mirror",
+  "window at night, rain streaks amplified by long exposure",
+  "studio corner with colored LED strip, motion arc in room"
+];
+
+// Motion-specific camera/lighting descriptors
+const MOTION_CAMERA = [
+  "Contax T2 with slow shutter, grain and blur",
+  "35mm handheld, 1/15s, intentional shake",
+  "medium format with ND filter, long exposure street",
+  "analog SLR, Kodak Tri-X pushed, motion grain",
+  "Leica M in low light, slow shutter handheld",
+  "digital mirrorless in S priority, 1/30s intentional blur",
+  "disposable camera aesthetic, unpredictable exposure",
+  "super 8 film frame, motion smear at edges"
+];
+const MOTION_STYLE_SCENE = [
+  "Daido Moriyama kinetic street aesthetic",
+  "William Klein motion blur street photography",
+  "Alexey Titarenko crowd motion long exposure",
+  "Trent Parke dramatic light and motion",
+  "Ernst Haas color motion street photography",
+  "Tokyo blur — motion as poetry, Nobuyoshi Araki influence",
+  "cinéma vérité still frame, motion as narrative",
+  "abstract figuration — body dissolving into urban light"
+];
+
 // ==================== GLUTTON MODE ====================
 const GLUTTON_SCENES = [
   { location: "ramen shop counter, steaming bowls, wooden stools", pose: "eating ramen with chopsticks, slurping noodles, satisfied expression", time: "lunch hour, city in motion", weather: "clear and bright, lunch rush atmosphere" },
@@ -1052,7 +1236,6 @@ const KAWAII_POSES = [
 
 // Best Friends poses
 const BEST_FRIENDS_POSES = [
-  // --- 定番・スタンダード ---
   "standing close together, shoulders touching, smiling at each other",
   "arm around each other's shoulders, laughing together",
   "linking arms, walking side by side, happy conversation",
@@ -1071,8 +1254,6 @@ const BEST_FRIENDS_POSES = [
   "one resting head on the other's shoulder, soft smiles",
   "facing forward, arms around each other's waists",
   "group hug pose, warm and friendly",
-
-  // --- 街・アーバン ---
   "walking side by side through city, both looking ahead, casual stride",
   "stopped at street corner, checking phones together, shoulders leaning in",
   "one pointing at something offscreen, the other reacting with surprise",
@@ -1089,8 +1270,6 @@ const BEST_FRIENDS_POSES = [
   "both shielding eyes from sun with hands, looking the same direction",
   "leaning against each other back-to-back on a railing, city view",
   "one whispering into the other's ear, the other covering mouth, amused",
-
-  // --- カフェ・インドア ---
   "sitting across from each other at a cafe table, leaning forward in conversation",
   "both looking at the same phone screen, heads together",
   "one showing the other something on phone, reactions differ",
@@ -1101,8 +1280,6 @@ const BEST_FRIENDS_POSES = [
   "one drawing or writing, the other watching intently over their shoulder",
   "both sitting cross-legged on floor, facing each other",
   "one lying on lap of the other, both relaxed",
-
-  // --- アクティブ・楽しい ---
   "both running together laughing, motion blur on hair",
   "spinning each other around, arms outstretched, laughing",
   "one giving the other a piggyback ride, both grinning",
@@ -1113,8 +1290,6 @@ const BEST_FRIENDS_POSES = [
   "chasing each other playfully, mid-run",
   "both jumping off a step together, mid-air",
   "one covering the other's eyes from behind, surprise pose",
-
-  // --- クール・エディトリアル ---
   "standing back to back, looking opposite directions, strong editorial pose",
   "one kneeling, the other standing behind with hand on shoulder, fashion editorial",
   "both seated on floor, legs extended, leaning on each other",
@@ -1125,8 +1300,6 @@ const BEST_FRIENDS_POSES = [
   "one in profile, the other facing camera, dynamic framing",
   "standing at slight distance, connected only by held hands toward camera",
   "both looking at camera with confident expressions, no touching, parallel stance",
-
-  // --- 感情・ムード ---
   "one consoling the other with hand on back, gentle moment",
   "both laughing so hard they're bent forward, uncontrollable",
   "surprised reaction together, both hands over mouths",
@@ -1341,6 +1514,7 @@ function toggleAlbumMode() {
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
     if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); document.getElementById("kawaiiBgSection").style.display = "none"; }
     if (bestFriendsMode) { bestFriendsMode = false; deactivateBtn("bestfriends-btn"); personA = {}; personB = {}; }
+    if (motionMode) { motionMode = false; deactivateBtn("motion-btn"); }
   } else {
     deactivateBtn("album-btn");
     if (inputs) inputs.style.display = "none";
@@ -1358,11 +1532,10 @@ function toggleWhiteStudioMode() {
     if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
     if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
-    // bestFriendsMode と共存可能 — オフにしない
+    if (motionMode) { motionMode = false; deactivateBtn("motion-btn"); }
     document.getElementById("kawaiiBgSection").style.display = "block";
   } else {
     deactivateBtn("white-btn");
-    // bestFriendsMode がONなら kawaiiBgSection を残す
     if (!bestFriendsMode) {
       document.getElementById("kawaiiBgSection").style.display = "none";
       currentBackground = "";
@@ -1383,13 +1556,12 @@ function toggleBestFriendsMode() {
     if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
     if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
-    // whiteStudioMode と共存可能 — オフにしない
+    if (motionMode) { motionMode = false; deactivateBtn("motion-btn"); }
     document.getElementById("kawaiiBgSection").style.display = "block";
   } else {
     deactivateBtn("bestfriends-btn");
     personA = {};
     personB = {};
-    // whiteStudioMode がオフなら kawaiiBgSection も隠す
     if (!whiteStudioMode) {
       document.getElementById("kawaiiBgSection").style.display = "none";
       currentBackground = "";
@@ -1399,6 +1571,24 @@ function toggleBestFriendsMode() {
   }
   if (document.getElementById("displayFields").style.display !== "none") {
     rebuildPromptAndDisplay();
+  }
+}
+
+function toggleMotionMode() {
+  motionMode = !motionMode;
+  const btn = document.getElementById("motion-btn");
+  if (motionMode) {
+    btn.classList.add("active");
+    btn.style.borderColor = "#fb923c";
+    btn.style.color = "#fb923c";
+    btn.style.background = "#1a1108";
+    if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
+    if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
+    if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
+    if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); if (!bestFriendsMode) { document.getElementById("kawaiiBgSection").style.display = "none"; } }
+    if (bestFriendsMode) { bestFriendsMode = false; deactivateBtn("bestfriends-btn"); personA = {}; personB = {}; if (!whiteStudioMode) { document.getElementById("kawaiiBgSection").style.display = "none"; } }
+  } else {
+    deactivateBtn("motion-btn");
   }
 }
 
@@ -1441,14 +1631,22 @@ function reroll(key) {
   else if (key === 'outer')          { lastVals.outer = pickOuterwear(currentSeason, lastVals.weather || ""); }
   else if (key === 'rare')           { lastVals.rare = Math.random() < 0.18 ? getContextualNoise(currentSceneType, lastVals.time || "", lastVals.loc || "") : null; }
   else if (key === 'foregroundBlur') { lastVals.foregroundBlur = getForegroundBlur(currentSceneType, currentFraming, lastVals.loc || ""); }
-  else if (key === 'camera')         { lastVals.camera = pick(CAMERA); }
-  else if (key === 'styleScene')     { lastVals.styleScene = pick(STYLE_SCENE); }
-  else if (key === 'pose')           { lastVals.pose = pick(BODY_POSES); }
+  else if (key === 'camera')         { lastVals.camera = motionMode ? pick(MOTION_CAMERA) : pick(CAMERA); }
+  else if (key === 'styleScene')     { lastVals.styleScene = motionMode ? pick(MOTION_STYLE_SCENE) : pick(STYLE_SCENE); }
+  else if (key === 'pose')           { lastVals.pose = motionMode ? pick(lastVals.motionType ? MOTION_TYPES.find(t=>t.id===lastVals.motionType).posePool : MOTION_TYPES[0].posePool) : pick(BODY_POSES); }
   else if (key === 'gesture')        { lastVals.gesture = pick(HAND_GESTURES); }
   else if (key === 'expression')     { lastVals.expression = pick(FACIAL_EXPRESSIONS); }
   else if (key === 'light')          { lastVals.light = getTemporalLighting(lastVals.time || ""); }
   else if (key === 'hair')           { lastVals.hair = pick(HAIRSTYLES); }
   else if (key === 'makeup')         { lastVals.makeup = pick(MAKEUPS); }
+  else if (key === 'motionType')     {
+    const mt = pick(MOTION_TYPES);
+    lastVals.motionType = mt.id;
+    lastVals.motionLabel = mt.label;
+    lastVals.motionBlurTag = mt.blurTag;
+    lastVals.motionShutterTag = mt.shutterTag;
+    lastVals.pose = pick(mt.posePool);
+  }
   rebuildPromptAndDisplay();
 }
 
@@ -1504,7 +1702,6 @@ function clearFieldB(key) {
   rebuildPromptAndDisplay();
 }
 
-// Shared scene reroll (best friends mode)
 function rerollShared(key) {
   reroll(key);
 }
@@ -1604,7 +1801,37 @@ function rebuildPromptAndDisplay() {
 
   let parts;
 
-  if (whiteStudioMode) {
+  // ── MOTION MODE ──────────────────────────────────────────────────────────
+  if (motionMode) {
+    const mt = MOTION_TYPES.find(t => t.id === v.motionType) || MOTION_TYPES[0];
+    parts = [
+      `location: ${v.loc}`,
+      v.season_scene, v.time, v.weather,
+      "young Japanese woman",
+      framingText, angleText,
+      v.pose,
+      mt.blurTag,
+      mt.shutterTag,
+      v.light,
+      v.hair ? `hairstyle: ${v.hair}` : null,
+      v.makeup ? `makeup: ${v.makeup}` : null,
+      `wearing ${v.style} outfit`,
+      v.top, v.bottom,
+      ...(v.outer ? [v.outer] : []),
+      `${v.fabric} fabric`,
+      `color palette: ${v.mood_color}`,
+      `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
+      v.shoe,
+      v.camera, v.styleScene,
+      "heavy film grain, high contrast, raw photographic energy, motion as artistic expression",
+      ...(v.rare ? [v.rare] : []),
+      filterTags,
+      sceneNote,
+      "hyper-realistic photography, intentional blur as aesthetic"
+    ];
+  }
+  // ── WHITE STUDIO MODE ────────────────────────────────────────────────────
+  else if (whiteStudioMode) {
     parts = [
       currentBackground
         ? `in a dreamy kawaii world: ${currentBackground}, floating pastel elements and sparkles in the air, soft magical ambient light with gentle glow, ethereal and cute atmosphere`
@@ -1624,10 +1851,11 @@ function rebuildPromptAndDisplay() {
       "clean crisp image, hyper-detailed, 85mm lens",
       "kawaii fashion editorial, playful and stylish, full color"
     ];
-  } else if (bestFriendsMode) {
+  }
+  // ── BEST FRIENDS MODE ────────────────────────────────────────────────────
+  else if (bestFriendsMode) {
     const pA = personA;
     const pB = personB;
-    // FIX1: sharedPose を lastVals に保存して rebuild ごとに変わらないようにする
     if (!v.sharedPose) v.sharedPose = pick(BEST_FRIENDS_POSES);
     const bfBg = currentBackground
       ? `in a dreamy kawaii world: ${currentBackground}, floating pastel elements and sparkles in the air, soft magical ambient light with gentle glow, ethereal and cute atmosphere`
@@ -1652,7 +1880,9 @@ function rebuildPromptAndDisplay() {
       "hyper-realistic, high detail photography, warm friendly atmosphere",
       ...(bfBg ? ["kawaii fashion editorial, playful and stylish, full color"] : [])
     ];
-  } else {
+  }
+  // ── DEFAULT ──────────────────────────────────────────────────────────────
+  else {
     parts = [
       `location: ${v.loc}`,
       v.season_scene, v.time, v.weather,
@@ -1690,7 +1920,6 @@ function renderFields() {
   const container = document.getElementById("displayFields");
 
   if (bestFriendsMode) {
-    // Shared scene fields
     const v = lastVals;
     const sharedFields = [
       { label: "Scene",   value: v.loc || "—",          color: "#fda4af", key: "loc" },
@@ -1704,7 +1933,6 @@ function renderFields() {
       ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
       ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
     ];
-
     const sharedRows = sharedFields.map(f => {
       const locked = isLocked(f.key);
       const isRare = f.rare;
@@ -1719,7 +1947,6 @@ function renderFields() {
         </div>
       `;
     }).join("");
-
     const sharedPoseVal = v.sharedPose || "—";
     const sharedPoseLocked = isLocked('sharedPose');
     const sharedPoseRow = `
@@ -1732,7 +1959,6 @@ function renderFields() {
         </div>
       </div>
     `;
-
     const sharedPanel = `
       <div class="person-panel" style="border-color:#332f40">
         <div class="person-panel-header">
@@ -1742,21 +1968,18 @@ function renderFields() {
         ${sharedPoseRow}
       </div>
     `;
-
     const panelA = personA.style
       ? buildPersonPanel(personA, 'A', 'PERSON A', '#f9a8d4', 'toggleLockA', isLockedA, 'rerollA', 'clearFieldA', 'generatePersonA')
       : `<div class="person-panel"><div class="person-panel-header"><div class="person-panel-title" style="color:#f9a8d4">PERSON A</div><button class="person-generate-btn" style="color:#f9a8d4" onclick="generatePersonA()">GENERATE</button></div><div style="color:#2a2535;font-size:11px;padding:8px 0">— not generated yet —</div></div>`;
-
     const panelB = personB.style
       ? buildPersonPanel(personB, 'B', 'PERSON B', '#c084fc', 'toggleLockB', isLockedB, 'rerollB', 'clearFieldB', 'generatePersonB')
       : `<div class="person-panel"><div class="person-panel-header"><div class="person-panel-title" style="color:#c084fc">PERSON B</div><button class="person-generate-btn" style="color:#c084fc" onclick="generatePersonB()">GENERATE</button></div><div style="color:#2a2535;font-size:11px;padding:8px 0">— not generated yet —</div></div>`;
-
     container.innerHTML = sharedPanel + panelA + panelB;
 
   } else {
-    // Normal single-person rendering
     const v = lastVals;
     const fields = [
+      ...(motionMode ? [{ label: "Motion Type", value: v.motionLabel || "—", color: "#fb923c", key: "motionType" }] : []),
       { label: "Style",      value: v.style,        color: "#f9a8d4", key: "style" },
       { label: "Top",        value: v.top,           color: "#c084fc", key: "top" },
       { label: "Bottom",     value: v.bottom,        color: "#c084fc", key: "bottom" },
@@ -1781,7 +2004,6 @@ function renderFields() {
       ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
       ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
     ];
-
     container.innerHTML = fields.map(f => {
       const locked = isLocked(f.key);
       const isRare = f.rare;
@@ -1813,7 +2035,6 @@ function generateAll() {
   const s = pickStyle();
   const style = s.name, styleType = s.type;
   const timePhase = pickTimePhase();
-  const locPool = currentSceneType === 'urban' ? LOC_URBAN : LOC_ROOM;
 
   const preserved = {};
   Object.keys(lockedFields).forEach(k => {
@@ -1828,6 +2049,27 @@ function generateAll() {
     const ws = ALBUM_SCENES.filter(sc => sc.location.includes("white") || sc.location.includes("gradient") || sc.location.includes("studio"));
     whiteStudioScene = ws.length > 0 ? pick(ws) : pick(ALBUM_SCENES);
   }
+
+  // ── MOTION MODE: pick type and location ──────────────────────────────────
+  let motionScene = null;
+  let resolvedMotionType = null;
+  let resolvedMotionLabel = null;
+  let resolvedMotionBlurTag = null;
+  let resolvedMotionShutterTag = null;
+  if (motionMode) {
+    const mt = preserved.motionType
+      ? MOTION_TYPES.find(t => t.id === preserved.motionType) || pick(MOTION_TYPES)
+      : pick(MOTION_TYPES);
+    resolvedMotionType = mt.id;
+    resolvedMotionLabel = mt.label;
+    resolvedMotionBlurTag = mt.blurTag;
+    resolvedMotionShutterTag = mt.shutterTag;
+    motionScene = { posePool: mt.posePool };
+  }
+
+  const locPool = currentSceneType === 'urban'
+    ? (motionMode ? [...LOC_URBAN, ...LOC_MOTION_URBAN] : LOC_URBAN)
+    : (motionMode ? [...LOC_ROOM, ...LOC_MOTION_ROOM] : LOC_ROOM);
 
   const resolvedLoc = preserved.loc ||
     (whiteStudioMode ? whiteStudioScene.location :
@@ -1882,8 +2124,8 @@ function generateAll() {
     time:         resolvedTime,
     weather:      resolvedWeather,
     season_scene: (whiteStudioMode || albumMode || artistMode || gluttonMode || bestFriendsMode) ? null : (preserved.season_scene || pickSeasonScene(currentSeason)),
-    camera:       preserved.camera || pick(CAMERA),
-    styleScene:   preserved.styleScene || pick(STYLE_SCENE),
+    camera:       preserved.camera || (motionMode ? pick(MOTION_CAMERA) : pick(CAMERA)),
+    styleScene:   preserved.styleScene || (motionMode ? pick(MOTION_STYLE_SCENE) : pick(STYLE_SCENE)),
     rare:         resolvedRare,
     foregroundBlur: preserved.foregroundBlur !== undefined
       ? preserved.foregroundBlur
@@ -1893,27 +2135,33 @@ function generateAll() {
       (whiteStudioMode ? whiteStudioScene.pose :
       (albumMode ? albumScene.pose :
       (artistMode ? artistScene.pose :
-      (gluttonMode ? gluttonScene.pose : pick(BODY_POSES)))))),
+      (gluttonMode ? gluttonScene.pose :
+      (motionMode ? pick(motionScene.posePool) :
+      pick(BODY_POSES))))))),
     gesture:      preserved.gesture !== undefined ? preserved.gesture :
-      (whiteStudioMode || bestFriendsMode ? null :
+      (whiteStudioMode || bestFriendsMode || motionMode ? null :
       (artistMode
         ? pick(["playing acoustic guitar softly", "humming melody while strumming", "tuning guitar with focused expression", "singing quietly while playing chords"])
         : (gluttonMode ? null : pick(HAND_GESTURES)))),
     expression:   preserved.expression !== undefined ? preserved.expression :
-      (whiteStudioMode || bestFriendsMode ? null :
+      (whiteStudioMode || bestFriendsMode || motionMode ? null :
       (artistMode
         ? pick(["dreamy and creative", "passionate and emotional while singing", "focused and inspired", "gentle smile while playing"])
         : (gluttonMode ? null : pick(FACIAL_EXPRESSIONS)))),
     light:        whiteStudioMode ? null : (preserved.light || getTemporalLighting(resolvedTime)),
     hair:         preserved.hair   !== undefined ? preserved.hair   : pick(HAIRSTYLES),
-    makeup:       preserved.makeup !== undefined ? preserved.makeup : pick(MAKEUPS)
+    makeup:       preserved.makeup !== undefined ? preserved.makeup : pick(MAKEUPS),
+    // MOTION specific
+    motionType:        resolvedMotionType,
+    motionLabel:       resolvedMotionLabel,
+    motionBlurTag:     resolvedMotionBlurTag,
+    motionShutterTag:  resolvedMotionShutterTag
   };
 
-  // Best Friends mode: generate both persons (FIX3: 1回だけrebuild)
+  // Best Friends mode
   if (bestFriendsMode) {
     generatePersonA(false);
     generatePersonB(false);
-    // sharedPose をリセットして新しいポーズを選ぶ
     lastVals.sharedPose = pick(BEST_FRIENDS_POSES);
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("displayFields").style.display = "flex";
@@ -1929,7 +2177,6 @@ function generateAll() {
 
 function generatePersonA(doRebuild = true) {
   if (!bestFriendsMode) return;
-  // Preserve locked A fields
   const sA = pickStyle();
   const resolvedStyleTypeA = isLockedA('style') ? personA.styleType : sA.type;
   personA = {
