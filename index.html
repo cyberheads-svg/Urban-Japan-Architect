@@ -147,7 +147,7 @@
       <button class="selector-btn" onclick="toggleBestFriendsMode()" id="bestfriends-btn">👭 仲良しモード</button>
     </div>
 
-```
+
 <!-- Kawaii Background (White Studio only) -->
 <div id="kawaiiBgSection" style="display:none; margin-top:8px; padding:8px; background:#1a1625; border:1px solid #3a2f4a; border-radius:4px;">
   <div style="font-size:8px; color:#6a5e80; margin-bottom:4px;">KAWAII BACKGROUND</div>
@@ -162,7 +162,7 @@
   </div>
   <div id="kawaiiBgStatus" style="font-size:7px; color:#ff8ad4; margin-top:4px; min-height:12px;"></div>
 </div>
-```
+
 
   </div>
 </div>
@@ -1607,7 +1607,7 @@ function rebuildPromptAndDisplay() {
   if (whiteStudioMode) {
     parts = [
       currentBackground
-        ? `studio background: ${currentBackground}, kawaii pattern wallpaper, completely original character design, no copyrighted characters, generic cute mascot style`
+        ? `in a dreamy kawaii world: ${currentBackground}, floating pastel elements and sparkles in the air, soft magical ambient light with gentle glow, ethereal and cute atmosphere`
         : "pure white seamless studio background",
       "young Japanese woman, fashion magazine editorial shot",
       framingText,
@@ -1630,7 +1630,7 @@ function rebuildPromptAndDisplay() {
     // FIX1: sharedPose を lastVals に保存して rebuild ごとに変わらないようにする
     if (!v.sharedPose) v.sharedPose = pick(BEST_FRIENDS_POSES);
     const bfBg = currentBackground
-      ? `studio background: ${currentBackground}, kawaii pattern wallpaper, completely original character design, no copyrighted characters, generic cute mascot style`
+      ? `in a dreamy kawaii world: ${currentBackground}, floating pastel elements and sparkles in the air, soft magical ambient light with gentle glow, ethereal and cute atmosphere`
       : null;
     parts = [
       bfBg ? bfBg : `location: ${v.loc}`,
