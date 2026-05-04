@@ -1117,6 +1117,40 @@ const MOTION_STYLE_SCENE = [
   "abstract figuration — body dissolving into urban light"
 ];
 
+// Motion-specific camera angles
+const MOTION_ANGLES = [
+  "extreme close-up on face, top of head cut off, jaw and cheekbone in frame",
+  "tight chest crop, collarbone to chin only, face partially out of frame above",
+  "side profile, sharp horizontal composition, subject facing frame edge",
+  "back of head and shoulder, subject walking away, city ahead",
+  "feet and lower legs only, ground-level, motion blur on steps",
+  "half-face composition, one eye sharp, other side cropped by frame edge",
+  "silhouette from behind, body centered, light source ahead of subject",
+  "shoulder and arm leading out of frame, face implied beyond edge",
+  "diagonal body crossing frame corner to corner, asymmetric composition",
+  "reflection in wet surface below, subject upside-down in puddle or glass",
+  "subject at far edge of frame, heavy negative space on opposite side",
+  "extreme low angle, shoes sharp, figure towering and abstract above",
+  "overhead bird's-eye, subject small against texture of ground",
+  "through a gap or crack, partial figure visible between walls or posts"
+];
+
+// Motion-specific art framing descriptors
+const MOTION_FRAMING = [
+  "face partially cut by top edge of frame, raw and unposed",
+  "subject entering from frame edge, not yet fully visible",
+  "body split by vertical architectural element in foreground",
+  "extreme negative space, subject occupying one quarter of frame",
+  "double exposure aesthetic, two moments layered into one",
+  "subject blurred to near abstraction, only color and form remain",
+  "sharp eyes, everything below deliberately blurred to impressionism",
+  "head turned away, nape of neck and hair as primary subject",
+  "arms and hands as foreground, face in soft background",
+  "one sharp eye in lower third, rest of image motion and light",
+  "figure fragmentary — shoulder, coat edge, one shoe, hair",
+  "strong geometric shadow overlaid on figure, body and shadow merged"
+];
+
 // ==================== GLUTTON MODE ====================
 const GLUTTON_SCENES = [
   { location: "ramen shop counter, steaming bowls, wooden stools", pose: "eating ramen with chopsticks, slurping noodles, satisfied expression", time: "lunch hour, city in motion", weather: "clear and bright, lunch rush atmosphere" },
@@ -1647,6 +1681,8 @@ function reroll(key) {
     lastVals.motionShutterTag = mt.shutterTag;
     lastVals.pose = pick(mt.posePool);
   }
+  else if (key === 'motionAngle')   { lastVals.motionAngle = pick(MOTION_ANGLES); }
+  else if (key === 'motionFraming') { lastVals.motionFraming = pick(MOTION_FRAMING); }
   rebuildPromptAndDisplay();
 }
 
@@ -1808,7 +1844,8 @@ function rebuildPromptAndDisplay() {
       `location: ${v.loc}`,
       v.season_scene, v.time, v.weather,
       "young Japanese woman",
-      framingText, angleText,
+      v.motionAngle || framingText,
+      v.motionFraming || null,
       v.pose,
       mt.blurTag,
       mt.shutterTag,
@@ -1980,6 +2017,8 @@ function renderFields() {
     const v = lastVals;
     const fields = [
       ...(motionMode ? [{ label: "Motion Type", value: v.motionLabel || "—", color: "#fb923c", key: "motionType" }] : []),
+      ...(motionMode && v.motionAngle   ? [{ label: "M.Angle",   value: v.motionAngle,   color: "#fb923c", key: "motionAngle"   }] : []),
+      ...(motionMode && v.motionFraming ? [{ label: "M.Framing", value: v.motionFraming, color: "#fdba74", key: "motionFraming" }] : []),
       { label: "Style",      value: v.style,        color: "#f9a8d4", key: "style" },
       { label: "Top",        value: v.top,           color: "#c084fc", key: "top" },
       { label: "Bottom",     value: v.bottom,        color: "#c084fc", key: "bottom" },
@@ -2155,7 +2194,9 @@ function generateAll() {
     motionType:        resolvedMotionType,
     motionLabel:       resolvedMotionLabel,
     motionBlurTag:     resolvedMotionBlurTag,
-    motionShutterTag:  resolvedMotionShutterTag
+    motionShutterTag:  resolvedMotionShutterTag,
+    motionAngle:       motionMode ? (preserved.motionAngle   !== undefined ? preserved.motionAngle   : pick(MOTION_ANGLES))   : null,
+    motionFraming:     motionMode ? (preserved.motionFraming !== undefined ? preserved.motionFraming : (Math.random() < 0.6 ? pick(MOTION_FRAMING) : null)) : null
   };
 
   // Best Friends mode
