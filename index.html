@@ -146,15 +146,23 @@
       <button class="selector-btn" onclick="toggleWhiteStudioMode()" id="white-btn">👕 白背景スタジオ</button>
       <button class="selector-btn" onclick="toggleBestFriendsMode()" id="bestfriends-btn">👭 仲良しモード</button>
     </div>
+
+```
 <!-- Kawaii Background (White Studio only) -->
 <div id="kawaiiBgSection" style="display:none; margin-top:8px; padding:8px; background:#1a1625; border:1px solid #3a2f4a; border-radius:4px;">
-  <div style="font-size:8px; color:#6a5e80; margin-bottom:4px;">KAWAII BACKGROUND (White Studio)</div>
-  <button onclick="generateKawaiiBackground()"
-          style="width:100%; background:#ff8ad4; color:#000; border:none; padding:8px; font-size:9px; letter-spacing:0.1em; cursor:pointer; border-radius:2px;">
-    🎀 GENERATE KAWAII PATTERN
-  </button>
+  <div style="font-size:8px; color:#6a5e80; margin-bottom:4px;">KAWAII BACKGROUND</div>
+  <div style="display:flex; gap:6px;">
+    <button onclick="generateKawaiiBackground()"
+            style="flex:1; background:#ff8ad4; color:#000; border:none; padding:8px; font-size:9px; letter-spacing:0.1em; cursor:pointer; border-radius:2px;">
+      🎀 GENERATE KAWAII PATTERN
+    </button>
+    <button onclick="clearKawaiiBackground()" id="clearKawaiiBtn"
+            style="display:none; background:transparent; border:1px solid #ef4444; color:#ef4444; padding:8px 12px; font-size:11px; cursor:pointer; border-radius:2px; flex-shrink:0;"
+            title="Remove kawaii background">✖</button>
+  </div>
   <div id="kawaiiBgStatus" style="font-size:7px; color:#ff8ad4; margin-top:4px; min-height:12px;"></div>
 </div>
+```
 
   </div>
 </div>
@@ -383,6 +391,22 @@ function generateKawaiiBackground() {
     statusEl.textContent = "✓ Generated: " + bg.substring(0, 60) + "...";
     statusEl.style.color = "#4ade80";
   }
+  const clearBtn = document.getElementById("clearKawaiiBtn");
+  if (clearBtn) clearBtn.style.display = "block";
+  if (document.getElementById("promptBox").style.display !== "none") {
+    rebuildPromptAndDisplay();
+  }
+}
+
+function clearKawaiiBackground() {
+  currentBackground = "";
+  const statusEl = document.getElementById("kawaiiBgStatus");
+  if (statusEl) {
+    statusEl.textContent = "— background removed";
+    statusEl.style.color = "#6a6278";
+  }
+  const clearBtn = document.getElementById("clearKawaiiBtn");
+  if (clearBtn) clearBtn.style.display = "none";
   if (document.getElementById("promptBox").style.display !== "none") {
     rebuildPromptAndDisplay();
   }
@@ -1028,6 +1052,7 @@ const KAWAII_POSES = [
 
 // Best Friends poses
 const BEST_FRIENDS_POSES = [
+  // --- 定番・スタンダード ---
   "standing close together, shoulders touching, smiling at each other",
   "arm around each other's shoulders, laughing together",
   "linking arms, walking side by side, happy conversation",
@@ -1045,7 +1070,73 @@ const BEST_FRIENDS_POSES = [
   "holding hands, swinging arms, walking together",
   "one resting head on the other's shoulder, soft smiles",
   "facing forward, arms around each other's waists",
-  "group hug pose, warm and friendly"
+  "group hug pose, warm and friendly",
+
+  // --- 街・アーバン ---
+  "walking side by side through city, both looking ahead, casual stride",
+  "stopped at street corner, checking phones together, shoulders leaning in",
+  "one pointing at something offscreen, the other reacting with surprise",
+  "both leaning against a wall, arms crossed, looking the same direction with cool expressions",
+  "walking through crowd, one pulling the other by the wrist, laughing",
+  "standing under same umbrella, pressed close together",
+  "both looking into a shop window, faces close to the glass",
+  "sitting on steps, knees together, deep in conversation",
+  "one sitting on low wall, the other standing beside leaning on their shoulder",
+  "both crouching down to look at something on the ground, curious",
+  "walking toward camera, both looking at each other mid-conversation, relaxed",
+  "one adjusting the other's collar or hair, caring gesture",
+  "side by side on escalator, one step apart, both looking forward",
+  "both shielding eyes from sun with hands, looking the same direction",
+  "leaning against each other back-to-back on a railing, city view",
+  "one whispering into the other's ear, the other covering mouth, amused",
+
+  // --- カフェ・インドア ---
+  "sitting across from each other at a cafe table, leaning forward in conversation",
+  "both looking at the same phone screen, heads together",
+  "one showing the other something on phone, reactions differ",
+  "sharing earphones, one bud each, nodding to music",
+  "both holding matching drinks, clinking cups toward camera",
+  "one resting chin on the other's shoulder from behind, both looking at camera",
+  "sitting side by side, both knees touching, deep in conversation",
+  "one drawing or writing, the other watching intently over their shoulder",
+  "both sitting cross-legged on floor, facing each other",
+  "one lying on lap of the other, both relaxed",
+
+  // --- アクティブ・楽しい ---
+  "both running together laughing, motion blur on hair",
+  "spinning each other around, arms outstretched, laughing",
+  "one giving the other a piggyback ride, both grinning",
+  "playing janken (rock paper scissors), intense expressions",
+  "both posing dramatically for camera, exaggerated expressions",
+  "doing matching poses side by side, synchronized",
+  "one pretending to push the other, both laughing",
+  "chasing each other playfully, mid-run",
+  "both jumping off a step together, mid-air",
+  "one covering the other's eyes from behind, surprise pose",
+
+  // --- クール・エディトリアル ---
+  "standing back to back, looking opposite directions, strong editorial pose",
+  "one kneeling, the other standing behind with hand on shoulder, fashion editorial",
+  "both seated on floor, legs extended, leaning on each other",
+  "one standing, the other crouching in front, layered composition",
+  "walking in opposite directions, both looking back over shoulder at camera",
+  "one silhouetted slightly behind the other, depth composition",
+  "both facing away from camera, walking into scene",
+  "one in profile, the other facing camera, dynamic framing",
+  "standing at slight distance, connected only by held hands toward camera",
+  "both looking at camera with confident expressions, no touching, parallel stance",
+
+  // --- 感情・ムード ---
+  "one consoling the other with hand on back, gentle moment",
+  "both laughing so hard they're bent forward, uncontrollable",
+  "surprised reaction together, both hands over mouths",
+  "one hiding face in the other's shoulder, shy or embarrassed",
+  "both staring dreamily in the same direction, quiet shared moment",
+  "exchanging a knowing look, small smiles",
+  "one patting the other's head affectionately",
+  "both sitting in silence, comfortable and close, not looking at camera",
+  "one fixing the other's earring or accessory, intimate moment",
+  "both caught mid-laugh, eyes closed, genuine joy"
 ];
 
 const HAND_GESTURES = [
@@ -1267,12 +1358,17 @@ function toggleWhiteStudioMode() {
     if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
     if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
-    if (bestFriendsMode) { bestFriendsMode = false; deactivateBtn("bestfriends-btn"); personA = {}; personB = {}; }
+    // bestFriendsMode と共存可能 — オフにしない
     document.getElementById("kawaiiBgSection").style.display = "block";
   } else {
     deactivateBtn("white-btn");
-    document.getElementById("kawaiiBgSection").style.display = "none";
-    currentBackground = "";
+    // bestFriendsMode がONなら kawaiiBgSection を残す
+    if (!bestFriendsMode) {
+      document.getElementById("kawaiiBgSection").style.display = "none";
+      currentBackground = "";
+      const cb1 = document.getElementById("clearKawaiiBtn");
+      if (cb1) cb1.style.display = "none";
+    }
   }
 }
 
@@ -1287,11 +1383,19 @@ function toggleBestFriendsMode() {
     if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
     if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
-    if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); document.getElementById("kawaiiBgSection").style.display = "none"; currentBackground = ""; }
+    // whiteStudioMode と共存可能 — オフにしない
+    document.getElementById("kawaiiBgSection").style.display = "block";
   } else {
     deactivateBtn("bestfriends-btn");
     personA = {};
     personB = {};
+    // whiteStudioMode がオフなら kawaiiBgSection も隠す
+    if (!whiteStudioMode) {
+      document.getElementById("kawaiiBgSection").style.display = "none";
+      currentBackground = "";
+      const cb2 = document.getElementById("clearKawaiiBtn");
+      if (cb2) cb2.style.display = "none";
+    }
   }
   if (document.getElementById("displayFields").style.display !== "none") {
     rebuildPromptAndDisplay();
@@ -1358,15 +1462,16 @@ function clearField(key) {
 // ---- Person A/B reroll/clear ----
 function rerollA(key) {
   if (isLockedA(key)) return;
-  if (key === 'style') { const s = pickStyle(); personA.style = s.name; personA.styleType = s.type; }
-  else if (key === 'top')    { personA.top = pickTop(personA.styleType || 'mode_minimal'); }
-  else if (key === 'bottom') { personA.bottom = getContextualBottom(currentSeason, personA.styleType || 'mode_minimal', currentSceneType); }
-  else if (key === 'shoe')   { personA.shoe = pick(SHOES); }
-  else if (key === 'hair')   { personA.hair = pick(HAIRSTYLES); }
-  else if (key === 'makeup') { personA.makeup = pick(MAKEUPS); }
-  else if (key === 'pose')   { personA.pose = pick(BEST_FRIENDS_POSES); }
-  else if (key === 'outer')  { personA.outer = pickOuterwear(currentSeason, ""); }
-  else if (key === 'fabric') { personA.fabric = pick(FABRICS); }
+  if (key === 'style')     { const s = pickStyle(); personA.style = s.name; personA.styleType = s.type; }
+  else if (key === 'top')       { personA.top = pickTop(personA.styleType || 'mode_minimal'); }
+  else if (key === 'bottom')    { personA.bottom = getContextualBottom(currentSeason, personA.styleType || 'mode_minimal', currentSceneType); }
+  else if (key === 'shoe')      { personA.shoe = pick(SHOES); }
+  else if (key === 'hair')      { personA.hair = pick(HAIRSTYLES); }
+  else if (key === 'makeup')    { personA.makeup = pick(MAKEUPS); }
+  else if (key === 'pose')      { personA.pose = pick(BEST_FRIENDS_POSES); }
+  else if (key === 'outer')     { personA.outer = pickOuterwear(currentSeason, ""); }
+  else if (key === 'fabric')    { personA.fabric = pick(FABRICS); }
+  else if (key === 'accessory') { const a = pickAccessories(personA.styleType || 'mode_minimal', currentSceneType); personA.accessory = a.primary; }
   rebuildPromptAndDisplay();
 }
 
@@ -1379,15 +1484,16 @@ function clearFieldA(key) {
 
 function rerollB(key) {
   if (isLockedB(key)) return;
-  if (key === 'style') { const s = pickStyle(); personB.style = s.name; personB.styleType = s.type; }
-  else if (key === 'top')    { personB.top = pickTop(personB.styleType || 'mode_minimal'); }
-  else if (key === 'bottom') { personB.bottom = getContextualBottom(currentSeason, personB.styleType || 'mode_minimal', currentSceneType); }
-  else if (key === 'shoe')   { personB.shoe = pick(SHOES); }
-  else if (key === 'hair')   { personB.hair = pick(HAIRSTYLES); }
-  else if (key === 'makeup') { personB.makeup = pick(MAKEUPS); }
-  else if (key === 'pose')   { personB.pose = pick(BEST_FRIENDS_POSES); }
-  else if (key === 'outer')  { personB.outer = pickOuterwear(currentSeason, ""); }
-  else if (key === 'fabric') { personB.fabric = pick(FABRICS); }
+  if (key === 'style')     { const s = pickStyle(); personB.style = s.name; personB.styleType = s.type; }
+  else if (key === 'top')       { personB.top = pickTop(personB.styleType || 'mode_minimal'); }
+  else if (key === 'bottom')    { personB.bottom = getContextualBottom(currentSeason, personB.styleType || 'mode_minimal', currentSceneType); }
+  else if (key === 'shoe')      { personB.shoe = pick(SHOES); }
+  else if (key === 'hair')      { personB.hair = pick(HAIRSTYLES); }
+  else if (key === 'makeup')    { personB.makeup = pick(MAKEUPS); }
+  else if (key === 'pose')      { personB.pose = pick(BEST_FRIENDS_POSES); }
+  else if (key === 'outer')     { personB.outer = pickOuterwear(currentSeason, ""); }
+  else if (key === 'fabric')    { personB.fabric = pick(FABRICS); }
+  else if (key === 'accessory') { const a = pickAccessories(personB.styleType || 'mode_minimal', currentSceneType); personB.accessory = a.primary; }
   rebuildPromptAndDisplay();
 }
 
@@ -1403,21 +1509,28 @@ function rerollShared(key) {
   reroll(key);
 }
 
+function rerollSharedPose() {
+  if (isLocked('sharedPose')) return;
+  lastVals.sharedPose = pick(BEST_FRIENDS_POSES);
+  rebuildPromptAndDisplay();
+}
+
 function buildPersonPanel(person, prefix, title, titleColor, lockFn, isLockedFn, rerollFn, clearFn, generateFn) {
   const fields = [
-    { label: "Style",   value: person.style  || "—", key: "style",  color: "#f9a8d4" },
-    { label: "Top",     value: person.top    || "—", key: "top",    color: "#c084fc" },
-    { label: "Bottom",  value: person.bottom || "—", key: "bottom", color: "#c084fc" },
-    { label: "Outer",   value: person.outer  || "— none —", key: "outer", color: person.outer ? "#93c5fd" : "#2a2535" },
-    { label: "Fabric",  value: person.fabric || "—", key: "fabric", color: "#fcd34d" },
-    { label: "Shoes",   value: person.shoe   || "—", key: "shoe",   color: "#67e8f9" },
-    { label: "Hair",    value: person.hair   || "—", key: "hair",   color: "#f9a8d4" },
-    { label: "Makeup",  value: person.makeup || "—", key: "makeup", color: "#fda4af" },
-    { label: "Pose",    value: person.pose   || "—", key: "pose",   color: "#86efac" },
+    { label: "Style",     value: person.style     || "—",       key: "style",     color: "#f9a8d4" },
+    { label: "Top",       value: person.top       || "—",       key: "top",       color: "#c084fc" },
+    { label: "Bottom",    value: person.bottom    || "—",       key: "bottom",    color: "#c084fc" },
+    { label: "Outer",     value: person.outer     || "— none —",key: "outer",     color: person.outer ? "#93c5fd" : "#2a2535" },
+    { label: "Fabric",    value: person.fabric    || "—",       key: "fabric",    color: "#fcd34d" },
+    { label: "Shoes",     value: person.shoe      || "—",       key: "shoe",      color: "#67e8f9" },
+    { label: "Accessory", value: person.accessory || "— none —",key: "accessory", color: person.accessory ? "#86efac" : "#2a2535" },
+    { label: "Hair",      value: person.hair      || "—",       key: "hair",      color: "#f9a8d4" },
+    { label: "Makeup",    value: person.makeup    || "—",       key: "makeup",    color: "#fda4af" },
+    { label: "Pose",      value: person.pose      || "—",       key: "pose",      color: "#86efac" },
   ];
   const rows = fields.map(f => {
     const locked = isLockedFn(f.key);
-    const canClear = (f.key === 'hair' || f.key === 'makeup') && f.value && f.value !== '—' && f.value !== '— none —';
+    const canClear = (f.key === 'hair' || f.key === 'makeup' || f.key === 'accessory') && f.value && f.value !== '—' && f.value !== '— none —';
     return `
       <div class="field-row ${locked ? 'is-locked' : ''}">
         <div class="field-label">${f.label}</div>
@@ -1514,24 +1627,30 @@ function rebuildPromptAndDisplay() {
   } else if (bestFriendsMode) {
     const pA = personA;
     const pB = personB;
-    const sharedPose = pick(BEST_FRIENDS_POSES);
+    // FIX1: sharedPose を lastVals に保存して rebuild ごとに変わらないようにする
+    if (!v.sharedPose) v.sharedPose = pick(BEST_FRIENDS_POSES);
+    const bfBg = currentBackground
+      ? `studio background: ${currentBackground}, kawaii pattern wallpaper, completely original character design, no copyrighted characters, generic cute mascot style`
+      : null;
     parts = [
-      `location: ${v.loc}`,
-      v.season_scene, v.time, v.weather,
+      bfBg ? bfBg : `location: ${v.loc}`,
+      ...(bfBg ? [] : [v.season_scene, v.time, v.weather]),
       "two young Japanese women, best friends",
       framingText, angleText,
       "standing close together, natural friendly interaction, warm chemistry between them",
-      sharedPose,
-      pA.style ? `Person A: ${pA.style} style, wearing ${pA.top || ""}, ${pA.bottom || ""}, ${pA.shoe || ""}${pA.outer ? ", " + pA.outer : ""}${pA.fabric ? ", " + pA.fabric + " fabric" : ""}${pA.hair ? ", hair: " + pA.hair : ""}${pA.makeup ? ", makeup: " + pA.makeup : ""}` : null,
-      pB.style ? `Person B: ${pB.style} style, wearing ${pB.top || ""}, ${pB.bottom || ""}, ${pB.shoe || ""}${pB.outer ? ", " + pB.outer : ""}${pB.fabric ? ", " + pB.fabric + " fabric" : ""}${pB.hair ? ", hair: " + pB.hair : ""}${pB.makeup ? ", makeup: " + pB.makeup : ""}` : null,
-      v.light,
+      v.sharedPose,
+      pA.style ? `Person A: ${pA.style} style, wearing ${pA.top || ""}, ${pA.bottom || ""}, ${pA.shoe || ""}${pA.outer ? ", " + pA.outer : ""}${pA.fabric ? ", " + pA.fabric + " fabric" : ""}${pA.hair ? ", hair: " + pA.hair : ""}${pA.makeup ? ", makeup: " + pA.makeup : ""}${pA.accessory ? ", " + pA.accessory : ""}` : null,
+      pB.style ? `Person B: ${pB.style} style, wearing ${pB.top || ""}, ${pB.bottom || ""}, ${pB.shoe || ""}${pB.outer ? ", " + pB.outer : ""}${pB.fabric ? ", " + pB.fabric + " fabric" : ""}${pB.hair ? ", hair: " + pB.hair : ""}${pB.makeup ? ", makeup: " + pB.makeup : ""}${pB.accessory ? ", " + pB.accessory : ""}` : null,
+      ...(bfBg ? [] : [v.light]),
       `color palette: ${v.mood_color}`,
-      v.camera, v.styleScene, CAMERA_FIXED,
+      ...(bfBg
+        ? ["high-key studio lighting, soft shadow, professional fashion photography", "clean crisp image, hyper-detailed, 85mm lens"]
+        : [v.camera, v.styleScene, CAMERA_FIXED]),
       ...(v.rare ? [v.rare] : []),
-      ...(v.foregroundBlur ? [v.foregroundBlur] : []),
-      filterTags,
-      sceneNote,
-      "hyper-realistic, high detail photography, warm friendly atmosphere"
+      ...(bfBg ? [] : v.foregroundBlur ? [v.foregroundBlur] : []),
+      ...(bfBg ? [] : [filterTags, sceneNote]),
+      "hyper-realistic, high detail photography, warm friendly atmosphere",
+      ...(bfBg ? ["kawaii fashion editorial, playful and stylish, full color"] : [])
     ];
   } else {
     parts = [
@@ -1601,12 +1720,26 @@ function renderFields() {
       `;
     }).join("");
 
+    const sharedPoseVal = v.sharedPose || "—";
+    const sharedPoseLocked = isLocked('sharedPose');
+    const sharedPoseRow = `
+      <div class="field-row ${sharedPoseLocked ? 'is-locked' : ''}">
+        <div class="field-label">Shared Pose</div>
+        <div class="field-value" style="color:#86efac">${sharedPoseVal}</div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="lock-btn ${sharedPoseLocked ? 'locked' : ''}" onclick="toggleLock('sharedPose')" title="${sharedPoseLocked ? 'Unlock' : 'Lock'}">${sharedPoseLocked ? '🔒' : '🔓'}</button>
+          <button class="reroll-btn" onclick="rerollSharedPose()" title="Re-roll">🔄</button>
+        </div>
+      </div>
+    `;
+
     const sharedPanel = `
       <div class="person-panel" style="border-color:#332f40">
         <div class="person-panel-header">
           <div class="person-panel-title" style="color:#6a6278">SHARED SCENE</div>
         </div>
         ${sharedRows}
+        ${sharedPoseRow}
       </div>
     `;
 
@@ -1776,60 +1909,75 @@ function generateAll() {
     makeup:       preserved.makeup !== undefined ? preserved.makeup : pick(MAKEUPS)
   };
 
-  // Best Friends mode: generate both persons
+  // Best Friends mode: generate both persons (FIX3: 1回だけrebuild)
   if (bestFriendsMode) {
-    generatePersonA();
-    generatePersonB();
-    return; // generatePersonA/B call rebuildPromptAndDisplay internally
+    generatePersonA(false);
+    generatePersonB(false);
+    // sharedPose をリセットして新しいポーズを選ぶ
+    lastVals.sharedPose = pick(BEST_FRIENDS_POSES);
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("displayFields").style.display = "flex";
+    document.getElementById("promptBox").style.display = "block";
+    document.getElementById("saveBtn").style.display = "block";
+    rebuildPromptAndDisplay();
+    return;
   }
 
   rebuildPromptAndDisplay();
   document.getElementById("saveBtn").style.display = "block";
 }
 
-function generatePersonA() {
+function generatePersonA(doRebuild = true) {
   if (!bestFriendsMode) return;
   // Preserve locked A fields
   const sA = pickStyle();
+  const resolvedStyleTypeA = isLockedA('style') ? personA.styleType : sA.type;
   personA = {
-    style:     isLockedA('style')  ? personA.style  : sA.name,
-    styleType: isLockedA('style')  ? personA.styleType : sA.type,
-    top:       isLockedA('top')    ? personA.top    : pickTop(isLockedA('style') ? personA.styleType : sA.type),
-    bottom:    isLockedA('bottom') ? personA.bottom : getContextualBottom(currentSeason, isLockedA('style') ? personA.styleType : sA.type, currentSceneType),
-    outer:     isLockedA('outer')  ? personA.outer  : pickOuterwear(currentSeason, lastVals.weather || ""),
-    fabric:    isLockedA('fabric') ? personA.fabric : pick(FABRICS),
-    shoe:      isLockedA('shoe')   ? personA.shoe   : pick(SHOES),
-    hair:      isLockedA('hair')   ? personA.hair   : pick(HAIRSTYLES),
-    makeup:    isLockedA('makeup') ? personA.makeup : pick(MAKEUPS),
-    pose:      isLockedA('pose')   ? personA.pose   : pick(BEST_FRIENDS_POSES),
+    style:     isLockedA('style')     ? personA.style     : sA.name,
+    styleType: resolvedStyleTypeA,
+    top:       isLockedA('top')       ? personA.top       : pickTop(resolvedStyleTypeA),
+    bottom:    isLockedA('bottom')    ? personA.bottom    : getContextualBottom(currentSeason, resolvedStyleTypeA, currentSceneType),
+    outer:     isLockedA('outer')     ? personA.outer     : pickOuterwear(currentSeason, lastVals.weather || ""),
+    fabric:    isLockedA('fabric')    ? personA.fabric    : pick(FABRICS),
+    shoe:      isLockedA('shoe')      ? personA.shoe      : pick(SHOES),
+    accessory: isLockedA('accessory') ? personA.accessory : pickAccessories(resolvedStyleTypeA, currentSceneType).primary,
+    hair:      isLockedA('hair')      ? personA.hair      : pick(HAIRSTYLES),
+    makeup:    isLockedA('makeup')    ? personA.makeup    : pick(MAKEUPS),
+    pose:      isLockedA('pose')      ? personA.pose      : pick(BEST_FRIENDS_POSES),
   };
-  document.getElementById("emptyState").style.display = "none";
-  document.getElementById("displayFields").style.display = "flex";
-  document.getElementById("promptBox").style.display = "block";
-  document.getElementById("saveBtn").style.display = "block";
-  rebuildPromptAndDisplay();
+  if (doRebuild) {
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("displayFields").style.display = "flex";
+    document.getElementById("promptBox").style.display = "block";
+    document.getElementById("saveBtn").style.display = "block";
+    rebuildPromptAndDisplay();
+  }
 }
 
-function generatePersonB() {
+function generatePersonB(doRebuild = true) {
   if (!bestFriendsMode) return;
   const sB = pickStyle();
+  const resolvedStyleTypeB = isLockedB('style') ? personB.styleType : sB.type;
   personB = {
-    style:     isLockedB('style')  ? personB.style  : sB.name,
-    styleType: isLockedB('style')  ? personB.styleType : sB.type,
-    top:       isLockedB('top')    ? personB.top    : pickTop(isLockedB('style') ? personB.styleType : sB.type),
-    bottom:    isLockedB('bottom') ? personB.bottom : getContextualBottom(currentSeason, isLockedB('style') ? personB.styleType : sB.type, currentSceneType),
-    outer:     isLockedB('outer')  ? personB.outer  : pickOuterwear(currentSeason, lastVals.weather || ""),
-    fabric:    isLockedB('fabric') ? personB.fabric : pick(FABRICS),
-    shoe:      isLockedB('shoe')   ? personB.shoe   : pick(SHOES),
-    hair:      isLockedB('hair')   ? personB.hair   : pick(HAIRSTYLES),
-    makeup:    isLockedB('makeup') ? personB.makeup : pick(MAKEUPS),
-    pose:      isLockedB('pose')   ? personB.pose   : pick(BEST_FRIENDS_POSES),
+    style:     isLockedB('style')     ? personB.style     : sB.name,
+    styleType: resolvedStyleTypeB,
+    top:       isLockedB('top')       ? personB.top       : pickTop(resolvedStyleTypeB),
+    bottom:    isLockedB('bottom')    ? personB.bottom    : getContextualBottom(currentSeason, resolvedStyleTypeB, currentSceneType),
+    outer:     isLockedB('outer')     ? personB.outer     : pickOuterwear(currentSeason, lastVals.weather || ""),
+    fabric:    isLockedB('fabric')    ? personB.fabric    : pick(FABRICS),
+    shoe:      isLockedB('shoe')      ? personB.shoe      : pick(SHOES),
+    accessory: isLockedB('accessory') ? personB.accessory : pickAccessories(resolvedStyleTypeB, currentSceneType).primary,
+    hair:      isLockedB('hair')      ? personB.hair      : pick(HAIRSTYLES),
+    makeup:    isLockedB('makeup')    ? personB.makeup    : pick(MAKEUPS),
+    pose:      isLockedB('pose')      ? personB.pose      : pick(BEST_FRIENDS_POSES),
   };
-  document.getElementById("emptyState").style.display = "none";
-  document.getElementById("displayFields").style.display = "flex";
-  document.getElementById("promptBox").style.display = "block";
-  document.getElementById("saveBtn").style.display = "block";
-  rebuildPromptAndDisplay();
+  if (doRebuild) {
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("displayFields").style.display = "flex";
+    document.getElementById("promptBox").style.display = "block";
+    document.getElementById("saveBtn").style.display = "block";
+    rebuildPromptAndDisplay();
+  }
 }
 
 function copyPrompt() {
