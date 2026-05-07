@@ -147,23 +147,6 @@
       <button class="selector-btn" onclick="toggleBestFriendsMode()" id="bestfriends-btn">👭 FRIENDS</button>
       <button class="selector-btn" onclick="toggleMotionMode()" id="motion-btn">📷 MOTION</button>
     </div>
-
-<!-- Kawaii Background (White Studio / Friends only) -->
-
-<div id="kawaiiBgSection" style="display:none; margin-top:8px; padding:8px; background:#1a1625; border:1px solid #3a2f4a; border-radius:4px;">
-  <div style="font-size:8px; color:#6a5e80; margin-bottom:4px;">KAWAII BACKGROUND</div>
-  <div style="display:flex; gap:6px;">
-    <button onclick="generateKawaiiBackground()"
-            style="flex:1; background:#ff8ad4; color:#000; border:none; padding:8px; font-size:9px; letter-spacing:0.1em; cursor:pointer; border-radius:2px;">
-      🎀 GENERATE KAWAII PATTERN
-    </button>
-    <button onclick="clearKawaiiBackground()" id="clearKawaiiBtn"
-            style="display:none; background:transparent; border:1px solid #ef4444; color:#ef4444; padding:8px 12px; font-size:11px; cursor:pointer; border-radius:2px; flex-shrink:0;"
-            title="Remove kawaii background">✖</button>
-  </div>
-  <div id="kawaiiBgStatus" style="font-size:7px; color:#ff8ad4; margin-top:4px; min-height:12px;"></div>
-</div>
-
   </div>
 </div>
 
@@ -182,7 +165,6 @@
   </div>
 
   <!-- Visual Mode専用入力欄 -->
-
   <div id="albumInputs" style="display:none; margin-top:16px; padding:12px; background:#0f0e12; border:1px solid #332f40; border-radius:6px;">
     <div style="font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#6a6278; margin-bottom:8px;">Visual Mode Info</div>
     <input id="artistNameInput" type="text" placeholder="アーティスト名（例: 夜の果て）"
@@ -252,7 +234,6 @@ let lastVals = {};
 let lockedFields = {};
 let lockedFieldsA = {};
 let lockedFieldsB = {};
-let currentBackground = "";
 let personA = {};
 let personB = {};
 
@@ -267,54 +248,7 @@ const pickN = (arr, n) => {
   return a.slice(0, Math.min(n, a.length));
 };
 
-// ==================== STYLES ====================
-const STYLES_MODE_MINIMAL = [
-  "Tokyo minimal chic","Ura-Harajuku techwear","Daikanyama layered silhouette",
-  "Aoyama sophisticated monochrome","techwear ninja","monochrome minimalist",
-  "modern utilitarian","architectural avant-garde","quiet luxury Japanese brand",
-  "dark techwear","deconstructed tailoring","Omotesando polished casual",
-  "J-pop idol off-duty casual","indie band vocalist aesthetic","city pop singer vintage look",
-  "underground rapper Tokyo style","lo-fi producer oversized hoodie look",
-  "sound engineer chic all-black technical","Shimokitazawa live house regular"
-];
-const STYLES_MODE_DECO = [
-  "Harajuku mix-print maximalist","Shimokitazawa thrift layered mix","vintage floral tapestry look",
-  "Tokyo bohemian Harajuku","heavy layered patterned streetwear","avant-garde frill street fashion",
-  "Harajuku vintage layering","pop-kei candy color pattern mix","retro patterned street style",
-  "indie folk singer cottagecore Tokyo","complex layered silhouette with bold prints",
-  "Harajuku rainbow coordination","fruits magazine era revival","neon Harajuku street",
-  "fairy kei pastel Tokyo","Lolita adjacent street casual","Laforet window display look"
-];
-const STYLES_SEXY = [
-  "Shibuya night-out glam","Y2K gyaru revival","jirai-kei dark cute",
-  "Roppongi club-ready","Harajuku sexy kawaii","Kabukicho after-midnight",
-  "gal-mode fusion","satin-and-skin Tokyo night","Shinjuku bar district style",
-  "risque street casual","bodycon minimalist","provocative minimal Tokyo",
-  "agejo gyaru evening","sexy Y2K shimmer","glam rock Tokyo night",
-  "party girl Azabu aesthetic","velvet club Roppongi","Shibuya109 going-out look"
-];
-const STYLES_YAMI = [
-  "yami kawaii dark pastel","menhera-kei street look","dark jirai aesthetic",
-  "hospital kei lite street","bandage accessory dark cute","pastel goth Tokyo",
-  "black lace gothic lolita street","dark fairy aesthetic Tokyo","broken doll aesthetic street",
-  "dark decora with medical motif","dark academia Tokyo version","witchcore street Japan",
-  "gloomy bear aesthetic","sad girl Tokyo aesthetic","dark fairy wing street"
-];
-const STYLES_MOE = [
-  "moe casual schoolgirl off-duty","soft moe aesthetic pastel",
-  "maid cafe aesthetic street version","magical girl civilian mode",
-  "Tokyo moe layered pastel","twin-tail ribbon casual",
-  "soft girl Tokyo edition","Akihabara idol fan fashion",
-  "heavily frilled dreamy pastel aesthetic","kawaii character fan meetup look"
-];
-const STYLES_SUBCULTURE = [
-  "visual kei dramatic makeup and hair","punk rock Tokyo street","hip-hop b-boy Tokyo style",
-  "gothic lolita proper black lace","extreme decora with many accessories","underground idol chika idol frilly",
-  "cyber techwear futuristic","band vocalist rock stage look","indie musician vintage band tee",
-  "fairy kei extreme pastel overload","proper sweet lolita with big bow","dark gothic street Japan",
-  "visual kei androgynous makeup","punk with safety pins and chains","underground idol with big ribbon and platform"
-];
-
+// ==================== KAWAII BG DATA ====================
 const KAWAII_DEEP_DATA = {
   motif: [
     "melting ice cream with glitter flakes","layered frill cake with ribbons","frilly ribbon bows with pearls",
@@ -373,6 +307,66 @@ const KAWAII_DEEP_DATA = {
   ]
 };
 
+function generateKawaiiBackground() {
+  const d = KAWAII_DEEP_DATA;
+  return {
+    motif: pick(d.motif),
+    structure: pick(d.structure),
+    palette: pick(d.palette),
+    vibe: pick(d.vibe),
+    details: pick(d.details),
+    medium: pick(d.medium)
+  };
+}
+
+// ==================== STYLES ====================
+const STYLES_MODE_MINIMAL = [
+  "Tokyo minimal chic","Ura-Harajuku techwear","Daikanyama layered silhouette",
+  "Aoyama sophisticated monochrome","techwear ninja","monochrome minimalist",
+  "modern utilitarian","architectural avant-garde","quiet luxury Japanese brand",
+  "dark techwear","deconstructed tailoring","Omotesando polished casual",
+  "J-pop idol off-duty casual","indie band vocalist aesthetic","city pop singer vintage look",
+  "underground rapper Tokyo style","lo-fi producer oversized hoodie look",
+  "sound engineer chic all-black technical","Shimokitazawa live house regular"
+];
+const STYLES_MODE_DECO = [
+  "Harajuku mix-print maximalist","Shimokitazawa thrift layered mix","vintage floral tapestry look",
+  "Tokyo bohemian Harajuku","heavy layered patterned streetwear","avant-garde frill street fashion",
+  "Harajuku vintage layering","pop-kei candy color pattern mix","retro patterned street style",
+  "indie folk singer cottagecore Tokyo","complex layered silhouette with bold prints",
+  "Harajuku rainbow coordination","fruits magazine era revival","neon Harajuku street",
+  "fairy kei pastel Tokyo","Lolita adjacent street casual","Laforet window display look"
+];
+const STYLES_SEXY = [
+  "Shibuya night-out glam","Y2K gyaru revival","jirai-kei dark cute",
+  "Roppongi club-ready","Harajuku sexy kawaii","Kabukicho after-midnight",
+  "gal-mode fusion","satin-and-skin Tokyo night","Shinjuku bar district style",
+  "risque street casual","bodycon minimalist","provocative minimal Tokyo",
+  "agejo gyaru evening","sexy Y2K shimmer","glam rock Tokyo night",
+  "party girl Azabu aesthetic","velvet club Roppongi","Shibuya109 going-out look"
+];
+const STYLES_YAMI = [
+  "yami kawaii dark pastel","menhera-kei street look","dark jirai aesthetic",
+  "hospital kei lite street","bandage accessory dark cute","pastel goth Tokyo",
+  "black lace gothic lolita street","dark fairy aesthetic Tokyo","broken doll aesthetic street",
+  "dark decora with medical motif","dark academia Tokyo version","witchcore street Japan",
+  "gloomy bear aesthetic","sad girl Tokyo aesthetic","dark fairy wing street"
+];
+const STYLES_MOE = [
+  "moe casual schoolgirl off-duty","soft moe aesthetic pastel",
+  "maid cafe aesthetic street version","magical girl civilian mode",
+  "Tokyo moe layered pastel","twin-tail ribbon casual",
+  "soft girl Tokyo edition","Akihabara idol fan fashion",
+  "heavily frilled dreamy pastel aesthetic","kawaii character fan meetup look"
+];
+const STYLES_SUBCULTURE = [
+  "visual kei dramatic makeup and hair","punk rock Tokyo street","hip-hop b-boy Tokyo style",
+  "gothic lolita proper black lace","extreme decora with many accessories","underground idol chika idol frilly",
+  "cyber techwear futuristic","band vocalist rock stage look","indie musician vintage band tee",
+  "fairy kei extreme pastel overload","proper sweet lolita with big bow","dark gothic street Japan",
+  "visual kei androgynous makeup","punk with safety pins and chains","underground idol with big ribbon and platform"
+];
+
 function pickStyle() {
   const r = Math.random();
   if (r < 0.25) return { name: pick(STYLES_MODE_MINIMAL), type: 'mode_minimal' };
@@ -381,36 +375,6 @@ function pickStyle() {
   if (r < 0.78) return { name: pick(STYLES_YAMI),         type: 'yami' };
   if (r < 0.88) return { name: pick(STYLES_MOE),          type: 'moe' };
   return           { name: pick(STYLES_SUBCULTURE),       type: 'subculture' };
-}
-
-function generateKawaiiBackground() {
-  const d = KAWAII_DEEP_DATA;
-  const bg = `${pick(d.motif)}, ${pick(d.structure)}, color palette: ${pick(d.palette)}, ${pick(d.details)}, vibe: ${pick(d.vibe)}, ${pick(d.medium)}`;
-  currentBackground = bg;
-  const statusEl = document.getElementById("kawaiiBgStatus");
-  if (statusEl) {
-    statusEl.textContent = "✓ Generated: " + bg.substring(0, 60) + "...";
-    statusEl.style.color = "#4ade80";
-  }
-  const clearBtn = document.getElementById("clearKawaiiBtn");
-  if (clearBtn) clearBtn.style.display = "block";
-  if (document.getElementById("promptBox").style.display !== "none") {
-    rebuildPromptAndDisplay();
-  }
-}
-
-function clearKawaiiBackground() {
-  currentBackground = "";
-  const statusEl = document.getElementById("kawaiiBgStatus");
-  if (statusEl) {
-    statusEl.textContent = "— background removed";
-    statusEl.style.color = "#6a6278";
-  }
-  const clearBtn = document.getElementById("clearKawaiiBtn");
-  if (clearBtn) clearBtn.style.display = "none";
-  if (document.getElementById("promptBox").style.display !== "none") {
-    rebuildPromptAndDisplay();
-  }
 }
 
 // ==================== TOPS ====================
@@ -761,7 +725,6 @@ const LOC_URBAN = [
   "waterfront park, benches facing the bay",
   "industrial canal, rusted bridges, industrial reflection",
   "bay bridge view, distant city skyline, water reflections",
-  // ── NEW LOCATIONS ──
   "pedestrian scramble crossing at rush hour, crowds blurring past",
   "overhead expressway on-ramp, green road signs, late afternoon",
   "monorail station platform, panoramic city glass window behind",
@@ -811,7 +774,6 @@ const LOC_ROOM = [
   "sun-drenched window with dust motes",
   "small home studio with synth and cables",
   "cozy nook with beanbag and bookshelves",
-  // ── NEW LOCATIONS ──
   "shared kitchen, pots drying, someone's groceries on counter",
   "window seat at night, city lights outside, curtain half-open",
   "tatami room, low table, open shoji door to corridor",
@@ -883,13 +845,6 @@ const SCENE_TIMES = {
   evening: ["late afternoon, golden hour, amber reflecting off windows","5 PM, rush hour beginning, warm slanted light","golden hour, last sunlight cutting between buildings","dusk, sky turning indigo, shop lights flickering on","twilight, boundary between natural and artificial light"],
   night:   ["early evening, 8 PM, city fully lit","midnight, deserted streets, solitary vending machine glow","3 AM, eerie stillness, orange sodium streetlights","2 AM, post-closing-time emptiness","blue hour transitioning to dark night"]
 };
-
-const GLUTTON_TIMES = [
-  "10 AM, crisp morning light, long soft shadows","midday, harsh overhead sun, deep geometric shadows",
-  "early afternoon, flat bright light","lunch hour, city in motion",
-  "late afternoon, golden hour, amber reflecting off windows","5 PM, rush hour beginning, warm slanted light",
-  "golden hour, last sunlight cutting between buildings","dusk, sky turning indigo, shop lights flickering on"
-];
 
 function pickTimePhase() {
   const r = Math.random();
@@ -987,7 +942,6 @@ function getForegroundBlur(sceneType, framing, loc = "") {
 }
 
 // ==================== MOTION MODE DATA ====================
-// Motion blur type definitions
 const MOTION_TYPES = [
   {
     id: "walking",
@@ -1067,7 +1021,6 @@ const MOTION_TYPES = [
   }
 ];
 
-// Motion-specific locations (work for both urban and room)
 const LOC_MOTION_URBAN = [
   "fluorescent-lit underground shopping arcade, blur of shoppers in background",
   "busy scramble crossing, light trails from phones and signs",
@@ -1095,7 +1048,6 @@ const LOC_MOTION_ROOM = [
   "studio corner with colored LED strip, motion arc in room"
 ];
 
-// Motion-specific camera/lighting descriptors
 const MOTION_CAMERA = [
   "Contax T2 with slow shutter, grain and blur",
   "35mm handheld, 1/15s, intentional shake",
@@ -1117,7 +1069,6 @@ const MOTION_STYLE_SCENE = [
   "abstract figuration — body dissolving into urban light"
 ];
 
-// Motion-specific camera angles
 const MOTION_ANGLES = [
   "extreme close-up on face, top of head cut off, jaw and cheekbone in frame",
   "tight chest crop, collarbone to chin only, face partially out of frame above",
@@ -1146,7 +1097,6 @@ const MOTION_ANGLES = [
   "behind a shoulder of a passerby, subject in background sharp amid foreground blur"
 ];
 
-// Motion-specific art framing descriptors
 const MOTION_FRAMING = [
   "face partially cut by top edge of frame, raw and unposed",
   "subject entering from frame edge, not yet fully visible",
@@ -1291,7 +1241,6 @@ const KAWAII_POSES = [
   "gentle twirl with skirt flare, looking at camera"
 ];
 
-// Best Friends poses
 const BEST_FRIENDS_POSES = [
   "standing close together, shoulders touching, smiling at each other",
   "arm around each other's shoulders, laughing together",
@@ -1569,7 +1518,7 @@ function toggleAlbumMode() {
     if (inputs) inputs.style.display = "block";
     if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
-    if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); document.getElementById("kawaiiBgSection").style.display = "none"; }
+    if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); }
     if (bestFriendsMode) { bestFriendsMode = false; deactivateBtn("bestfriends-btn"); personA = {}; personB = {}; }
     if (motionMode) { motionMode = false; deactivateBtn("motion-btn"); }
   } else {
@@ -1590,15 +1539,8 @@ function toggleWhiteStudioMode() {
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
     if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
     if (motionMode) { motionMode = false; deactivateBtn("motion-btn"); }
-    document.getElementById("kawaiiBgSection").style.display = "block";
   } else {
     deactivateBtn("white-btn");
-    if (!bestFriendsMode) {
-      document.getElementById("kawaiiBgSection").style.display = "none";
-      currentBackground = "";
-      const cb1 = document.getElementById("clearKawaiiBtn");
-      if (cb1) cb1.style.display = "none";
-    }
   }
 }
 
@@ -1614,17 +1556,10 @@ function toggleBestFriendsMode() {
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
     if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
     if (motionMode) { motionMode = false; deactivateBtn("motion-btn"); }
-    document.getElementById("kawaiiBgSection").style.display = "block";
   } else {
     deactivateBtn("bestfriends-btn");
     personA = {};
     personB = {};
-    if (!whiteStudioMode) {
-      document.getElementById("kawaiiBgSection").style.display = "none";
-      currentBackground = "";
-      const cb2 = document.getElementById("clearKawaiiBtn");
-      if (cb2) cb2.style.display = "none";
-    }
   }
   if (document.getElementById("displayFields").style.display !== "none") {
     rebuildPromptAndDisplay();
@@ -1642,8 +1577,8 @@ function toggleMotionMode() {
     if (gluttonMode) { gluttonMode = false; deactivateBtn("glutton-btn"); }
     if (artistMode) { artistMode = false; deactivateBtn("artist-btn"); }
     if (albumMode) { albumMode = false; deactivateBtn("album-btn"); document.getElementById("albumInputs").style.display = "none"; }
-    if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); if (!bestFriendsMode) { document.getElementById("kawaiiBgSection").style.display = "none"; } }
-    if (bestFriendsMode) { bestFriendsMode = false; deactivateBtn("bestfriends-btn"); personA = {}; personB = {}; if (!whiteStudioMode) { document.getElementById("kawaiiBgSection").style.display = "none"; } }
+    if (whiteStudioMode) { whiteStudioMode = false; deactivateBtn("white-btn"); }
+    if (bestFriendsMode) { bestFriendsMode = false; deactivateBtn("bestfriends-btn"); personA = {}; personB = {}; }
   } else {
     deactivateBtn("motion-btn");
   }
@@ -1667,6 +1602,25 @@ function toggleLockB(key) {
   renderFields();
 }
 function isLockedB(key) { return !!lockedFieldsB[key]; }
+
+function toggleKawaiiBg() {
+  if (!lastVals.kawaiiBg) {
+    lastVals.kawaiiBg = generateKawaiiBackground();
+  }
+  lastVals.kawaiiBgEnabled = !lastVals.kawaiiBgEnabled;
+  rebuildPromptAndDisplay();
+}
+
+function clearKawaiiPart(part) {
+  if (!lastVals.kawaiiBg) return;
+  lastVals.kawaiiBg[part] = null;
+  rebuildPromptAndDisplay();
+}
+
+function rerollKawaiiBg() {
+  lastVals.kawaiiBg = generateKawaiiBackground();
+  rebuildPromptAndDisplay();
+}
 
 // ==================== GENERATE ====================
 function reroll(key) {
@@ -1696,6 +1650,14 @@ function reroll(key) {
   else if (key === 'light')          { lastVals.light = getTemporalLighting(lastVals.time || ""); }
   else if (key === 'hair')           { lastVals.hair = pick(HAIRSTYLES); }
   else if (key === 'makeup')         { lastVals.makeup = pick(MAKEUPS); }
+  else if (key === 'kawaiiBg')       { lastVals.kawaiiBg = generateKawaiiBackground(); }
+  else if (key.startsWith('kawaiiBg_')) {
+    const part = key.split('_')[1];
+    if (!lastVals.kawaiiBg) lastVals.kawaiiBg = generateKawaiiBackground();
+    if (KAWAII_DEEP_DATA[part]) {
+      lastVals.kawaiiBg[part] = pick(KAWAII_DEEP_DATA[part]);
+    }
+  }
   else if (key === 'motionType')     {
     const mt = pick(MOTION_TYPES);
     lastVals.motionType = mt.id;
@@ -1858,6 +1820,12 @@ function rebuildPromptAndDisplay() {
     }
   }
 
+  // kawaiiBg helper
+  const kawaiiActive = (whiteStudioMode || bestFriendsMode) && v.kawaiiBg && v.kawaiiBgEnabled !== false;
+  const kawaiiBgStr = kawaiiActive && v.kawaiiBg && typeof v.kawaiiBg === 'object'
+    ? `in a dreamy kawaii world: ${v.kawaiiBg.motif}, ${v.kawaiiBg.structure}, color palette: ${v.kawaiiBg.palette}, ${v.kawaiiBg.details}, vibe: ${v.kawaiiBg.vibe}, ${v.kawaiiBg.medium}, floating pastel elements and sparkles in the air, soft magical ambient light with gentle glow, ethereal and cute atmosphere`
+    : null;
+
   let parts;
 
   // ── MOTION MODE ──────────────────────────────────────────────────────────
@@ -1893,9 +1861,7 @@ function rebuildPromptAndDisplay() {
   // ── WHITE STUDIO MODE ────────────────────────────────────────────────────
   else if (whiteStudioMode) {
     parts = [
-      currentBackground
-        ? `in a dreamy kawaii world: ${currentBackground}, floating pastel elements and sparkles in the air, soft magical ambient light with gentle glow, ethereal and cute atmosphere`
-        : "pure white seamless studio background",
+      kawaiiBgStr || "pure white seamless studio background",
       "young Japanese woman, fashion magazine editorial shot",
       framingText,
       v.pose,
@@ -1917,28 +1883,25 @@ function rebuildPromptAndDisplay() {
     const pA = personA;
     const pB = personB;
     if (!v.sharedPose) v.sharedPose = pick(BEST_FRIENDS_POSES);
-    const bfBg = currentBackground
-      ? `in a dreamy kawaii world: ${currentBackground}, floating pastel elements and sparkles in the air, soft magical ambient light with gentle glow, ethereal and cute atmosphere`
-      : null;
     parts = [
-      bfBg ? bfBg : `location: ${v.loc}`,
-      ...(bfBg ? [] : [v.season_scene, v.time, v.weather]),
+      kawaiiBgStr ? kawaiiBgStr : `location: ${v.loc}`,
+      ...(kawaiiBgStr ? [] : [v.season_scene, v.time, v.weather]),
       "two young Japanese women, best friends",
       framingText, angleText,
       "standing close together, natural friendly interaction, warm chemistry between them",
       v.sharedPose,
       pA.style ? `Person A: ${pA.style} style, wearing ${pA.top || ""}, ${pA.bottom || ""}, ${pA.shoe || ""}${pA.outer ? ", " + pA.outer : ""}${pA.fabric ? ", " + pA.fabric + " fabric" : ""}${pA.hair ? ", hair: " + pA.hair : ""}${pA.makeup ? ", makeup: " + pA.makeup : ""}${pA.accessory ? ", " + pA.accessory : ""}` : null,
       pB.style ? `Person B: ${pB.style} style, wearing ${pB.top || ""}, ${pB.bottom || ""}, ${pB.shoe || ""}${pB.outer ? ", " + pB.outer : ""}${pB.fabric ? ", " + pB.fabric + " fabric" : ""}${pB.hair ? ", hair: " + pB.hair : ""}${pB.makeup ? ", makeup: " + pB.makeup : ""}${pB.accessory ? ", " + pB.accessory : ""}` : null,
-      ...(bfBg ? [] : [v.light]),
+      ...(kawaiiBgStr ? [] : [v.light]),
       `color palette: ${v.mood_color}`,
-      ...(bfBg
+      ...(kawaiiBgStr
         ? ["high-key studio lighting, soft shadow, professional fashion photography", "clean crisp image, hyper-detailed, 85mm lens"]
         : [v.camera, v.styleScene, CAMERA_FIXED]),
       ...(v.rare ? [v.rare] : []),
-      ...(bfBg ? [] : v.foregroundBlur ? [v.foregroundBlur] : []),
-      ...(bfBg ? [] : [filterTags, sceneNote]),
+      ...(kawaiiBgStr ? [] : v.foregroundBlur ? [v.foregroundBlur] : []),
+      ...(kawaiiBgStr ? [] : [filterTags, sceneNote]),
       "hyper-realistic, high detail photography, warm friendly atmosphere",
-      ...(bfBg ? ["kawaii fashion editorial, playful and stylish, full color"] : [])
+      ...(kawaiiBgStr ? ["kawaii fashion editorial, playful and stylish, full color"] : [])
     ];
   }
   // ── DEFAULT ──────────────────────────────────────────────────────────────
@@ -1978,9 +1941,10 @@ function rebuildPromptAndDisplay() {
 
 function renderFields() {
   const container = document.getElementById("displayFields");
+  const v = lastVals;
+  const showKawaii = whiteStudioMode || bestFriendsMode;
 
   if (bestFriendsMode) {
-    const v = lastVals;
     const sharedFields = [
       { label: "Scene",   value: v.loc || "—",          color: "#fda4af", key: "loc" },
       { label: "Season",  value: v.season_scene || "—",  color: "#fcd34d", key: "season_scene" },
@@ -2007,6 +1971,59 @@ function renderFields() {
         </div>
       `;
     }).join("");
+
+    // === Kawaii Background Layer (Best Friends mode) ===
+    const kawaiiEnabled = !!v.kawaiiBgEnabled;
+    let kawaiiSection = '';
+    if (kawaiiEnabled && v.kawaiiBg && typeof v.kawaiiBg === 'object') {
+      // Toggle + 6 items
+      kawaiiSection = `
+        <div class="field-row" style="border-color:#3a2f4a; background:#1a1625">
+          <div class="field-label" style="color:#ff8ad4">Kawaii Bg</div>
+          <div class="field-value" style="color:#4ade80;font-size:11px">ON</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="reroll-btn" onclick="rerollKawaiiBg()" title="Re-roll entire kawaii background">🔄</button>
+            <button class="reroll-btn" onclick="toggleKawaiiBg()" style="color:#ef4444;font-size:9px;padding:0 6px;border:1px solid #ef4444">OFFにする</button>
+          </div>
+        </div>
+      `;
+      const kawaiiParts = [
+        { key: 'motif', label: 'Motif', color: '#f9a8d4' },
+        { key: 'structure', label: 'Structure', color: '#c084fc' },
+        { key: 'palette', label: 'Palette', color: '#fcd34d' },
+        { key: 'vibe', label: 'Vibe', color: '#86efac' },
+        { key: 'details', label: 'Details', color: '#fda4af' },
+        { key: 'medium', label: 'Medium', color: '#67e8f9' },
+      ];
+      kawaiiSection += kawaiiParts.map(p => {
+        const fullKey = 'kawaiiBg_' + p.key;
+        const locked = isLocked(fullKey);
+        const val = v.kawaiiBg[p.key] || '—';
+        return `
+          <div class="field-row ${locked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
+            <div class="field-label" style="color:${p.color}">${p.label}</div>
+            <div class="field-value" style="color:${p.color};font-size:11px">${val}</div>
+            <div style="display:flex;gap:4px;align-items:center">
+              <button class="lock-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${fullKey}')" title="${locked ? 'Unlock' : 'Lock'}">${locked ? '🔒' : '🔓'}</button>
+              <button class="reroll-btn" onclick="reroll('${fullKey}')" title="Re-roll">🔄</button>
+              <button class="reroll-btn" onclick="clearKawaiiPart('${p.key}')" title="Delete" style="color:#ef4444">✖</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      // OFF state - show normal shared fields + toggle to ON
+      kawaiiSection = `
+        <div class="field-row" style="border-color:#3a2f4a">
+          <div class="field-label" style="color:#ff8ad4">Kawaii Bg</div>
+          <div class="field-value" style="color:#6a6278;font-size:11px">OFF (通常背景)</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="reroll-btn" onclick="toggleKawaiiBg()" style="color:#4ade80;font-size:9px;padding:0 6px;border:1px solid #4ade80">ONにする</button>
+          </div>
+        </div>
+      `;
+    }
+
     const sharedPoseVal = v.sharedPose || "—";
     const sharedPoseLocked = isLocked('sharedPose');
     const sharedPoseRow = `
@@ -2019,12 +2036,14 @@ function renderFields() {
         </div>
       </div>
     `;
+
     const sharedPanel = `
       <div class="person-panel" style="border-color:#332f40">
         <div class="person-panel-header">
           <div class="person-panel-title" style="color:#6a6278">SHARED SCENE</div>
         </div>
         ${sharedRows}
+        ${kawaiiSection}
         ${sharedPoseRow}
       </div>
     `;
@@ -2037,7 +2056,58 @@ function renderFields() {
     container.innerHTML = sharedPanel + panelA + panelB;
 
   } else {
-    const v = lastVals;
+    // Build kawaii bg field for White Studio mode
+    const kawaiiBgFieldRows = showKawaii ? (() => {
+      const kawaiiEnabled = !!v.kawaiiBgEnabled;
+      if (kawaiiEnabled && v.kawaiiBg && typeof v.kawaiiBg === 'object') {
+        let html = `
+          <div class="field-row" style="border-color:#3a2f4a; background:#1a1625">
+            <div class="field-label" style="color:#ff8ad4">Kawaii Bg</div>
+            <div class="field-value" style="color:#4ade80;font-size:11px">ON</div>
+            <div style="display:flex;gap:4px;align-items:center">
+              <button class="reroll-btn" onclick="rerollKawaiiBg()" title="Re-roll entire kawaii background">🔄</button>
+              <button class="reroll-btn" onclick="toggleKawaiiBg()" style="color:#ef4444;font-size:9px;padding:0 6px;border:1px solid #ef4444">OFFにする</button>
+            </div>
+          </div>
+        `;
+        const parts = [
+          { key: 'motif', label: 'Motif', color: '#f9a8d4' },
+          { key: 'structure', label: 'Structure', color: '#c084fc' },
+          { key: 'palette', label: 'Palette', color: '#fcd34d' },
+          { key: 'vibe', label: 'Vibe', color: '#86efac' },
+          { key: 'details', label: 'Details', color: '#fda4af' },
+          { key: 'medium', label: 'Medium', color: '#67e8f9' },
+        ];
+        html += parts.map(p => {
+          const fullKey = 'kawaiiBg_' + p.key;
+          const locked = isLocked(fullKey);
+          const val = v.kawaiiBg[p.key] || '—';
+          return `
+            <div class="field-row ${locked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
+              <div class="field-label" style="color:${p.color}">${p.label}</div>
+              <div class="field-value" style="color:${p.color};font-size:11px">${val}</div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <button class="lock-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${fullKey}')" title="${locked ? 'Unlock' : 'Lock'}">${locked ? '🔒' : '🔓'}</button>
+                <button class="reroll-btn" onclick="reroll('${fullKey}')" title="Re-roll">🔄</button>
+                <button class="reroll-btn" onclick="clearKawaiiPart('${p.key}')" title="Delete" style="color:#ef4444">✖</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+        return html;
+      } else {
+        return `
+          <div class="field-row" style="border-color:#3a2f4a">
+            <div class="field-label" style="color:#ff8ad4">Kawaii Bg</div>
+            <div class="field-value" style="color:#6a6278;font-size:11px">OFF (白背景)</div>
+            <div style="display:flex;gap:4px;align-items:center">
+              <button class="reroll-btn" onclick="toggleKawaiiBg()" style="color:#4ade80;font-size:9px;padding:0 6px;border:1px solid #4ade80">ONにする</button>
+            </div>
+          </div>
+        `;
+      }
+    })() : '';
+
     const fields = [
       ...(motionMode ? [{ label: "Motion Type", value: v.motionLabel || "—", color: "#fb923c", key: "motionType" }] : []),
       ...(motionMode && v.motionAngle   ? [{ label: "M.Angle",   value: v.motionAngle,   color: "#fb923c", key: "motionAngle"   }] : []),
@@ -2066,7 +2136,7 @@ function renderFields() {
       ...(v.rare ? [{ label: "Rare ✦", value: v.rare, color: "#c084fc", key: "rare", rare: true }] : []),
       ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
     ];
-    container.innerHTML = fields.map(f => {
+    const fieldRows = fields.map(f => {
       const locked = isLocked(f.key);
       const isRare = f.rare;
       return `
@@ -2084,6 +2154,7 @@ function renderFields() {
         </div>
       `;
     }).join("");
+    container.innerHTML = fieldRows + kawaiiBgFieldRows;
   }
 }
 
@@ -2112,7 +2183,7 @@ function generateAll() {
     whiteStudioScene = ws.length > 0 ? pick(ws) : pick(ALBUM_SCENES);
   }
 
-  // ── MOTION MODE: pick type and location ──────────────────────────────────
+  // ── MOTION MODE ──────────────────────────────────────────────────────────
   let motionScene = null;
   let resolvedMotionType = null;
   let resolvedMotionLabel = null;
@@ -2174,6 +2245,9 @@ function generateAll() {
   const resolvedStyle     = preserved.style     || style;
   const resolvedStyleType = preserved.styleType || styleType;
 
+  // Kawaii bg: preserve if locked, otherwise keep existing (don't auto-generate)
+  const resolvedKawaiiBg = preserved.kawaiiBg !== undefined ? preserved.kawaiiBg : (lastVals.kawaiiBg || null);
+
   lastVals = {
     style:     resolvedStyle,
     styleType: resolvedStyleType,
@@ -2197,7 +2271,7 @@ function generateAll() {
       ? preserved.foregroundBlur
       : getForegroundBlur(currentSceneType, currentFraming, resolvedLoc),
     pose:         preserved.pose ||
-      (whiteStudioMode && currentBackground ? pick(KAWAII_POSES) :
+      (whiteStudioMode && resolvedKawaiiBg ? pick(KAWAII_POSES) :
       (whiteStudioMode ? whiteStudioScene.pose :
       (albumMode ? albumScene.pose :
       (artistMode ? artistScene.pose :
@@ -2217,6 +2291,7 @@ function generateAll() {
     light:        whiteStudioMode ? null : (preserved.light || getTemporalLighting(resolvedTime)),
     hair:         preserved.hair   !== undefined ? preserved.hair   : pick(HAIRSTYLES),
     makeup:       preserved.makeup !== undefined ? preserved.makeup : pick(MAKEUPS),
+    kawaiiBg:     resolvedKawaiiBg,
     // MOTION specific
     motionType:        resolvedMotionType,
     motionLabel:       resolvedMotionLabel,
