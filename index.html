@@ -228,6 +228,8 @@ let albumMode = false;
 let whiteStudioMode = false;
 let bestFriendsMode = false;
 let motionMode = false;
+// ▼ FRIENDS MOTION追加
+let friendsMotionMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
@@ -1021,6 +1023,39 @@ const MOTION_TYPES = [
   }
 ];
 
+// ==================== FRIENDS MOTION DATA (新規) ====================
+const FRIENDS_MOTION_POSES = [
+  "both running together side by side, hair and coats streaking into motion trails, laughing mid-stride",
+  "spinning each other around by the hands, bodies blurring into circular arcs, dresses fanning out",
+  "both walking fast toward camera, shoulders touching, entire figures smearing forward",
+  "one pulling the other into a run, connected hands sharp, bodies dissolving into streaks behind",
+  "jumping off a step together simultaneously, both mid-air and blurred, only shoes touching ground",
+  "both turning to face camera while walking, faces half-caught, backgrounds rushing past",
+  "running side by side through scramble crossing, crowd and lights abstracting around them",
+  "chasing each other playfully, one sharp-edged and one a full motion ghost behind",
+  "walking away from camera together, both dissolving into the background blur",
+  "one twirling the other, spinner semi-sharp, twirlee blurred into arc around her",
+  "both caught mid-laugh and stumbling forward, frames tilted, documentary urgency",
+  "rushing out of a train door together, arms interlinked, bodies a single merged blur streak",
+  "two figures walking under same umbrella in rain, neon reflections streaking below them",
+  "both looking back over shoulders simultaneously, faces ghosted by own movement",
+  "one shielding the other from rain mid-run, shared motion smearing both into the city",
+  "side by side on escalator, both in motion, architecture streaking vertically behind them",
+  "both caught turning a corner, coats flaring, only eyes briefly sharp before blur takes over",
+  "jumping from a low wall together, two diagonal blur vectors cutting the frame",
+  "one whispering to the other while walking, heads together, city becoming pure color bands behind",
+  "both suddenly stopping mid-run, one foot forward sharp, upper bodies still dissolving from momentum"
+];
+
+const FRIENDS_MOTION_BLUR_TAGS = [
+  "motion blur photography of two subjects moving in sync, both bodies partially dissolved into directional streaks, shared kinetic energy radiating from the frame, hair and clothing edges ghosted and smeared together",
+  "panning shot following two running figures, both torsos semi-sharp, entire city background destroyed into horizontal color bands, strong sense of shared velocity and movement",
+  "handheld documentary blur of two friends mid-action, camera shake adding urgency, both faces caught between clarity and blur, raw and intimate street photography feel",
+  "slow shutter two-subject street photography, limbs and motion trails overlapping between the figures, city background sharp while both subjects dissolve into the scene",
+  "long exposure of two figures in motion, dual ghost trails weaving together through neon-lit street, two luminous movement paths visible in the exposure",
+  "candid motion blur, two subjects caught in genuine unposed movement, blur as evidence of real life rather than studio staging, strong documentary authenticity"
+];
+
 const LOC_MOTION_URBAN = [
   "fluorescent-lit underground shopping arcade, blur of shoppers in background",
   "busy scramble crossing, light trails from phones and signs",
@@ -1560,8 +1595,22 @@ function toggleBestFriendsMode() {
     deactivateBtn("bestfriends-btn");
     personA = {};
     personB = {};
+    // ▼ FRIENDS MOTIONもリセット
+    friendsMotionMode = false;
   }
   if (document.getElementById("displayFields").style.display !== "none") {
+    rebuildPromptAndDisplay();
+  }
+}
+
+// ▼ 新規：FRIENDS MOTION トグル
+function toggleFriendsMotion(){
+  friendsMotionMode = !friendsMotionMode;
+  if(friendsMotionMode && !lastVals.friendsMotionPose){
+    lastVals.friendsMotionPose = pick(FRIENDS_MOTION_POSES);
+    lastVals.friendsMotionBlur = pick(FRIENDS_MOTION_BLUR_TAGS);
+  }
+  if(bestFriendsMode && document.getElementById("displayFields").style.display !== "none"){
     rebuildPromptAndDisplay();
   }
 }
@@ -1622,6 +1671,13 @@ function rerollKawaiiBg() {
   rebuildPromptAndDisplay();
 }
 
+function rerollMotion(){
+  if(!friendsMotionMode) return;
+  if(!isLocked('friendsMotionPose')) lastVals.friendsMotionPose = pick(FRIENDS_MOTION_POSES);
+  if(!isLocked('friendsMotionBlur')) lastVals.friendsMotionBlur = pick(FRIENDS_MOTION_BLUR_TAGS);
+  rebuildPromptAndDisplay();
+}
+
 // ==================== GENERATE ====================
 function reroll(key) {
   if (isLocked(key)) return;
@@ -1668,6 +1724,9 @@ function reroll(key) {
   }
   else if (key === 'motionAngle')   { lastVals.motionAngle = pick(MOTION_ANGLES); }
   else if (key === 'motionFraming') { lastVals.motionFraming = pick(MOTION_FRAMING); }
+  // ▼ FRIENDS MOTION専用フィールド
+  else if (key === 'friendsMotionPose')   { lastVals.friendsMotionPose = pick(FRIENDS_MOTION_POSES); }
+  else if (key === 'friendsMotionBlur')   { lastVals.friendsMotionBlur = pick(FRIENDS_MOTION_BLUR_TAGS); }
   rebuildPromptAndDisplay();
 }
 
@@ -1890,6 +1949,11 @@ function rebuildPromptAndDisplay() {
       framingText, angleText,
       "standing close together, natural friendly interaction, warm chemistry between them",
       v.sharedPose,
+      // ▼ FRIENDS MOTION追加：sharedPoseの直後
+      ...(friendsMotionMode ? [
+        v.friendsMotionPose || null,
+        v.friendsMotionBlur || "motion blur photography, both subjects moving together, dynamic motion, candid street moment, slight camera shake, limbs and hair with motion trails, background with subtle streaks, 1/30s shutter speed, handheld documentary feel"
+      ].filter(Boolean) : []),
       pA.style ? `Person A: ${pA.style} style, wearing ${pA.top || ""}, ${pA.bottom || ""}, ${pA.shoe || ""}${pA.outer ? ", " + pA.outer : ""}${pA.fabric ? ", " + pA.fabric + " fabric" : ""}${pA.hair ? ", hair: " + pA.hair : ""}${pA.makeup ? ", makeup: " + pA.makeup : ""}${pA.accessory ? ", " + pA.accessory : ""}` : null,
       pB.style ? `Person B: ${pB.style} style, wearing ${pB.top || ""}, ${pB.bottom || ""}, ${pB.shoe || ""}${pB.outer ? ", " + pB.outer : ""}${pB.fabric ? ", " + pB.fabric + " fabric" : ""}${pB.hair ? ", hair: " + pB.hair : ""}${pB.makeup ? ", makeup: " + pB.makeup : ""}${pB.accessory ? ", " + pB.accessory : ""}` : null,
       ...(kawaiiBgStr ? [] : [v.light]),
@@ -1900,7 +1964,9 @@ function rebuildPromptAndDisplay() {
       ...(v.rare ? [v.rare] : []),
       ...(kawaiiBgStr ? [] : v.foregroundBlur ? [v.foregroundBlur] : []),
       ...(kawaiiBgStr ? [] : [filterTags, sceneNote]),
-      "hyper-realistic, high detail photography, warm friendly atmosphere",
+      "hyper-realistic, high detail photography",
+      // ▼ atmosphere切り替え
+      friendsMotionMode ? "energetic motion atmosphere" : "warm friendly atmosphere",
       ...(kawaiiBgStr ? ["kawaii fashion editorial, playful and stylish, full color"] : [])
     ];
   }
@@ -1976,7 +2042,6 @@ function renderFields() {
     const kawaiiEnabled = !!v.kawaiiBgEnabled;
     let kawaiiSection = '';
     if (kawaiiEnabled && v.kawaiiBg && typeof v.kawaiiBg === 'object') {
-      // Toggle + 6 items
       kawaiiSection = `
         <div class="field-row" style="border-color:#3a2f4a; background:#1a1625">
           <div class="field-label" style="color:#ff8ad4">Kawaii Bg</div>
@@ -2012,13 +2077,49 @@ function renderFields() {
         `;
       }).join('');
     } else {
-      // OFF state - show normal shared fields + toggle to ON
       kawaiiSection = `
         <div class="field-row" style="border-color:#3a2f4a">
           <div class="field-label" style="color:#ff8ad4">Kawaii Bg</div>
           <div class="field-value" style="color:#6a6278;font-size:11px">OFF (通常背景)</div>
           <div style="display:flex;gap:4px;align-items:center">
             <button class="reroll-btn" onclick="toggleKawaiiBg()" style="color:#4ade80;font-size:9px;padding:0 6px;border:1px solid #4ade80">ONにする</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ▼ FRIENDS MOTION トグル行
+    const motionToggleRow = `
+      <div class="field-row" style="border-color:#3a2f4a">
+        <div class="field-label" style="color:#fb923c">Motion</div>
+        <div class="field-value" style="color:${friendsMotionMode ? '#fb923c' : '#6a6278'};font-size:11px">${friendsMotionMode ? 'ON – 2人でブレる' : 'OFF'}</div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="reroll-btn" onclick="rerollMotion()" title="全体リロール" style="${friendsMotionMode ? '' : 'opacity:.3;pointer-events:none'}">🔄</button>
+          <button class="reroll-btn" onclick="toggleFriendsMotion()" style="color:${friendsMotionMode ? '#fb923c' : '#6a6278'};font-size:9px;padding:0 6px;border:1px solid ${friendsMotionMode ? '#fb923c' : '#6a6278'}">${friendsMotionMode ? 'OFFにする' : 'ONにする'}</button>
+        </div>
+      </div>
+    `;
+
+    // ▼ FRIENDS MOTION ON時の専用フィールド（Pose / Blur Type）
+    let friendsMotionFields = '';
+    if (friendsMotionMode) {
+      const fmPoseLocked = isLocked('friendsMotionPose');
+      const fmBlurLocked = isLocked('friendsMotionBlur');
+      friendsMotionFields = `
+        <div class="field-row ${fmPoseLocked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
+          <div class="field-label" style="color:#fb923c">M.Pose</div>
+          <div class="field-value" style="color:#fb923c;font-size:11px">${v.friendsMotionPose || '—'}</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="lock-btn ${fmPoseLocked ? 'locked' : ''}" onclick="toggleLock('friendsMotionPose')">${fmPoseLocked ? '🔒' : '🔓'}</button>
+            <button class="reroll-btn" onclick="reroll('friendsMotionPose')" title="Re-roll">🔄</button>
+          </div>
+        </div>
+        <div class="field-row ${fmBlurLocked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
+          <div class="field-label" style="color:#fdba74">Blur Type</div>
+          <div class="field-value" style="color:#fdba74;font-size:11px">${v.friendsMotionBlur ? v.friendsMotionBlur.substring(0, 60) + '…' : '— default —'}</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="lock-btn ${fmBlurLocked ? 'locked' : ''}" onclick="toggleLock('friendsMotionBlur')">${fmBlurLocked ? '🔒' : '🔓'}</button>
+            <button class="reroll-btn" onclick="reroll('friendsMotionBlur')" title="Re-roll">🔄</button>
           </div>
         </div>
       `;
@@ -2044,6 +2145,8 @@ function renderFields() {
         </div>
         ${sharedRows}
         ${kawaiiSection}
+        ${motionToggleRow}
+        ${friendsMotionFields}
         ${sharedPoseRow}
       </div>
     `;
@@ -2245,8 +2348,15 @@ function generateAll() {
   const resolvedStyle     = preserved.style     || style;
   const resolvedStyleType = preserved.styleType || styleType;
 
-  // Kawaii bg: preserve if locked, otherwise keep existing (don't auto-generate)
   const resolvedKawaiiBg = preserved.kawaiiBg !== undefined ? preserved.kawaiiBg : (lastVals.kawaiiBg || null);
+
+  // ▼ FRIENDS MOTION: ロック保持 or 新規生成
+  const resolvedFriendsMotionPose = preserved.friendsMotionPose !== undefined
+    ? preserved.friendsMotionPose
+    : (friendsMotionMode ? pick(FRIENDS_MOTION_POSES) : null);
+  const resolvedFriendsMotionBlur = preserved.friendsMotionBlur !== undefined
+    ? preserved.friendsMotionBlur
+    : null;
 
   lastVals = {
     style:     resolvedStyle,
@@ -2298,7 +2408,10 @@ function generateAll() {
     motionBlurTag:     resolvedMotionBlurTag,
     motionShutterTag:  resolvedMotionShutterTag,
     motionAngle:       motionMode ? (preserved.motionAngle   !== undefined ? preserved.motionAngle   : pick(MOTION_ANGLES))                              : null,
-    motionFraming:     motionMode ? (preserved.motionFraming !== undefined ? preserved.motionFraming : (Math.random() < 0.75 ? pick(MOTION_FRAMING) : null)) : null
+    motionFraming:     motionMode ? (preserved.motionFraming !== undefined ? preserved.motionFraming : (Math.random() < 0.75 ? pick(MOTION_FRAMING) : null)) : null,
+    // ▼ FRIENDS MOTION specific
+    friendsMotionPose: resolvedFriendsMotionPose,
+    friendsMotionBlur: resolvedFriendsMotionBlur,
   };
 
   // Best Friends mode
