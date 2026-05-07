@@ -1948,10 +1948,8 @@ function rebuildPromptAndDisplay() {
       "two young Japanese women, best friends",
       framingText, angleText,
       "standing close together, natural friendly interaction, warm chemistry between them",
-      v.sharedPose,
-      // ▼ FRIENDS MOTION追加：sharedPoseの直後
+      friendsMotionMode ? (v.friendsMotionPose || "both running together side by side, hair and coats streaking into motion trails") : v.sharedPose,
       ...(friendsMotionMode ? [
-        v.friendsMotionPose || null,
         v.friendsMotionBlur || "motion blur photography, both subjects moving together, dynamic motion, candid street moment, slight camera shake, limbs and hair with motion trails, background with subtle streaks, 1/30s shutter speed, handheld documentary feel"
       ].filter(Boolean) : []),
       pA.style ? `Person A: ${pA.style} style, wearing ${pA.top || ""}, ${pA.bottom || ""}, ${pA.shoe || ""}${pA.outer ? ", " + pA.outer : ""}${pA.fabric ? ", " + pA.fabric + " fabric" : ""}${pA.hair ? ", hair: " + pA.hair : ""}${pA.makeup ? ", makeup: " + pA.makeup : ""}${pA.accessory ? ", " + pA.accessory : ""}` : null,
