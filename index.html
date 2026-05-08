@@ -230,6 +230,7 @@ let bestFriendsMode = false;
 let motionMode = false;
 // ▼ FRIENDS MOTION追加
 let friendsMotionMode = false;
+let friendsGourmetMode = false;
 let generated = 0;
 let currentPrompt = "";
 let lastVals = {};
@@ -1076,6 +1077,73 @@ const FRIENDS_MOTION_BLUR_TAGS = [
   "candid motion blur, two subjects caught in genuine unposed movement, blur as evidence of real life rather than studio staging, strong documentary authenticity"
 ];
 
+// ==================== FRIENDS GOURMET DATA ====================
+const FRIENDS_GOURMET_SCENES = [
+  { location: "izakaya interior, wooden tables, paper lanterns, overflowing small plates", time: "evening, 8 PM, after-work crowd", weather: "warm lantern lighting, lively izakaya vibe" },
+  { location: "izakaya counter, sake bottles lined up, yakitori smoke rising", time: "late evening, 9 PM, peak izakaya time", weather: "warm amber lighting, smoky and cozy" },
+  { location: "ramen shop counter, two steaming bowls side by side, wooden stools", time: "late night, 11 PM, quiet ramen shop", weather: "bright fluorescent, steam rising from bowls" },
+  { location: "late night ramen shop, nearly empty, two seats at counter", time: "midnight, last customers of the night", weather: "harsh fluorescent, quiet and intimate" },
+  { location: "korean bbq restaurant, grill between them, smoke and sizzle, tongs ready", time: "evening, 7 PM, dinner time", weather: "warm restaurant lighting, smoky and festive" },
+  { location: "conveyor belt sushi, plates stacking up, bright colors rolling past", time: "lunch hour, busy kaiten sushi", weather: "bright shop lighting, cheerful and busy" },
+  { location: "sushi counter, chef preparing omakase, intimate setting", time: "early evening, 6 PM, dinner beginning", weather: "soft counter lighting, refined atmosphere" },
+  { location: "cafe table by window, two lattes and shared cake slice, afternoon light", time: "afternoon, 3 PM, relaxed cafe time", weather: "soft window light, cozy cafe ambiance" },
+  { location: "trendy cafe, matching drinks on marble table, phone cameras ready", time: "afternoon, 2 PM, cafe peak time", weather: "bright natural light, aesthetically lit space" },
+  { location: "conveyor belt dessert cafe, tiny colorful sweets passing by", time: "afternoon, 4 PM, sweet time", weather: "soft pastel lighting, playful atmosphere" },
+  { location: "takoyaki street stall, paper trays in hand, steam rising", time: "evening, 7 PM, street food hour", weather: "warm stall lighting, bustling street behind" },
+  { location: "crepe stand at Harajuku, colorful crepes overflowing with toppings", time: "afternoon, 4 PM, weekend crowd", weather: "bright afternoon light, cheerful street vibe" },
+  { location: "convenience store parking lot, plastic bags open, sitting on curb", time: "late night, 12 AM, after everything closed", weather: "cold fluorescent konbini glow, quiet street" },
+  { location: "convenience store eating corner, small standing table, onigiri wrappers", time: "late night, 11 PM, quick stop", weather: "harsh bright konbini lighting, empty store" },
+  { location: "family restaurant, giant menus open, drink bar cups in hand", time: "afternoon, 3 PM, long lazy visit", weather: "flat bright family restaurant lighting" },
+  { location: "hamburger shop, tray loaded with burgers and fries, loud and bright", time: "late night, 11 PM, after drinks", weather: "bright fast food lighting, casual atmosphere" },
+  { location: "standing soba shop, two bowls at narrow counter, quick lunch", time: "lunch hour, busy standing soba", weather: "bright shop lighting, quick and efficient" },
+  { location: "curry restaurant, two steaming plates, naan bread shared between them", time: "lunch hour, curry rush", weather: "warm restaurant lighting, spicy aroma implied" },
+  { location: "food court, trays from different stalls, crowded weekend afternoon", time: "weekend afternoon, shopping mall food court", weather: "bright mall lighting, busy and loud" },
+  { location: "rooftop beer garden, city lights below, summer night, many empty glasses", time: "summer evening, 8 PM, golden hour fading", weather: "warm outdoor lighting, city glow behind" },
+  { location: "yakitori alley, narrow seats, smoke everywhere, skewers piling up", time: "evening, 9 PM, peak dining", weather: "amber glow, smoky atmosphere, tight quarters" },
+  { location: "shabu shabu restaurant, pot bubbling between them, vegetables waiting", time: "evening, 7 PM, winter dinner", weather: "warm restaurant lighting, steam from hot pot" },
+  { location: "tonkatsu restaurant, crispy cutlets on wooden boards, cabbage mound", time: "lunch hour, tonkatsu rush", weather: "bright shop lighting, satisfying lunch vibe" },
+  { location: "italian restaurant, pasta and wine, candle between them", time: "evening, 7 PM, dinner date vibe", weather: "warm candlelight, sophisticated atmosphere" },
+  { location: "chinese restaurant, lazy susan spinning, many shared dishes", time: "weekend lunch, family style dining", weather: "bright restaurant lighting, festive mood" },
+  { location: "outdoor festival food stalls, paper cups and skewers, crowd behind", time: "summer evening, matsuri festival time", weather: "warm festival lighting, lively crowd noise implied" },
+  { location: "midnight diner, retro interior, coffee and pie on counter", time: "late night, 2 AM, only customers left", weather: "warm retro diner glow, quiet and timeless" }
+];
+
+const FRIENDS_GOURMET_POSES = [
+  // シリアス・楽しく食べてる系
+  "both eating with chopsticks, looking at each other mid-conversation, bowls raised",
+  "clinking glasses toward camera, both grinning, plates full in front of them",
+  "both leaning over shared hot pot, chopsticks reaching in at the same time",
+  "side by side at counter, both slurping noodles simultaneously, completely in sync",
+  "both staring at the conveyor belt in anticipation, hands ready to grab",
+  "one pouring drink for the other, both smiling, relaxed and comfortable",
+  "both holding up matching dishes toward camera, proud of their order",
+  "sitting across from each other, both mid-chew, eyes wide with happiness",
+  "both taking photos of the food at the same time, phones out before eating",
+  "sharing one dessert with two spoons, leaning in from opposite sides",
+  "both wrapping hands around warm mugs, steam rising, quiet contentment",
+  "one cutting meat on the grill, the other watching hungrily, tongs in hand",
+  "both reaching for the last piece at the same time, eyes meeting",
+  "side by side at street stall, holding paper trays, eating standing up",
+  "both looking at menu together, heads touching, deep in deliberation",
+  "one feeding the other a bite across the table, both laughing",
+  "both caught mid-bite, completely unselfconscious, pure enjoyment",
+  "clinking paper cups of konbini drinks on the curb, late night toast",
+  // コミカル系（食いしん坊 vs 呆れ）
+  "one eating with wild abandon, face close to bowl, the other watching with exasperated smile",
+  "one has nearly finished while the other just started, looking at each other in disbelief",
+  "one holding menu with intense focus as if studying for exam, the other slumped waiting",
+  "one sneaking the last piece thinking unnoticed, the other catching them with raised eyebrow",
+  "one taking elaborate food photo from every angle, the other starving and staring",
+  "one ordering way too much, gesturing at the table covered in dishes, the other wide-eyed",
+  "one eating at alarming speed, the other frozen mid-chopstick in shock",
+  "one licking plate clean unabashedly, the other looking around hoping no one noticed",
+  "one presenting the last bite dramatically, the other lunging for it, pure chaos",
+  "one asleep mid-wait, head on arms, the other poking them as food arrives",
+  "one with sauce on face, completely unaware, the other trying not to laugh",
+  "one stacking empty plates into a tower proudly, the other face-palming",
+  "one pointing excitedly at someone else's food, the other grabbing their arm to stop them"
+];
+
 const LOC_MOTION_URBAN = [
   "fluorescent-lit underground shopping arcade, blur of shoppers in background",
   "busy scramble crossing, light trails from phones and signs",
@@ -1617,9 +1685,8 @@ function toggleBestFriendsMode() {
     personB = {};
     // ▼ FRIENDS MOTIONもリセット
     friendsMotionMode = false;
-  }
-  if (document.getElementById("displayFields").style.display !== "none") {
-    rebuildPromptAndDisplay();
+    // ▼ FRIENDS GOURMETもリセット
+    friendsGourmetMode = false;
   }
 }
 
@@ -1633,6 +1700,24 @@ function toggleFriendsMotion(){
   if(bestFriendsMode && document.getElementById("displayFields").style.display !== "none"){
     rebuildPromptAndDisplay();
   }
+}
+
+function toggleFriendsGourmet() {
+  friendsGourmetMode = !friendsGourmetMode;
+  if (friendsGourmetMode && !lastVals.friendsGourmetScene) {
+    lastVals.friendsGourmetScene = pick(FRIENDS_GOURMET_SCENES);
+    lastVals.friendsGourmetPose = pick(FRIENDS_GOURMET_POSES);
+  }
+  if (bestFriendsMode && document.getElementById("displayFields").style.display !== "none") {
+    rebuildPromptAndDisplay();
+  }
+}
+
+function rerollFriendsGourmet() {
+  if (!friendsGourmetMode) return;
+  if (!isLocked('friendsGourmetScene')) lastVals.friendsGourmetScene = pick(FRIENDS_GOURMET_SCENES);
+  if (!isLocked('friendsGourmetPose')) lastVals.friendsGourmetPose = pick(FRIENDS_GOURMET_POSES);
+  rebuildPromptAndDisplay();
 }
 
 function toggleMotionMode() {
@@ -1747,6 +1832,8 @@ function reroll(key) {
   // ▼ FRIENDS MOTION専用フィールド
   else if (key === 'friendsMotionPose')   { lastVals.friendsMotionPose = pick(FRIENDS_MOTION_POSES); }
   else if (key === 'friendsMotionBlur')   { lastVals.friendsMotionBlur = pick(FRIENDS_MOTION_BLUR_TAGS); }
+  else if (key === 'friendsGourmetScene') { lastVals.friendsGourmetScene = pick(FRIENDS_GOURMET_SCENES); }
+  else if (key === 'friendsGourmetPose')  { lastVals.friendsGourmetPose = pick(FRIENDS_GOURMET_POSES); }
   rebuildPromptAndDisplay();
 }
 
@@ -1963,11 +2050,18 @@ function rebuildPromptAndDisplay() {
     const pB = personB;
     if (!v.sharedPose) v.sharedPose = pick(BEST_FRIENDS_POSES);
     parts = [
-      kawaiiBgStr ? kawaiiBgStr : `location: ${v.loc}`,
-      ...(kawaiiBgStr ? [] : [v.season_scene, v.time, v.weather]),
+      kawaiiBgStr ? kawaiiBgStr :
+      friendsGourmetMode ? `location: ${v.friendsGourmetScene ? v.friendsGourmetScene.location : pick(FRIENDS_GOURMET_SCENES).location}` :
+      `location: ${v.loc}`,
+      ...(kawaiiBgStr ? [] : [
+        v.season_scene,
+        friendsGourmetMode ? (v.friendsGourmetScene ? v.friendsGourmetScene.time : null) : v.time,
+        friendsGourmetMode ? (v.friendsGourmetScene ? v.friendsGourmetScene.weather : null) : v.weather
+      ]),
       "two young Japanese women, best friends",
       framingText, angleText,
       "standing close together, natural friendly interaction, warm chemistry between them",
+      friendsGourmetMode ? (v.friendsGourmetPose || pick(FRIENDS_GOURMET_POSES)) :
       friendsMotionMode ? (v.friendsMotionPose || "both running together side by side, hair and coats streaking into motion trails") : v.sharedPose,
       ...(friendsMotionMode ? [
         v.friendsMotionBlur || "motion blur photography, both subjects moving together, dynamic motion, candid street moment, slight camera shake, limbs and hair with motion trails, background with subtle streaks, 1/30s shutter speed, handheld documentary feel"
@@ -1984,7 +2078,9 @@ function rebuildPromptAndDisplay() {
       ...(kawaiiBgStr ? [] : [filterTags, sceneNote]),
       "hyper-realistic, high detail photography",
       // ▼ atmosphere切り替え
-      friendsMotionMode ? "energetic motion atmosphere" : "warm friendly atmosphere",
+      friendsMotionMode ? "energetic motion atmosphere" :
+      friendsGourmetMode ? "warm gourmet atmosphere, delicious food, enjoyable meal" :
+      "warm friendly atmosphere",
       ...(kawaiiBgStr ? ["kawaii fashion editorial, playful and stylish, full color"] : [])
     ];
   }
@@ -2143,6 +2239,43 @@ function renderFields() {
       `;
     }
 
+    // ▼ FRIENDS GOURMET トグル行
+    const gourmetToggleRow = `
+      <div class="field-row" style="border-color:#3a2f4a">
+        <div class="field-label" style="color:#f97316">Gourmet</div>
+        <div class="field-value" style="color:${friendsGourmetMode ? '#f97316' : '#6a6278'};font-size:11px">${friendsGourmetMode ? 'ON – 2人でグルメ' : 'OFF'}</div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="reroll-btn" onclick="rerollFriendsGourmet()" title="全体リロール" style="${friendsGourmetMode ? '' : 'opacity:.3;pointer-events:none'}">🔄</button>
+          <button class="reroll-btn" onclick="toggleFriendsGourmet()" style="color:${friendsGourmetMode ? '#f97316' : '#6a6278'};font-size:9px;padding:0 6px;border:1px solid ${friendsGourmetMode ? '#f97316' : '#6a6278'}">${friendsGourmetMode ? 'OFFにする' : 'ONにする'}</button>
+        </div>
+      </div>
+    `;
+
+    let friendsGourmetFields = '';
+    if (friendsGourmetMode) {
+      const fgSceneLocked = isLocked('friendsGourmetScene');
+      const fgPoseLocked = isLocked('friendsGourmetPose');
+      const sceneVal = v.friendsGourmetScene ? v.friendsGourmetScene.location : '—';
+      friendsGourmetFields = `
+        <div class="field-row ${fgSceneLocked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
+          <div class="field-label" style="color:#f97316">G.Scene</div>
+          <div class="field-value" style="color:#f97316;font-size:11px">${sceneVal}</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="lock-btn ${fgSceneLocked ? 'locked' : ''}" onclick="toggleLock('friendsGourmetScene')">${fgSceneLocked ? '🔒' : '🔓'}</button>
+            <button class="reroll-btn" onclick="reroll('friendsGourmetScene')" title="Re-roll">🔄</button>
+          </div>
+        </div>
+        <div class="field-row ${fgPoseLocked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
+          <div class="field-label" style="color:#fdba74">G.Pose</div>
+          <div class="field-value" style="color:#fdba74;font-size:11px">${v.friendsGourmetPose || '—'}</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="lock-btn ${fgPoseLocked ? 'locked' : ''}" onclick="toggleLock('friendsGourmetPose')">${fgPoseLocked ? '🔒' : '🔓'}</button>
+            <button class="reroll-btn" onclick="reroll('friendsGourmetPose')" title="Re-roll">🔄</button>
+          </div>
+        </div>
+      `;
+    }
+
     const sharedPoseVal = v.sharedPose || "—";
     const sharedPoseLocked = isLocked('sharedPose');
     const sharedPoseRow = `
@@ -2165,6 +2298,8 @@ function renderFields() {
         ${kawaiiSection}
         ${motionToggleRow}
         ${friendsMotionFields}
+        ${gourmetToggleRow}
+        ${friendsGourmetFields}
         ${sharedPoseRow}
       </div>
     `;
@@ -2430,6 +2565,9 @@ function generateAll() {
     // ▼ FRIENDS MOTION specific
     friendsMotionPose: resolvedFriendsMotionPose,
     friendsMotionBlur: resolvedFriendsMotionBlur,
+    // ▼ FRIENDS GOURMET specific
+    friendsGourmetScene: friendsGourmetMode ? (preserved.friendsGourmetScene !== undefined ? preserved.friendsGourmetScene : pick(FRIENDS_GOURMET_SCENES)) : null,
+    friendsGourmetPose:  friendsGourmetMode ? (preserved.friendsGourmetPose  !== undefined ? preserved.friendsGourmetPose  : pick(FRIENDS_GOURMET_POSES))  : null,
   };
 
   // Best Friends mode
