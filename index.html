@@ -1078,82 +1078,274 @@ const FRIENDS_MOTION_BLUR_TAGS = [
 ];
 
 // ==================== FRIENDS GOURMET DATA ====================
-const FRIENDS_GOURMET_SCENES = [
-  { location: "izakaya interior, wooden tables, paper lanterns, overflowing small plates", time: "evening, 8 PM, after-work crowd", weather: "warm lantern lighting, lively izakaya vibe" },
-  { location: "izakaya counter, sake bottles lined up, yakitori smoke rising", time: "late evening, 9 PM, peak izakaya time", weather: "warm amber lighting, smoky and cozy" },
-  { location: "ramen shop counter, two steaming bowls side by side, wooden stools", time: "late night, 11 PM, quiet ramen shop", weather: "bright fluorescent, steam rising from bowls" },
-  { location: "late night ramen shop, nearly empty, two seats at counter", time: "midnight, last customers of the night", weather: "harsh fluorescent, quiet and intimate" },
-  { location: "korean bbq restaurant, grill between them, smoke and sizzle, tongs ready", time: "evening, 7 PM, dinner time", weather: "warm restaurant lighting, smoky and festive" },
-  { location: "conveyor belt sushi, plates stacking up, bright colors rolling past", time: "lunch hour, busy kaiten sushi", weather: "bright shop lighting, cheerful and busy" },
-  { location: "sushi counter, chef preparing omakase, intimate setting", time: "early evening, 6 PM, dinner beginning", weather: "soft counter lighting, refined atmosphere" },
-  { location: "cafe table by window, two lattes and shared cake slice, afternoon light", time: "afternoon, 3 PM, relaxed cafe time", weather: "soft window light, cozy cafe ambiance" },
-  { location: "trendy cafe, matching drinks on marble table, phone cameras ready", time: "afternoon, 2 PM, cafe peak time", weather: "bright natural light, aesthetically lit space" },
-  { location: "conveyor belt dessert cafe, tiny colorful sweets passing by", time: "afternoon, 4 PM, sweet time", weather: "soft pastel lighting, playful atmosphere" },
-  { location: "takoyaki street stall, paper trays in hand, steam rising", time: "evening, 7 PM, street food hour", weather: "warm stall lighting, bustling street behind" },
-  { location: "crepe stand at Harajuku, colorful crepes overflowing with toppings", time: "afternoon, 4 PM, weekend crowd", weather: "bright afternoon light, cheerful street vibe" },
-  { location: "convenience store parking lot, plastic bags open, sitting on curb", time: "late night, 12 AM, after everything closed", weather: "cold fluorescent konbini glow, quiet street" },
-  { location: "convenience store eating corner, small standing table, onigiri wrappers", time: "late night, 11 PM, quick stop", weather: "harsh bright konbini lighting, empty store" },
-  { location: "family restaurant, giant menus open, drink bar cups in hand", time: "afternoon, 3 PM, long lazy visit", weather: "flat bright family restaurant lighting" },
-  { location: "hamburger shop, tray loaded with burgers and fries, loud and bright", time: "late night, 11 PM, after drinks", weather: "bright fast food lighting, casual atmosphere" },
-  { location: "standing soba shop, two bowls at narrow counter, quick lunch", time: "lunch hour, busy standing soba", weather: "bright shop lighting, quick and efficient" },
-  { location: "curry restaurant, two steaming plates, naan bread shared between them", time: "lunch hour, curry rush", weather: "warm restaurant lighting, spicy aroma implied" },
-  { location: "food court, trays from different stalls, crowded weekend afternoon", time: "weekend afternoon, shopping mall food court", weather: "bright mall lighting, busy and loud" },
-  { location: "rooftop beer garden, city lights below, summer night, many empty glasses", time: "summer evening, 8 PM, golden hour fading", weather: "warm outdoor lighting, city glow behind" },
-  { location: "yakitori alley, narrow seats, smoke everywhere, skewers piling up", time: "evening, 9 PM, peak dining", weather: "amber glow, smoky atmosphere, tight quarters" },
-  { location: "shabu shabu restaurant, pot bubbling between them, vegetables waiting", time: "evening, 7 PM, winter dinner", weather: "warm restaurant lighting, steam from hot pot" },
-  { location: "tonkatsu restaurant, crispy cutlets on wooden boards, cabbage mound", time: "lunch hour, tonkatsu rush", weather: "bright shop lighting, satisfying lunch vibe" },
-  { location: "italian restaurant, pasta and wine, candle between them", time: "evening, 7 PM, dinner date vibe", weather: "warm candlelight, sophisticated atmosphere" },
-  { location: "chinese restaurant, lazy susan spinning, many shared dishes", time: "weekend lunch, family style dining", weather: "bright restaurant lighting, festive mood" },
-  { location: "outdoor festival food stalls, paper cups and skewers, crowd behind", time: "summer evening, matsuri festival time", weather: "warm festival lighting, lively crowd noise implied" },
-  { location: "midnight diner, retro interior, coffee and pie on counter", time: "late night, 2 AM, only customers left", weather: "warm retro diner glow, quiet and timeless" }
+const FRIENDS_GOURMET_COMBOS = [
+  {
+    location: "izakaya interior, wooden tables, paper lanterns, overflowing small plates",
+    time: "evening, 8 PM, after-work crowd",
+    weather: "warm lantern lighting, lively izakaya vibe",
+    poses: [
+      "both perched on bar stools at izakaya, shoulders touching, plates between them",
+      "sitting across small table, both reaching for same small plate simultaneously",
+      "one stacking empty plates into tower at table proudly, the other face-palming",
+      "one sneaking the last karaage, the other catching them mid-reach across table",
+      "both clinking beer glasses, mouths full, laughing"
+    ]
+  },
+  {
+    location: "izakaya counter, sake bottles lined up, yakitori smoke rising",
+    time: "late evening, 9 PM, peak izakaya time",
+    weather: "warm amber lighting, smoky and cozy",
+    poses: [
+      "both sitting at counter side by side, watching chef grill yakitori",
+      "one ordering way too much gesturing at menu, the other wide-eyed sitting opposite",
+      "one with sauce on face completely unaware seated, the other trying not to laugh"
+    ]
+  },
+  {
+    location: "ramen shop counter, two steaming bowls side by side, wooden stools",
+    time: "late night, 11 PM, quiet ramen shop",
+    weather: "bright fluorescent, steam rising from bowls",
+    poses: [
+      "both sitting side by side at ramen counter, elbows on counter, slurping noodles simultaneously",
+      "one eating with wild abandon face close to bowl, the other sitting back watching with exasperated smile",
+      "one has nearly finished while the other just started, both seated looking at each other in disbelief",
+      "both hunched over bowls, steam fogging glasses, completely focused"
+    ]
+  },
+  {
+    location: "late night ramen shop, nearly empty, two seats at counter",
+    time: "midnight, last customers of the night",
+    weather: "harsh fluorescent, quiet and intimate",
+    poses: [
+      "sitting at empty counter, both slurping quietly, tired but happy",
+      "one asleep at counter head on arms, the other poking them as ramen arrives"
+    ]
+  },
+  {
+    location: "korean bbq restaurant, grill between them, smoke and sizzle, tongs ready",
+    time: "evening, 7 PM, dinner time",
+    weather: "warm restaurant lighting, smoky and festive",
+    poses: [
+      "both seated at Korean BBQ, one grilling meat intently, the other waiting with chin on hand",
+      "sitting on either side of grill, chopsticks hovering, meat sizzling",
+      "one wrapping lettuce wrap for the other, caring gesture"
+    ]
+  },
+  {
+    location: "conveyor belt sushi, plates stacking up, bright colors rolling past",
+    time: "lunch hour, busy kaiten sushi",
+    weather: "bright shop lighting, cheerful and busy",
+    poses: [
+      "both hunched over conveyor belt sushi, plates stacked high in front of them",
+      "both staring at the conveyor belt in anticipation, hands ready to grab",
+      "one taking elaborate sushi photo, the other already eating"
+    ]
+  },
+  {
+    location: "sushi counter, chef preparing omakase, intimate setting",
+    time: "early evening, 6 PM, dinner beginning",
+    weather: "soft counter lighting, refined atmosphere",
+    poses: [
+      "both seated at sushi counter, side by side, chef in front, focused on omakase",
+      "sitting elegantly, both eating nigiri with proper manners"
+    ]
+  },
+  {
+    location: "cafe table by window, two lattes and shared cake slice, afternoon light",
+    time: "afternoon, 3 PM, relaxed cafe time",
+    weather: "soft window light, cozy cafe ambiance",
+    poses: [
+      "sitting at cafe window seat, both leaning over one shared parfait with two spoons",
+      "one taking elaborate food photo from above while seated, the other starving staring at cake",
+      "both wrapping hands around warm mugs, quiet contentment"
+    ]
+  },
+  {
+    location: "trendy cafe, matching drinks on marble table, phone cameras ready",
+    time: "afternoon, 2 PM, cafe peak time",
+    weather: "bright natural light, aesthetically lit space",
+    poses: [
+      "sitting across marble table, both holding up matching drinks for photo",
+      "both taking photos of drinks at same time, phones out"
+    ]
+  },
+  {
+    location: "conveyor belt dessert cafe, tiny colorful sweets passing by",
+    time: "afternoon, 4 PM, sweet time",
+    weather: "soft pastel lighting, playful atmosphere",
+    poses: [
+      "both leaning over dessert conveyor, eyes wide at passing sweets"
+    ]
+  },
+  {
+    location: "takoyaki street stall, paper trays in hand, steam rising",
+    time: "evening, 7 PM, street food hour",
+    weather: "warm stall lighting, bustling street behind",
+    poses: [
+      "both standing at takoyaki stall, paper trays in hand, eating while standing",
+      "one blowing on hot takoyaki, the other already burned tongue"
+    ]
+  },
+  {
+    location: "crepe stand at Harajuku, colorful crepes overflowing with toppings",
+    time: "afternoon, 4 PM, weekend crowd",
+    weather: "bright afternoon light, cheerful street vibe",
+    poses: [
+      "standing at crepe stand at Harajuku, holding colorful crepes, eating on the go",
+      "both trying to eat giant crepes without making mess, laughing"
+    ]
+  },
+  {
+    location: "convenience store parking lot, plastic bags open, sitting on curb",
+    time: "late night, 12 AM, after everything closed",
+    weather: "cold fluorescent konbini glow, quiet street",
+    poses: [
+      "both sitting on curb outside konbini, plastic bags open, eating onigiri",
+      "sitting on curb, clinking paper cups of konbini drinks, late night toast"
+    ]
+  },
+  {
+    location: "convenience store eating corner, small standing table, onigiri wrappers",
+    time: "late night, 11 PM, quick stop",
+    weather: "harsh bright konbini lighting, empty store",
+    poses: [
+      "both standing at konbini eat-in corner, small table, quick bite"
+    ]
+  },
+  {
+    location: "family restaurant, giant menus open, drink bar cups in hand",
+    time: "afternoon, 3 PM, long lazy visit",
+    weather: "flat bright family restaurant lighting",
+    poses: [
+      "sitting at family restaurant booth, one sprawled eating fries, the other sipping drink bored",
+      "both with giant menus hiding faces, peeking over top",
+      "one asleep at table head on arms waiting, the other poking them"
+    ]
+  },
+  {
+    location: "hamburger shop, tray loaded with burgers and fries, loud and bright",
+    time: "late night, 11 PM, after drinks",
+    weather: "bright fast food lighting, casual atmosphere",
+    poses: [
+      "both at burger shop, tray loaded, one with burger halfway to mouth",
+      "one eating burger messily with sauce on cheek, the other offering napkin"
+    ]
+  },
+  {
+    location: "standing soba shop, two bowls at narrow counter, quick lunch",
+    time: "lunch hour, busy standing soba",
+    weather: "bright shop lighting, quick and efficient",
+    poses: [
+      "sitting at standing soba shop counter on stools, heads down over bowls",
+      "both slurping soba quickly, business lunch vibe"
+    ]
+  },
+  {
+    location: "curry restaurant, two steaming plates, naan bread shared between them",
+    time: "lunch hour, curry rush",
+    weather: "warm restaurant lighting, spicy aroma implied",
+    poses: [
+      "one sitting seiza-style at low table devouring curry, the other sitting cross-legged watching in disbelief",
+      "both leaning over curry plates, spoons ready"
+    ]
+  },
+  {
+    location: "food court, trays from different stalls, crowded weekend afternoon",
+    time: "weekend afternoon, shopping mall food court",
+    weather: "bright mall lighting, busy and loud",
+    poses: [
+      "both at food court table, trays from different stalls, crowded background",
+      "one guarding table while other gets food, then switching"
+    ]
+  },
+  {
+    location: "rooftop beer garden, city lights below, summer night, many empty glasses",
+    time: "summer evening, 8 PM, golden hour fading",
+    weather: "warm outdoor lighting, city glow behind",
+    poses: [
+      "both at beer garden table, many empty glasses, city lights behind",
+      "clinking beer mugs, summer night breeze"
+    ]
+  },
+  {
+    location: "yakitori alley, narrow seats, smoke everywhere, skewers piling up",
+    time: "evening, 9 PM, peak dining",
+    weather: "amber glow, smoky atmosphere, tight quarters",
+    poses: [
+      "both at yakitori counter, smoke rising, skewers piled on small plates"
+    ]
+  },
+  {
+    location: "shabu shabu restaurant, pot bubbling between them, vegetables waiting",
+    time: "evening, 7 PM, winter dinner",
+    weather: "warm restaurant lighting, steam from hot pot",
+    poses: [
+      "sitting on either side of hot pot, chopsticks hovering over bubbling broth, steam on faces",
+      "both at shabu shabu, both holding baskets over pot, steam fogging glasses"
+    ]
+  },
+  {
+    location: "tonkatsu restaurant, crispy cutlets on wooden boards, cabbage mound",
+    time: "lunch hour, tonkatsu rush",
+    weather: "bright shop lighting, satisfying lunch vibe",
+    poses: [
+      "sitting at tonkatsu restaurant, both with trays, one already half-eaten"
+    ]
+  },
+  {
+    location: "italian restaurant, pasta and wine, candle between them",
+    time: "evening, 7 PM, dinner date vibe",
+    weather: "warm candlelight, sophisticated atmosphere",
+    poses: [
+      "both at italian restaurant, sharing pasta from same plate, forks tangled",
+      "sitting at candlelit table, wine glasses raised"
+    ]
+  },
+  {
+    location: "chinese restaurant, lazy susan spinning, many shared dishes",
+    time: "weekend lunch, family style dining",
+    weather: "bright restaurant lighting, festive mood",
+    poses: [
+      "sitting at chinese round table, lazy susan between them, reaching for dishes",
+      "both reaching for last dumpling on lazy susan at same time"
+    ]
+  },
+  {
+    location: "outdoor festival food stalls, paper cups and skewers, crowd behind",
+    time: "summer evening, matsuri festival time",
+    weather: "warm festival lighting, lively crowd noise implied",
+    poses: [
+      "both at festival, holding paper cups and yakisoba, crowd behind"
+    ]
+  },
+  {
+    location: "midnight diner, retro interior, coffee and pie on counter",
+    time: "late night, 2 AM, only customers left",
+    weather: "warm retro diner glow, quiet and timeless",
+    poses: [
+      "sitting at diner counter on swivel stools, coffee cups and pie slices",
+      "both at midnight diner, quiet conversation, only customers"
+    ]
+  }
 ];
 
-const FRIENDS_GOURMET_POSES = [
-  // 座り・カウンター系
-  "both sitting side by side at ramen counter, elbows on counter, slurping noodles simultaneously",
-  "sitting across from each other at small table, both leaning forward over steaming bowls",
-  "one sitting seiza-style at low table devouring curry, the other sitting cross-legged watching in disbelief",
-  "both perched on bar stools at izakaya, shoulders touching, plates between them",
-  "sitting on either side of hot pot, chopsticks hovering over bubbling broth, steam on faces",
-  "both hunched over conveyor belt sushi, plates stacked high in front of them",
-  "sitting at cafe window seat, both leaning over one shared parfait with two spoons",
-  "one sitting with legs tucked under, eating with intense focus, the other sitting back arms crossed sighing",
-  "both sitting on curb outside konbini, plastic bags open, eating onigiri",
-  "sitting at family restaurant booth, one sprawled eating fries, the other sipping drink bored",
-  "both seated at Korean BBQ, one grilling meat intently, the other waiting with chin on hand",
-  "sitting at standing soba shop counter on stools, heads down over bowls",
-  "both sitting at low kotatsu, hot pot between them, cozy winter eating",
-  "both seated at sushi counter, side by side, chef in front, focused on omakase",
-  "sitting at hotel lounge table, both with afternoon tea stands, elegant posture",
-  "both at wine bar counter, small plates between them, relaxed evening",
-  "sitting at tonkatsu restaurant, both with trays, one already half-eaten",
-  "both at italian restaurant, sharing pasta from same plate, forks tangled",
-  "sitting at chinese round table, lazy susan between them, reaching for dishes",
-  "both at food court table, trays from different stalls, crowded mall background",
-  "sitting at diner counter on swivel stools, coffee cups and pie slices",
-  "both at yakitori counter, smoke rising, skewers piled on small plates",
-  "sitting at shabu shabu, both holding baskets over pot, steam fogging glasses",
-  
-  // 食いしん坊 vs 呆れ（座り）
-  "one eating with wild abandon face close to bowl, the other sitting back watching with exasperated smile",
-  "one has nearly finished plate while the other just started, both seated looking at each other in disbelief",
-  "one holding menu with intense focus seated, the other slumped in chair waiting",
-  "one sneaking the last piece from shared plate, the other catching them mid-reach across table",
-  "one taking elaborate food photo from above while seated, the other starving staring at food",
-  "one ordering way too much gesturing at menu, the other wide-eyed sitting opposite",
-  "one eating at alarming speed seated, the other frozen mid-chopstick in shock",
-  "one licking plate clean at table unabashedly, the other looking around hoping no one noticed",
-  "one presenting last bite on chopsticks across table dramatically, the other lunging for it",
-  "one asleep at table head on arms waiting, the other poking them as food arrives",
-  "one with sauce on face completely unaware seated, the other trying not to laugh",
-  "one stacking empty plates into tower at table proudly, the other face-palming",
-  "one pointing excitedly at someone else's food while seated, the other grabbing their arm to stop them",
-  
-  // 立ち（屋台用に少しだけ残す）
-  "both standing at takoyaki stall, paper trays in hand, eating while standing",
-  "standing at crepe stand at Harajuku, holding colorful crepes, eating on the go"
-];
+function toggleFriendsGourmet() {
+  friendsGourmetMode = !friendsGourmetMode;
+  if (friendsGourmetMode) {
+    const combo = pick(FRIENDS_GOURMET_COMBOS);
+    lastVals.friendsGourmetCombo = combo;
+    lastVals.friendsGourmetPose = pick(combo.poses);
+  }
+  if (bestFriendsMode) rebuildPromptAndDisplay();
+}
 
+function rerollFriendsGourmet() {
+  if (!friendsGourmetMode) return;
+  const combo = pick(FRIENDS_GOURMET_COMBOS);
+  if (!isLocked('friendsGourmetCombo')) lastVals.friendsGourmetCombo = combo;
+  if (!isLocked('friendsGourmetPose')) lastVals.friendsGourmetPose = pick(combo.poses);
+  rebuildPromptAndDisplay();
+}
 const LOC_MOTION_URBAN = [
   "fluorescent-lit underground shopping arcade, blur of shoppers in background",
   "busy scramble crossing, light trails from phones and signs",
@@ -1712,24 +1904,6 @@ function toggleFriendsMotion(){
   }
 }
 
-function toggleFriendsGourmet() {
-  friendsGourmetMode = !friendsGourmetMode;
-  if (friendsGourmetMode && !lastVals.friendsGourmetScene) {
-    lastVals.friendsGourmetScene = pick(FRIENDS_GOURMET_SCENES);
-    lastVals.friendsGourmetPose = pick(FRIENDS_GOURMET_POSES);
-  }
-  if (bestFriendsMode && document.getElementById("displayFields").style.display !== "none") {
-    rebuildPromptAndDisplay();
-  }
-}
-
-function rerollFriendsGourmet() {
-  if (!friendsGourmetMode) return;
-  if (!isLocked('friendsGourmetScene')) lastVals.friendsGourmetScene = pick(FRIENDS_GOURMET_SCENES);
-  if (!isLocked('friendsGourmetPose')) lastVals.friendsGourmetPose = pick(FRIENDS_GOURMET_POSES);
-  rebuildPromptAndDisplay();
-}
-
 function toggleMotionMode() {
   motionMode = !motionMode;
   const btn = document.getElementById("motion-btn");
@@ -1842,8 +2016,14 @@ function reroll(key) {
   // ▼ FRIENDS MOTION専用フィールド
   else if (key === 'friendsMotionPose')   { lastVals.friendsMotionPose = pick(FRIENDS_MOTION_POSES); }
   else if (key === 'friendsMotionBlur')   { lastVals.friendsMotionBlur = pick(FRIENDS_MOTION_BLUR_TAGS); }
-  else if (key === 'friendsGourmetScene') { lastVals.friendsGourmetScene = pick(FRIENDS_GOURMET_SCENES); }
-  else if (key === 'friendsGourmetPose')  { lastVals.friendsGourmetPose = pick(FRIENDS_GOURMET_POSES); }
+else if (key === 'friendsGourmetCombo') { 
+  const combo = pick(FRIENDS_GOURMET_COMBOS);
+  lastVals.friendsGourmetCombo = combo;
+  lastVals.friendsGourmetPose = pick(combo.poses);
+}
+else if (key === 'friendsGourmetPose')  { 
+  if (lastVals.friendsGourmetCombo) lastVals.friendsGourmetPose = pick(lastVals.friendsGourmetCombo.poses);
+}
   rebuildPromptAndDisplay();
 }
 
@@ -2061,17 +2241,17 @@ function rebuildPromptAndDisplay() {
     if (!v.sharedPose) v.sharedPose = pick(BEST_FRIENDS_POSES);
     parts = [
       kawaiiBgStr ? kawaiiBgStr :
-      friendsGourmetMode ? `location: ${v.friendsGourmetScene ? v.friendsGourmetScene.location : pick(FRIENDS_GOURMET_SCENES).location}` :
+friendsGourmetMode ? `location: ${v.friendsGourmetCombo ? v.friendsGourmetCombo.location : ''}` :
       `location: ${v.loc}`,
       ...(kawaiiBgStr ? [] : [
         v.season_scene,
-        friendsGourmetMode ? (v.friendsGourmetScene ? v.friendsGourmetScene.time : null) : v.time,
-        friendsGourmetMode ? (v.friendsGourmetScene ? v.friendsGourmetScene.weather : null) : v.weather
+friendsGourmetMode ? (v.friendsGourmetCombo ? v.friendsGourmetCombo.time : null) : v.time,
+friendsGourmetMode ? (v.friendsGourmetCombo ? v.friendsGourmetCombo.weather : null) : v.weather
       ]),
       "two young Japanese women, best friends",
       framingText, angleText,
       "standing close together, natural friendly interaction, warm chemistry between them",
-      friendsGourmetMode ? (v.friendsGourmetPose || pick(FRIENDS_GOURMET_POSES)) :
+friendsGourmetMode ? (v.friendsGourmetPose || '') :
       friendsMotionMode ? (v.friendsMotionPose || "both running together side by side, hair and coats streaking into motion trails") : v.sharedPose,
       ...(friendsMotionMode ? [
         v.friendsMotionBlur || "motion blur photography, both subjects moving together, dynamic motion, candid street moment, slight camera shake, limbs and hair with motion trails, background with subtle streaks, 1/30s shutter speed, handheld documentary feel"
@@ -2261,18 +2441,18 @@ function renderFields() {
       </div>
     `;
 
-    let friendsGourmetFields = '';
+let friendsGourmetFields = '';
     if (friendsGourmetMode) {
-      const fgSceneLocked = isLocked('friendsGourmetScene');
+      const fgComboLocked = isLocked('friendsGourmetCombo');
       const fgPoseLocked = isLocked('friendsGourmetPose');
-      const sceneVal = v.friendsGourmetScene ? v.friendsGourmetScene.location : '—';
+      const sceneVal = v.friendsGourmetCombo ? v.friendsGourmetCombo.location : '—';
       friendsGourmetFields = `
-        <div class="field-row ${fgSceneLocked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
+        <div class="field-row ${fgComboLocked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
           <div class="field-label" style="color:#f97316">G.Scene</div>
           <div class="field-value" style="color:#f97316;font-size:11px">${sceneVal}</div>
           <div style="display:flex;gap:4px;align-items:center">
-            <button class="lock-btn ${fgSceneLocked ? 'locked' : ''}" onclick="toggleLock('friendsGourmetScene')">${fgSceneLocked ? '🔒' : '🔓'}</button>
-            <button class="reroll-btn" onclick="reroll('friendsGourmetScene')" title="Re-roll">🔄</button>
+            <button class="lock-btn ${fgComboLocked ? 'locked' : ''}" onclick="toggleLock('friendsGourmetCombo')">${fgComboLocked ? '🔒' : '🔓'}</button>
+            <button class="reroll-btn" onclick="reroll('friendsGourmetCombo')" title="Re-roll">🔄</button>
           </div>
         </div>
         <div class="field-row ${fgPoseLocked ? 'is-locked' : ''}" style="border-color:#3a2f4a">
@@ -2576,9 +2756,12 @@ function generateAll() {
     friendsMotionPose: resolvedFriendsMotionPose,
     friendsMotionBlur: resolvedFriendsMotionBlur,
     // ▼ FRIENDS GOURMET specific
-    friendsGourmetScene: friendsGourmetMode ? (preserved.friendsGourmetScene !== undefined ? preserved.friendsGourmetScene : pick(FRIENDS_GOURMET_SCENES)) : null,
-    friendsGourmetPose:  friendsGourmetMode ? (preserved.friendsGourmetPose  !== undefined ? preserved.friendsGourmetPose  : pick(FRIENDS_GOURMET_POSES))  : null,
+    friendsGourmetCombo: friendsGourmetMode ? (preserved.friendsGourmetCombo !== undefined ? preserved.friendsGourmetCombo : pick(FRIENDS_GOURMET_COMBOS)) : null,
+    friendsGourmetPose:  friendsGourmetMode ? (preserved.friendsGourmetPose !== undefined ? preserved.friendsGourmetPose : null) : null,
   };
+  if (friendsGourmetMode && !lastVals.friendsGourmetPose && lastVals.friendsGourmetCombo) {
+    lastVals.friendsGourmetPose = pick(lastVals.friendsGourmetCombo.poses);
+  }
 
   // Best Friends mode
   if (bestFriendsMode) {
