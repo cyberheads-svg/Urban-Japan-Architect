@@ -2386,13 +2386,22 @@ function generateAll() {
   const resolvedStyle     = preserved.style     || style;
   const resolvedStyleType = preserved.styleType || styleType;
 
-  // Preserve bgType and customBg across generates
+  // Preserve bgType and customBg across generates, respecting per-part locks
   const resolvedBgType  = preserved.bgType  !== undefined ? preserved.bgType  : (lastVals.bgType  || 'off');
   const resolvedCustomBg = (() => {
-    if (preserved.customBg !== undefined) return preserved.customBg;
-    if (resolvedBgType === 'kawaii')  return generateKawaiiBackground();
-    if (resolvedBgType === 'popArt')  return generatePopArtBackground();
-    return lastVals.customBg || null;
+    if (resolvedBgType === 'off') return lastVals.customBg || null;
+    // Generate a fresh bg as base
+    const fresh = resolvedBgType === 'kawaii' ? generateKawaiiBackground() : generatePopArtBackground();
+    // Then overlay any locked parts from lastVals.customBg
+    if (lastVals.customBg && lastVals.customBg.type === resolvedBgType) {
+      const parts = ['motif', 'structure', 'palette', 'vibe', 'details', 'medium'];
+      parts.forEach(p => {
+        if (isLocked('customBg_' + p) && lastVals.customBg[p]) {
+          fresh[p] = lastVals.customBg[p];
+        }
+      });
+    }
+    return fresh;
   })();
 
   const resolvedFriendsMotionPose = preserved.friendsMotionPose !== undefined
