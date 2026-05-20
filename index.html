@@ -437,7 +437,7 @@ function buildBgString() {
     return `in a dreamy kawaii world: ${bg.motif}, ${bg.structure}, color palette: ${bg.palette}, ${bg.details}, vibe: ${bg.vibe}, ${bg.medium}, floating pastel elements and sparkles in the air, soft magical ambient light with gentle glow, ethereal and cute atmosphere`;
   }
   if (t === 'popArt') {
-    return `against a vivid pop art background: ${bg.motif}, ${bg.structure}, color palette: ${bg.palette}, ${bg.details}, vibe: ${bg.vibe}, ${bg.medium}, bold graphic energy, high contrast poster aesthetic, dynamic pop art composition`;
+    return `set in a vivid pop art world: ${bg.motif}, ${bg.structure}, color palette: ${bg.palette}, ${bg.details}, vibe: ${bg.vibe}, ${bg.medium}, bold graphic energy, high contrast poster aesthetic, dynamic pop art composition`;
   }
   return null;
 }
@@ -2034,7 +2034,7 @@ function rebuildPromptAndDisplay() {
   else if (whiteStudioMode) {
     parts = [
       bgStr || "pure white seamless studio background",
-      "young Japanese woman, fashion magazine editorial shot",
+      bgStr ? "realistic photo of a young Japanese woman, fashion magazine editorial shot" : "young Japanese woman, fashion magazine editorial shot",
       framingText, v.pose,
       v.hair ? `hairstyle: ${v.hair}` : null,
       v.makeup ? `makeup: ${v.makeup}` : null,
@@ -2061,7 +2061,7 @@ function rebuildPromptAndDisplay() {
         friendsGourmetMode ? (v.friendsGourmetCombo ? v.friendsGourmetCombo.time : null) : v.time,
         friendsGourmetMode ? (v.friendsGourmetCombo ? v.friendsGourmetCombo.weather : null) : v.weather
       ]),
-      "two young Japanese women, best friends",
+      bgStr ? "realistic photo of two young Japanese women, best friends" : "two young Japanese women, best friends",
       framingText, angleText,
       "standing close together, natural friendly interaction, warm chemistry between them",
       friendsGourmetMode ? (v.friendsGourmetPose || '') :
