@@ -1613,6 +1613,98 @@ const STYLE_SCENE = [
 
 const CAMERA_FIXED = "cinematic color grade, Fujifilm X-T4, 23mm f2, natural skin texture, unretouched";
 
+// ==================== COMPOSITION ====================
+const COMPOSITION = [
+  // 画面内位置 — 中央系
+  "subject dead center, perfectly symmetrical, static and confrontational",
+  "subject centered but floating in vast negative space above and below",
+  "centered low in frame, heavy sky or ceiling dominating top two-thirds",
+  "centered, face in upper third, body bleeding out of bottom frame edge",
+
+  // 画面内位置 — オフセンター
+  "subject placed hard left, two-thirds of frame empty to the right",
+  "subject placed hard right, city or space rushing in from the left",
+  "subject in lower-left corner, diagonal of environment pulling eye to opposite corner",
+  "subject in upper-right quadrant, ground and shadow occupying lower half",
+  "subject at far left edge, only shoulder and arm in frame, rest implied beyond",
+  "subject positioned at right third intersection, classic rule-of-thirds tension",
+  "subject at left third, gaze directed into the empty right half of frame",
+  "extreme off-center, subject occupying roughly one-fifth of total frame width",
+
+  // 見切れ — 頭部
+  "top of head cut by upper frame edge, face centered, crown missing",
+  "face cropped at forehead, eyes centered, scalp outside frame",
+  "head tilted, one ear cut, asymmetric crop pulling toward shoulder",
+  "face half-cropped from above, only eyes and below visible",
+
+  // 見切れ — 足元
+  "feet cut by lower frame edge, legs leading down out of shot",
+  "cut at mid-shin, shoes implied, hovering figure effect",
+  "ankles at very bottom of frame, full body visible but barely contained",
+
+  // 見切れ — 左右
+  "left shoulder and arm cut by frame edge, body angled into scene",
+  "right side of body cut, figure entering frame from the left",
+  "both arms cropped at elbows, torso and face the entire subject",
+  "one hand entering from frame edge, arm cut at forearm",
+  "figure half off-frame, silhouette split by edge, tension between in and out",
+
+  // 見切れ — 複合
+  "figure cut at both top and bottom, only torso and middle visible",
+  "extreme diagonal crop, head off upper-right, feet off lower-left",
+  "subject nearly entirely off-frame, only silhouette sliver visible at edge",
+
+  // ネガティブスペース
+  "subject small in lower third, enormous negative space of sky above",
+  "tiny figure against vast urban wall, architecture dominating 80% of frame",
+  "subject in foreground left, deep empty corridor receding to the right",
+  "subject surrounded by negative space on three sides, compressed to one edge",
+  "extreme negative space — subject occupies less than 20% of total frame area",
+  "deliberate emptiness to the left as if someone has just left that space",
+
+  // 前景レイヤリング
+  "subject sharp in background, blurred architectural element dominating foreground",
+  "subject visible through gap in foreground objects, partially obscured",
+  "foreground element cutting diagonally across lower portion of subject",
+  "strong foreground shadow falling across subject, body split by darkness",
+  "subject framed within a natural rectangle — doorway, window, arch, gap",
+  "foreground out-of-focus figure or object, subject fully sharp behind",
+  "chain-link or mesh fence foreground layer, subject visible through diamonds",
+
+  // 幾何学・線
+  "subject at golden ratio point, environment lines leading directly to her",
+  "strong leading lines from both sides converging on subject in center",
+  "diagonal architectural line bisecting frame, subject on the upper half",
+  "subject aligned with a strong vertical — pole, column, doorframe — beside her",
+  "horizon line cutting exactly at subject's waist, equal sky and ground",
+  "strong horizontal band of light or shadow crossing at subject's eye line",
+  "symmetrical architecture flanking centered subject, bilateral balance",
+
+  // 反射・鏡
+  "subject and reflection both visible, mirror or water splitting frame horizontally",
+  "subject seen in reflection only, real-world space occupying main frame",
+  "partial reflection alongside direct view, two versions of same figure",
+  "puddle reflection below, subject above, frame split at ground level",
+
+  // 視線・方向
+  "subject facing away from camera entirely, back as primary visual element",
+  "subject in profile, facing frame edge, gaze directed out of shot",
+  "subject looking back over shoulder, body facing away, face toward lens",
+  "subject looking down, top of head and shoulders to camera",
+  "subject's gaze directed at something outside the frame bottom-left",
+
+  // 距離感
+  "extreme telephoto compression, subject and background fused in apparent distance",
+  "subject very close to lens, environment behind distorted by wide angle",
+  "long shot — subject small, recognizable by silhouette and posture only",
+  "medium shot with deliberate visual noise between camera and subject",
+];
+
+function rollComposition() {
+  // ~55% chance of a composition value, otherwise null
+  return Math.random() < 0.55 ? pick(COMPOSITION) : null;
+}
+
 // ==================== HAIR ====================
 const HAIRSTYLES = [
   "short cropped pixie cut","textured short wolf cut","blunt bob chin-length",
@@ -1835,6 +1927,7 @@ function reroll(key) {
   else if (key === 'light')        { lastVals.light = getTemporalLighting(lastVals.time || ""); }
   else if (key === 'hair')         { lastVals.hair = pick(HAIRSTYLES); }
   else if (key === 'makeup')       { lastVals.makeup = pick(MAKEUPS); }
+  else if (key === 'composition')  { lastVals.composition = pick(COMPOSITION); }
   else if (key === 'motionType') {
     const mt = pick(MOTION_TYPES);
     lastVals.motionType = mt.id; lastVals.motionLabel = mt.label;
@@ -2045,6 +2138,7 @@ function rebuildPromptAndDisplay() {
       bgStr ? null : "high-key studio lighting, soft shadow, professional fashion photography",
       bgStr ? null : "clean crisp image, hyper-detailed, 85mm lens",
       bgStr ? "bold pop art energy, graphic and vibrant backdrop" : null,
+      ...(v.composition ? [`composition: ${v.composition}`] : []),
       "kawaii fashion editorial, playful and stylish, full color"
     ];
   }
@@ -2077,6 +2171,7 @@ function rebuildPromptAndDisplay() {
       ...(bgStr
         ? ["high-key studio lighting, soft shadow, professional fashion photography", "clean crisp image, hyper-detailed, 85mm lens"]
         : [v.camera, v.styleScene, CAMERA_FIXED]),
+      ...(v.composition ? [`composition: ${v.composition}`] : []),
       ...(v.rare ? [v.rare] : []),
       ...(bgStr ? [] : (v.foregroundBlur ? [v.foregroundBlur] : [])),
       ...(bgStr ? [] : [filterTags, sceneNote]),
@@ -2102,6 +2197,7 @@ function rebuildPromptAndDisplay() {
       `color palette: ${v.mood_color}`,
       `accessories: ${v.accessory1 || "none"}${v.accessory2 ? ", " + v.accessory2 : ""}`,
       v.shoe, v.camera, v.styleScene, CAMERA_FIXED,
+      ...(v.composition ? [`composition: ${v.composition}`] : []),
       ...(v.rare ? [v.rare] : []),
       ...(v.foregroundBlur ? [v.foregroundBlur] : []),
       filterTags, sceneNote, albumTags, textOverlay,
@@ -2130,6 +2226,7 @@ function renderFields() {
       { label: "Camera",     value: v.camera || "—",       color: "#fed7aa", key: "camera" },
       { label: "Film Style", value: v.styleScene || "—",   color: "#fda4af", key: "styleScene" },
       ...(v.light ? [{ label: "Lighting", value: v.light, color: "#fcd34d", key: "light" }] : []),
+      { label: "Composition", value: v.composition || "— none —", color: v.composition ? "#a78bfa" : "#2a2535", key: "composition" },
       ...(v.rare  ? [{ label: "Rare ✦",  value: v.rare,  color: "#c084fc", key: "rare", rare: true }] : []),
       ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
     ];
@@ -2142,6 +2239,7 @@ function renderFields() {
           <div style="display:flex;gap:4px;align-items:center">
             <button class="lock-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${f.key}')">${locked ? '🔒' : '🔓'}</button>
             <button class="reroll-btn" onclick="rerollShared('${f.key}')">🔄</button>
+            ${f.key === 'composition' && f.value && f.value !== '—' ? `<button class="reroll-btn" onclick="clearField('${f.key}')" style="color:#ef4444">✖</button>` : ''}
           </div>
         </div>
       `;
@@ -2284,6 +2382,8 @@ function renderFields() {
       ...(v.light ? [{ label: "Lighting", value: v.light, color: "#fcd34d", key: "light" }] : []),
       { label: "Hair",   value: v.hair,   color: "#f9a8d4", key: "hair" },
       { label: "Makeup", value: v.makeup, color: "#fda4af", key: "makeup" },
+      ...(v.composition && !motionMode ? [{ label: "Composition", value: v.composition, color: "#a78bfa", key: "composition" }] : []),
+      ...(!v.composition && !motionMode ? [{ label: "Composition", value: "— none —", color: "#2a2535", key: "composition" }] : []),
       ...(v.rare          ? [{ label: "Rare ✦",    value: v.rare,          color: "#c084fc", key: "rare",          rare: true }] : []),
       ...(v.foregroundBlur ? [{ label: "Foreground", value: v.foregroundBlur, color: "#a5f3fc", key: "foregroundBlur" }] : []),
     ];
@@ -2299,7 +2399,7 @@ function renderFields() {
           <div style="display:flex;gap:4px;align-items:center">
             <button class="lock-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${f.key}')">${locked ? '🔒' : '🔓'}</button>
             <button class="reroll-btn" onclick="reroll('${f.key}')">🔄</button>
-            ${(f.key === 'gesture' || f.key === 'hair' || f.key === 'makeup') && f.value && f.value !== '— none —' ?
+            ${(f.key === 'gesture' || f.key === 'hair' || f.key === 'makeup' || f.key === 'composition') && f.value && f.value !== '— none —' ?
               `<button class="reroll-btn" onclick="clearField('${f.key}')" style="color:#ef4444">✖</button>` : ''}
           </div>
         </div>
@@ -2456,6 +2556,7 @@ function generateAll() {
     light: whiteStudioMode ? null : (preserved.light || getTemporalLighting(resolvedTime)),
     hair:   preserved.hair   !== undefined ? preserved.hair   : pick(HAIRSTYLES),
     makeup: preserved.makeup !== undefined ? preserved.makeup : pick(MAKEUPS),
+    composition: preserved.composition !== undefined ? preserved.composition : (motionMode ? null : rollComposition()),
     // Bg system
     bgType:    resolvedBgType,
     customBg:  resolvedCustomBg,
